@@ -263,13 +263,11 @@ a:hover {
 </div>
 
 <script>
-// צילום תמונה מרחוק
-const imageUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&fit=crop';
+// צילום תמונה
 const photoImg = document.querySelector('.photo');
-photoImg.src = imageUrl;
-photoImg.onerror = () => {
-  photoImg.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-};
+photoImg.src = 'author.png';
+photoImg.style.width = '100%';
+photoImg.style.height = 'auto';
 
 // תאריך
 const today = new Date();
