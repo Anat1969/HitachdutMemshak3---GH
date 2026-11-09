@@ -39,7 +39,7 @@ th{font-size:12px;color:var(--g3);font-weight:500}
 td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .src{font-size:11.5px;color:var(--g3)}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:4px;vertical-align:middle}
-.g{background:var(--gr)}.y{background:var(--ye)}.r{background:var(--rd)}
+.g{background:var(--gr)}.y{background:var(--ye)}.r{background:var(--rd)}.n{background:#bbb}
 .score{font-size:30px;font-weight:700;margin:4px 0}
 section.fit{padding:24px 40px;border-bottom:1px solid var(--g2)}
 .fitgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
@@ -120,6 +120,7 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
   <h2>בדיקת התאמה: תב"ע ועירייה מול יזם</h2>
   <div class="label">יעד יח"ד של היזם (דמו, שדה קלט)</div>
   <input type="number" id="target" value="32" min="0" aria-label="יעד יח&quot;ד של היזם" style="max-width:200px">
+  <p class="note">נתוני הרווחיות דמו בלבד. מודל הכדאיות בתיק הריפו (docs/feasibility_model_tba603.xlsx) ריק, ולכן אין בו ערכים מאומתים.</p>
   <div class="fitgrid" id="fit"></div>
 </section>
 
@@ -133,7 +134,7 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
     <p><b>נבין:</b> האם הטבלה מציגה שטח כולל או פיצול? מה קורה כשהתכנית ישנה יותר מ-1992?</p>
   </details>
   <details><summary><span class="step">2</span>שטח מגרש, תכסית וקווי בניין</summary>
-    <p>שטח המגרש נלקח מטבלת הזכויות ומתאם לשכבת המגרש. סטייה של עד 0.5% בין השייפ לטבלה נחשבת תקינה. תכסית וקווי בניין מגיעים מההוראות, לא מהתשריט בלבד.</p>
+    <p>שטח המגרש נלקח מטבלת הזכויות ומתאם לשכבת המגרש. סטייה של עד 0.5% בין השייפ לטבלה נחשבת תקינה. תכסית וקווי בניין מגיעים מההוראות, לא מהתשריט בלבד. קו בניין קדמי, צדדי ואחורי נבדקים בנפרד.</p>
   </details>
   <details><summary><span class="step">3</span>קומות, גובה וזכויות מתחת לקרקע</summary>
     <p>מספר קומות מעל ומתחת לקרקע מופיע בהוראות. גובה מרבי נמדד לפי ההגדרה שבתכנית, לא לפי הנחה כללית.</p>
@@ -171,10 +172,10 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">שלב 3: בדיקת התאמה</h2>
   <details open><summary><span class="step">1</span>צד תב"ע ועירייה</summary>
-    <p>כל פרמטר מהשלב הראשון נבדק מול החלופה. <b>ירוק:</b> עומד בתנאי עם מרווח של לפחות 5%. <b>צהוב:</b> עומד בתנאי, אך במרווח קטן מ-5%. <b>אדום:</b> חורג.</p>
+    <p>כל פרמטר מהשלב הראשון נבדק מול החלופה. <b>ירוק:</b> עומד בתנאי עם מרווח של לפחות 5%. <b>צהוב:</b> עומד בתנאי, אך במרווח קטן מ-5%. <b>אדום:</b> חורג. בקווי בניין, חריגה מסומנת באדום עם המרחק המדויק. מרווח קטן מ-1 מ' בתוך אזור הבנייה מסומן בצהוב כאזהרה לצורך בגמישות.</p>
   </details>
   <details><summary><span class="step">2</span>צד יזם</summary>
-    <p>שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%), מספר יח"ד מול יעד היזם, שטח יח"ד ממוצע, וניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום.</p>
+    <p>שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%), מספר יח"ד מול יעד היזם, שטח יח"ד ממוצע, וניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום. <b>רווחיות:</b> רווחי (ירוק), בסדר (צהוב), לא רווחי (אדום), לפי NPV ורווח על עלות מול יעד היזם.</p>
   </details>
   <details><summary><span class="step">3</span>אחוזי התאמה</summary>
     <p>ירוק = 1, צהוב = 0.5, אדום = 0. הממוצע על כל הבדיקות כפול 100. המספר מסייע להשוואה, אבל לא מחליף את הפירוט.</p>
@@ -200,8 +201,11 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 </section>
 
 <script>
-const R={plot:2000,cov:35,bp:250,floors:8,h:28,units:40,fl:3.2,sell:0.8,avg:90,target:32};
-const ALTS={"א":{fp:650,fl:6},"ב":{fp:600,fl:8},"ג":{fp:700,fl:7}};
+const R={plot:2000,cov:35,bp:250,floors:8,below:1,h:28,units:40,dens:20,front:5,side:4,rear:4,uses:"מגורים",fl:3.2,sell:0.8,avg:90,target:32,
+  pMain:50000,cons:12000,plan:0.05,cont:0.05,mkt:0.03,fees:5000000,land:80000000,rate:0.06,build:30,delay:0,sale:12,disc:0.10,tgtProfit:30};
+const SB_WARN=1;
+const ALTS={"א":{fp:650,fl:6,below:0,purpose:"מגורים"},"ב":{fp:600,fl:8,below:0,purpose:"מגורים"},"ג":{fp:700,fl:7,below:0,purpose:"מגורים"}};
+const GN={g:"רווחי",y:"בסדר",r:"לא רווחי"};
 let cur="א", mode="iso";
 
 const PROMPTS={
@@ -235,12 +239,13 @@ p2e:`Build a 3D massing model from the rights extracted in stage 1 only. Inputs:
 6. Place all numbers in collapsible panels so the screen stays uncluttered.`,
 p3h:`בחן כל חלופה לאורך שני צירים.
 ציר תב"ע ועירייה: כל פרמטר מהשלב הראשון מול החלופה. ירוק: עומד בתנאי עם מרווח של לפחות 5%. צהוב: עומד בתנאי עם מרווח קטן מ-5%. אדום: חורג.
-ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום.
+קווי בניין: בדוק שהחלופה נכנסת לאזור הבנייה, שהוא המגרש פחות קווי הבניין. חריגה מסומנת באדום עם המרחק המדויק. מרווח קטן מ-1 מ' בתוך האזור מסומן בצהוב כאזהרה לצורך בגמישות. קומות מתחת לקרקע, צפיפות ושימוש מותר נבדקים מול הערכים מהשלב הראשון.
+ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום. רווחיות היזם: רווחי (ירוק) כש-NPV אינו שלילי ורווח על עלות מגיע ליעד היזם; בסדר (צהוב) כש-NPV אינו שלילי ורווח על עלות מתחת ליעד; לא רווחי (אדום) כש-NPV שלילי או כשהרווח שלילי. NPV מחושב לפי מודל כדאיות עם שיעור ההיוון ומועדי התזרים שהוגדרו בו.
 חשב אחוזי התאמה: ירוק = 1, צהוב = 0.5, אדום = 0, ממוצע על כל הבדיקות כפול 100.
 לכל חלופה: טבלה, אחוזי התאמה, יתרון אחד, חיסרון אחד, ומה לבדוק מול הרשות. אם נתון מהשלב הראשון חסר, זקק את הפער וסמן אותו, ואל תשלים אותו.`,
 p3e:`Examine each alternative on two axes.
-Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit.
-Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%.
+Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit. Setbacks: check that the alternative fits within the permitted building zone (plot minus setbacks). Exceedance is red, with the exact distance. A margin under 1 m inside the zone is yellow, as a warning that flexibility is needed. Underground floors, density and permitted use are checked against the stage 1 values.
+Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%. Profitability: profitable (green) when NPV is not negative and profit on cost reaches the developer target; fine (yellow) when NPV is not negative and profit on cost is below target; not profitable (red) when NPV is negative or profit is negative. NPV follows the feasibility model: discount rate and cash-flow timing as defined there.
 Fit score: green = 1, yellow = 0.5, red = 0, averaged over all checks, times 100.
 For each alternative show the table, the score, one advantage, one disadvantage, and what to verify with the planning authority. Distill the gap if a stage 1 value is missing, and do not fill it in.`,
 p4h:`סנתז דוח השוואה בין החלופות. מבנה הדוח:
@@ -253,39 +258,63 @@ p4h:`סנתז דוח השוואה בין החלופות. מבנה הדוח:
 p4e:`Synthesize a comparison report for the alternatives. Structure: 1. Conclusion: the recommended alternative in three sentences. 2. Comparison table: parameter, A, B, C, status. 3. Advantages and disadvantages per alternative. 4. Recommendation and the assumptions behind it; expose every assumption not taken from a document. 5. Source for every number. Write plainly, with no preamble. Do not present a conclusion without naming the data it rests on.`
 };
 
+function geo(a){
+  const P=Math.sqrt(R.plot), w=Math.sqrt(a.fp*1.4), d=a.fp/w;
+  const zW=P-2*R.side, zD=P-R.front-R.rear;
+  return {w,d,mx:(zW-w)/2,my:(zD-d)/2};
+}
 function calc(a){
   const gross=a.fp*a.fl, cov=a.fp/R.plot*100, bp=gross/R.plot*100;
   const h=a.fl*R.fl, units=Math.floor(gross*R.sell/R.avg), use=bp/R.bp*100;
-  return {fp:a.fp,fl:a.fl,gross,cov,bp,h,units,use};
+  const dens=units/(R.plot/1000), g=geo(a);
+  const rev=gross*R.pMain, mkt=rev*R.mkt, cons=gross*R.cons, pl=cons*R.plan, co=cons*R.cont;
+  const fin=(R.land+R.fees+cons+pl+co)*R.rate*(R.build/24+R.delay/12);
+  const cost=R.land+R.fees+cons+pl+co+mkt+fin, profit=rev-cost;
+  const tB=R.build/12/2, tS=(R.build+R.delay+R.sale/2)/12;
+  const npv=(rev-mkt)/Math.pow(1+R.disc,tS)-(R.land+(R.fees+cons+pl+co)/Math.pow(1+R.disc,tB));
+  return {fp:a.fp,fl:a.fl,gross,cov,bp,h,units,use,dens,below:a.below,purpose:a.purpose,g,rev,cost,profit,pct:profit/cost*100,npv};
 }
+const profitGrade=c=>(c.npv<0||c.profit<0)?"r":(c.pct>=R.tgtProfit?"g":"y");
 const stMax=(v,m)=>v>m?"r":(v>m*0.95?"y":"g");
 const stMin=(v,m)=>v<m?"r":(v<m*1.05?"y":"g");
 const stUse=v=>v>90?"g":(v>=75?"y":"r");
 const fmt=(n,d=1)=>Number(n).toLocaleString("he-IL",{maximumFractionDigits:d});
 
 function checks(c){
+  const sb=Math.min(c.g.mx,c.g.my), pg=profitGrade(c);
   return [
     ["תכסית מרבית ("+R.cov+"%)", fmt(c.cov)+"%", stMax(c.cov,R.cov)],
     ["אחוזי בנייה מרביים ("+R.bp+"%)", fmt(c.bp,0)+"%", stMax(c.bp,R.bp)],
-    ["מספר קומות ("+R.floors+")", c.fl, stMax(c.fl,R.floors)],
+    ["מספר קומות מעל ("+R.floors+")", c.fl, stMax(c.fl,R.floors)],
+    ["קומות מתחת לקרקע ("+R.below+")", c.below, stMax(c.below,R.below)],
     ["גובה מרבי ("+R.h+" מ')", fmt(c.h)+" מ'", stMax(c.h,R.h)],
     ["יח\"ד מול תקרה ("+R.units+")", c.units, stMax(c.units,R.units)],
+    ["צפיפות ("+R.dens+" יח\"ד לדונם)", fmt(c.dens), stMax(c.dens,R.dens)],
+    ["שימוש מותר ("+R.uses+")", c.purpose, c.purpose===R.uses?"g":"r"],
+    ["קווי בניין ("+R.front+" / "+R.side+" / "+R.rear+" מ')", sb<0?"חריגה "+fmt(-sb)+" מ'":"מרווח "+fmt(sb)+" מ'", sb<0?"r":(sb<SB_WARN?"y":"g")],
     ["יח\"ד מול יעד יזם ("+R.target+")", c.units, stMin(c.units,R.target)],
-    ["ניצול זכויות יזם", fmt(c.use,0)+"%", stUse(c.use)]
+    ["ניצול זכויות יזם", fmt(c.use,0)+"%", stUse(c.use)],
+    ["רווחיות יזם ("+fmt(c.pct)+"%)", GN[pg], pg]
   ];
 }
 const score=ch=>Math.round(ch.reduce((s,x)=>s+(x[2]==="g"?1:x[2]==="y"?0.5:0),0)/ch.length*100);
 
 function renderRights(){
+  const D="דמו: טרם חולץ ממסמך";
   const rows=[
-    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", "דמו: טרם חולץ ממסמך", "g"],
-    ["תכסית מרבית", R.cov+"%", "דמו: טרם חולץ ממסמך", "g"],
-    ["אחוזי בנייה", R.bp+"%", "דמו: טרם חולץ ממסמך", "g"],
-    ["קומות מרבי", R.floors, "דמו: טרם חולץ ממסמך", "g"],
-    ["גובה מרבי", R.h+" מ'", "דמו: טרם חולץ ממסמך", "g"],
-    ["קו בניין קדמי / צדדי", "5 / 4 מ'", "דמו: טרם חולץ ממסמך", "y"],
-    ["יח\"ד מרבי", R.units, "דמו: טרם חולץ ממסמך", "g"],
-    ["חניה", "לא נמצא", "דמו: טרם חולץ ממסמך", "r"]
+    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", D, "n"],
+    ["תכסית מרבית", R.cov+"%", D, "n"],
+    ["אחוזי בנייה", R.bp+"%", D, "n"],
+    ["קומות מעל לקרקע", R.floors, D, "n"],
+    ["קומות מתחת לקרקע", R.below, D, "n"],
+    ["גובה מרבי", R.h+" מ'", D, "n"],
+    ["קו בניין קדמי", R.front+" מ'", D, "n"],
+    ["קו בניין צדדי", R.side+" מ'", D, "n"],
+    ["קו בניין אחורי", R.rear+" מ'", D, "n"],
+    ["יח\"ד מרבי", R.units, D, "n"],
+    ["צפיפות מרבית", R.dens+" יח\"ד לדונם", D, "n"],
+    ["שימושים מותרים", R.uses, D, "n"],
+    ["חניה", "לא נמצא", "לא נמצא: לבדוק בהוראות התכנית", "n"]
   ];
   document.getElementById("rights").innerHTML=rows.map(r=>
     `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td><span class="dot ${r[3]}"></span></td></tr>
@@ -322,7 +351,7 @@ function renderFit(){
 function renderView(){
   const k=ALTS[cur], c=calc(k), P=Math.sqrt(R.plot);
   const w=Math.sqrt(k.fp*1.4), d=k.fp/w, H=c.h;
-  const ox=(P-w)/2, oy=(P-d)/2, sf=5, ss=4, sr=4;
+  const sf=R.front, ss=R.side, sr=R.rear, ox=ss+((P-2*ss)-w)/2, oy=sr+((P-sf-sr)-d)/2;
   let svg="";
   if(mode==="iso"){
     const cs=Math.cos(Math.PI/6), sn=Math.sin(Math.PI/6), s=5;
