@@ -7,8 +7,8 @@
   <title>קורס בינה מלאכותית לאדריכלים</title>
 
   <!-- Design System & Components -->
-  <link rel="stylesheet" href="../src/design-system.css">
-  <link rel="stylesheet" href="../src/components.css">
+  <link rel="stylesheet" href="./design-system.css">
+  <link rel="stylesheet" href="./components.css">
 
   <style>
     /* Inline critical styles for faster paint */
@@ -39,13 +39,13 @@
 
 <!-- Import data and logic as modules -->
 <script type="module">
-  import { lessons } from '../src/data.js';
+  import { lessons } from './data.js';
 
   // Expose lessons globally for debugging
   window.lessons = lessons;
 
   // Dynamic import of index.js
-  import('../src/index.js');
+  import('./index.js');
 </script>
 
 </body>
