@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קורס בינה מלאכותית לאדריכלים</title>
+<style>
+:root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e}
+*{box-sizing:border-box}
+html{direction:rtl}
+body{margin:0;font-family:system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.7;font-size:15px}
+header{padding:48px 64px 28px;border-bottom:1px solid var(--g2)}
+.kicker{color:var(--g3);font-size:13px}
+h1{font-size:28px;margin:8px 0 10px;font-weight:700;line-height:1.3}
+.lead{margin:0 0 28px;color:var(--g3);max-width:820px}
+main{padding:24px 64px 80px;max-width:1000px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:28px}
+.card{border:1px solid var(--g2);padding:24px;background:#fff;text-decoration:none;color:var(--ink);transition:all 0.2s}
+.card:hover{border-color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.card-num{font-size:32px;font-weight:700;color:var(--g3);margin-bottom:8px}
+.card-title{font-size:18px;font-weight:700;margin:0 0 10px}
+.card-desc{font-size:14px;color:var(--g3);margin:0;line-height:1.6}
+.card-link{display:inline-block;margin-top:12px;padding:6px 0;color:var(--ink);font-weight:600;border-bottom:2px solid var(--ink)}
+.meta{color:var(--g3);font-size:13px;margin-top:4px}
+section{padding:36px 0;border-bottom:1px solid var(--g2)}
+h2{font-size:21px;margin:0 0 6px;font-weight:700}
+.sub{color:var(--g3);font-size:14px;margin:0 0 14px}
+ul.plain{padding-right:20px;margin:6px 0}
+ul.plain li{margin:8px 0}
+footer{padding:24px 64px;color:var(--g3);font-size:13px;border-top:1px solid var(--g2)}
+@media (max-width:860px){header,main,footer{padding-left:20px;padding-right:20px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">קורס בינה מלאכותית לאדריכלים</div>
+  <h1>כל מה שצריך לבנות אפליקציה מקצה לקצה עם Claude Code</h1>
+  <p class="lead">שלוש דפים: מה הכללים, איך עובדים בכלים, ואיך מסדרים בעיות כשהן גדולות או מבולבלות.</p>
+</header>
+
+<main>
+
+<section>
+  <h2>הדפים</h2>
+  <div class="grid2">
+    <a href="ai-course-general-guide.html" class="card">
+      <div class="card-num">1</div>
+      <h3 class="card-title">עבודה יעילה עם Claude Code</h3>
+      <p class="card-desc">עקרונות, כלים, סדר עבודה, וקובץ הכללים שמחזיק את הקוד והנתונים בסדר.</p>
+      <div class="card-link">קרא</div>
+      <div class="meta">תובנות, תהליך, כלים, קבצים, טיפים</div>
+    </a>
+
+    <a href="order-in-chaos.html" class="card">
+      <div class="card-num">2</div>
+      <h3 class="card-title">סדר בבאלגן</h3>
+      <p class="card-desc">כשהמטלה גדולה מדי, הנתונים מפוזרים, או שיש הרבה חלופות. איך מתחילים לארגן.</p>
+      <div class="card-link">קרא</div>
+      <div class="meta">פתרת חוט אחד, ניהול חלופות, רישום ממצאים</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>איך להשתמש בדפים האלה</h2>
+  <ul class="plain">
+    <li><b>דף 1 (עבודה יעילה):</b> קראו בתחילת הקורס. כאן אתם מגדירים את הכללים של הפרויקט ואת התהליך שלכם.</li>
+    <li><b>דף 2 (סדר בבאלגן):</b> קראו כשהתחלתם בנייה וגילו שהנתונים מפוזרים או שצריך בדיקה של הרבה גרסאות.</li>
+    <li><b>דף 3 (קרא בקרוב):</b> איך בודקים וממשיכים לשלב הבא.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>מה כל דף עוסק בו</h2>
+  <h3>דף 1: עבודה יעילה עם Claude Code</h3>
+  <ul class="plain">
+    <li><b>תובנות:</b> חמישה עקרונות שמשנים את איכות התוצר: אפיון לפני קוד, בדיקה לפני הבא, קובץ הכללים, קטן וברור, לא מדמיינים קבצים.</li>
+    <li><b>תהליך מקצה לקצה:</b> תשעה שלבים מהגדרת הבעיה ועד מסירה.</li>
+    <li><b>כלים ותפקידם:</b> היכן משתמשים בצ'אט, Cowork, Claude Code, GitHub, Vercel ו-Supabase.</li>
+    <li><b>סוגי קבצים:</b> מה כל קובץ עושה ואיפה הוא חי.</li>
+    <li><b>קובץ הכללים (CLAUDE.md):</b> תבנית להעתקה.</li>
+    <li><b>טיפים:</b> שמונה טיפים לעבודה יעילה.</li>
+    <li><b>אבטחה:</b> מה לא עושים.</li>
+    <li><b>תבניות:</b> אפיון, משימה, פרומפטים.</li>
+  </ul>
+
+  <h3>דף 2: סדר בבאלגן</h3>
+  <ul class="plain">
+    <li><b>למה הכאוס קורה:</b> שלוש סיבות עיקריות וכיצד לזהות את המשלך.</li>
+    <li><b>פתרת חוט אחד בכל פעם:</b> עקרון עבודה בשלוש רמות.</li>
+    <li><b>ניהול חלופות:</b> טבלה ודרך לרישום גרסאות.</li>
+    <li><b>רישום ממצאים:</b> איך תעדים תוצאות כדי שאחרים יוכלו להבין.</li>
+    <li><b>דיווח תוצאות:</b> שלוש דרכים לפי הקהל.</li>
+    <li><b>רשימת בדיקה:</b> שש שאלות לפני ההמשך לשלב הבא.</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>דפים אלה נכתבו עבור סטודנטים בקורס. הם משתדרגים עם כל גרסה של Claude Code וכלים נלווים.</p>
+</footer>
+
+</body>
+</html>

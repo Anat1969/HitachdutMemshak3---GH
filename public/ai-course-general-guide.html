@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קורס בינה מלאכותית לאדריכלים · מידע כללי, תובנות וטיפים</title>
+<style>
+:root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e}
+*{box-sizing:border-box}
+html{direction:rtl}
+body{margin:0;font-family:system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.7;font-size:15px}
+header{padding:48px 64px 28px;border-bottom:1px solid var(--g2)}
+.kicker{color:var(--g3);font-size:13px}
+h1{font-size:28px;margin:8px 0 10px;font-weight:700;line-height:1.3}
+.lead{margin:0;color:var(--g3);max-width:820px}
+nav.toc{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+nav.toc a{border:1px solid var(--ink);padding:6px 14px;color:var(--ink);text-decoration:none;font-size:14px}
+nav.toc a:hover{background:var(--ink);color:#fff}
+main{padding:24px 64px 80px;max-width:1000px}
+section{padding:36px 0;border-bottom:1px solid var(--g2)}
+h2{font-size:21px;margin:0 0 6px;font-weight:700}
+h3{font-size:16px;margin:24px 0 6px;font-weight:700}
+p{margin:8px 0;max-width:860px}
+.sub{color:var(--g3);font-size:14px;margin:0 0 14px}
+.note{font-size:13px;color:var(--g3)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th,td{text-align:right;padding:8px;border-bottom:1px solid var(--g1);vertical-align:top}
+th{font-size:12px;color:var(--g3);font-weight:500}
+ul.plain{padding-right:20px;margin:6px 0}
+ul.plain li{margin:4px 0}
+.steps{counter-reset:s;border-top:1px solid var(--ink)}
+.steps>div{padding:12px 0 12px 0;border-bottom:1px solid var(--g2);display:grid;grid-template-columns:44px 1fr;gap:6px}
+.steps>div:before{counter-increment:s;content:counter(s);font-size:20px;color:var(--g3)}
+.steps b{display:block}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink)}
+.grid3>div{padding:14px 16px;border-left:1px solid var(--g2)}
+.grid3>div:last-child{border-left:none}
+.grid3 b{display:block;margin-bottom:4px}
+.warn{border-right:3px solid var(--ye);background:#fbf7e9;padding:10px 14px;margin:12px 0;max-width:860px;font-size:14px}
+.block{margin:14px 0;border:1px solid var(--g2);padding:12px 16px;max-width:900px}
+.block>.lbl{font-size:12px;color:var(--g3);margin-bottom:4px}
+.btn{background:var(--ink);color:#fff;border:none;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px}
+.toast{font-size:12px;color:var(--gr);margin-right:8px}
+.toggle{cursor:pointer;display:inline-block;border:1px solid var(--ink);padding:7px 14px;font-size:14px;list-style:none;font-weight:600}
+.toggle::-webkit-details-marker{display:none}
+.toggle:before{content:"+ ";color:var(--g3)}
+details[open]>.toggle:before{content:"- "}
+details[open]>.toggle{background:var(--ink);color:#fff}
+details.pr{margin-top:10px}
+details.pr .body{margin-top:10px}
+pre{background:var(--g1);padding:14px 16px;white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px;line-height:1.75;margin:10px 0 0;border-right:3px solid var(--ink)}
+pre.ltr{direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:13px}
+code{font-family:Consolas,monospace;font-size:13px;direction:ltr;unicode-bidi:embed}
+@media (max-width:860px){header,main{padding-left:20px;padding-right:20px}.grid3{grid-template-columns:1fr}.grid3>div{border-left:none;border-bottom:1px solid var(--g2)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">קורס בינה מלאכותית לאדריכלים · מידע כללי, תובנות וטיפים</div>
+  <h1>עבודה יעילה עם Claude Code: אפיון קצר, בדיקה לפני כל צעד, וקובץ אחד שמחזיק את הכללים</h1>
+  <p class="lead">הדף מרכז את כל מה שצריך כדי לבנות אפליקציה מקצה לקצה: סדר העבודה, תפקיד כל כלי, סוגי הקבצים, כללי הבטיחות, ותבניות להעתקה. הוא לא מחליף את מפגש א ומפגש ב, שמופיעים בדפים נפרדים.</p>
+  <nav class="toc">
+    <a href="#principles">תובנות</a>
+    <a href="#flow">תהליך מקצה לקצה</a>
+    <a href="#tools">כלים ותפקידם</a>
+    <a href="#files">סוגי קבצים</a>
+    <a href="#claudemd">קובץ הכללים</a>
+    <a href="#tips">טיפים לעבודה יעילה</a>
+    <a href="#safety">אבטחה</a>
+    <a href="#templates">תבניות להעתקה</a>
+    <a href="#open">מה לאמת</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="principles">
+  <h2>תובנות</h2>
+  <p class="sub">חמישה עקרונות שמשנים את איכות התוצר, יותר מכל כלי.</p>
+  <div class="grid3">
+    <div><b>אפיון לפני קוד</b>שלוש שורות על הבעיה, המשתמש, והתוצר הרצוי. בלי אפיון, הקוד מתחיל לנחש.</div>
+    <div><b>בדיקה לפני הבא</b>כל צעד נבדק לפני שממשיכים. בדיקה שנדחית לסוף מכפילה את התיקונים.</div>
+    <div><b>קובץ הכללים כחוזה</b>כל מה שחוזר פעם שנייה נכנס לקובץ הכללים של הפרויקט, ולא נאמר שוב בצ'אט.</div>
+  </div>
+  <div class="grid3">
+    <div><b>קטן וברור</b>משימה אחת בכל פעם, עם תוצאה שאפשר לבדוק. משימה גדולה מקבלת תוצאה מטושטשת.</div>
+    <div><b>לא מדמיינים קבצים</b>אם לא בטוחים במה שיש בקובץ, פותחים אותו. ניחוש על קוד או נתונים יוצר באגים שאי אפשר לאתר.</div>
+    <div><b>כל כלי לתפקיד שלו</b>ייעוץ וניסוח בצ'אט, עבודה מתמשכת על מסמכים בקוורק, בנייה ופריסה בקלוד קוד.</div>
+  </div>
+</section>
+
+<section id="flow">
+  <h2>תהליך מקצה לקצה</h2>
+  <p class="sub">הסדר שבו נבנית אפליקציה לכל משתמש. כל שלב נגמר בתוצאה שאפשר לבדוק.</p>
+  <div class="steps">
+    <div><div><b>הגדרת הבעיה</b>במשפט אחד: מי משתמש, במה, ומה התוצר. אם אי אפשר לנסח, הבעיה עוד לא מוגדרת.</div></div>
+    <div><div><b>אפיון</b>קובץ SPEC.md קצר: מטרה, משתמשים, מסכים, נתונים, מה לא נבנה. מאושר לפני קוד.</div></div>
+    <div><div><b>מבנה נתונים</b>טבלאות וקשרים ב-Supabase, עם Row Level Security מופעל מההתחלה. מיגרציות נשמרות כקבצים, לא כשינוי ידני.</div></div>
+    <div><div><b>בנייה בשלבים</b>קודם הלוגיקה והנתונים, אחר כך הממשק. כל שלב נבדק לפני שממשיכים.</div></div>
+    <div><div><b>בדיקה</b>בדיקות אוטומטיות על הלוגיקה, ובדיקה ידנית של כל כפתור ומסך. בדיקה ירוקה היא תנאי למיזוג.</div></div>
+    <div><div><b>מיזוג ל-main</b>רק אחרי בדיקה ירוקה. הודעת commit ברורה, ו-Pull Request עם תיאור של מה השתנה.</div></div>
+    <div><div><b>פריסה ב-Vercel</b>מיד אחרי המיזוג. בודקים את הכתובת הסופית, לא רק את התצוגה המקדימה.</div></div>
+    <div><div><b>תיעוד</b>האפליקציה נרשמת באפליקציית האפליקציות, עם כתובת GitHub וכתובת Vercel. תוצר עיצובי נשמר גם בקנבה.</div></div>
+    <div><div><b>מסירה</b>כתובת סופית ושורה אחת שמסבירה מה נבנה. בלי סיכום של כל הצעדים.</div></div>
+  </div>
+  <div class="warn">הכללים האלה מופיעים בקובץ anat-standards, שנטען בתחילת כל שיחה של בנייה. סטודנטים שאין להם את הסקיל צריכים להעתיק את הכללים לקובץ CLAUDE.md של הפרויקט שלהם (ראו סעיף קובץ הכללים).</div>
+</section>
+
+<section id="tools">
+  <h2>כלים ותפקידם</h2>
+  <p class="sub">כל כלי עושה דבר אחד טוב. בחירה לא נכונה של כלי היא מקור נפוץ לבזבוז זמן.</p>
+  <table>
+    <thead><tr><th>כלי</th><th>למה משתמשים בו</th><th>מה לא עושים בו</th></tr></thead>
+    <tbody>
+      <tr><td>צ'אט של Claude</td><td>חשיבה, אפיון, ניסוח פרומפטים, חקירה, שאלות על מושגים.</td><td>בנייה מתמשכת של קוד או פריסה.</td></tr>
+      <tr><td>Cowork</td><td>עבודה מתמשכת על מסמכים ומקורות לאורך זמן.</td><td>בנייה ופריסה של אפליקציה.</td></tr>
+      <tr><td>Claude Code</td><td>בנייה, תיקון, בדיקות, מיזוג, פריסה ואוטומציה בתוך מאגר הקוד.</td><td>החלטה על מה לבנות. זה נעשה לפני.</td></tr>
+      <tr><td>GitHub (gh)</td><td>מאגר הקוד, ענפים, Pull Requests, היסטוריית שינויים.</td><td>שמירת מפתחות סודיים. ראו סעיף אבטחה.</td></tr>
+      <tr><td>Vercel</td><td>פריסה של האפליקציה, תצוגה מקדימה לכל ענף, כתובת ציבורית.</td><td>אחסון נתונים. הנתונים נשמרים ב-Supabase.</td></tr>
+      <tr><td>Supabase</td><td>בסיס נתונים, אימות משתמשים, אחסון קבצים. עם Row Level Security.</td><td>לוגיקת ממשק.</td></tr>
+      <tr><td>Lovable</td><td>אב טיפוס מהיר של אפליקציה מלאה, לפי פרומפטים חדים.</td><td>מערכות שדורשות שליטה מלאה בקוד ובתשתית. שם עובדים עם Claude Code.</td></tr>
+      <tr><td>Canva</td><td>תוצרים עיצוביים שנשמרים כקובץ הניתן לעריכה: פלייר, פוסט, מצגת קצרה.</td><td>לוגיקה או נתונים.</td></tr>
+    </tbody>
+  </table>
+  <h3>איך לבחור</h3>
+  <ul class="plain">
+    <li>שאלה או החלטה: צ'אט.</li>
+    <li>מסמך שחוזר לאורך זמן: קוורק.</li>
+    <li>אפליקציה שתיבנה, תיבדק ותפרס: Claude Code, עם GitHub, Vercel ו-Supabase.</li>
+    <li>אב טיפוס מהיר שיבדקו לפני בנייה אמיתית: Lovable.</li>
+    <li>תוצר שמודפס או מופץ: Canva, עם שמירה גם בקנבה.</li>
+  </ul>
+</section>
+
+<section id="files">
+  <h2>סוגי קבצים</h2>
+  <p class="sub">כל סוג קובץ מתפקד אחרת. ערבוב ביניהם הוא מקור לבעיות.</p>
+  <table>
+    <thead><tr><th>קובץ</th><th>תפקיד</th><th>איפה</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE.md</code></td><td>הכללים של הפרויקט: מה נבנה, באיזה כלים, מה אסור. נקרא אוטומטית בתחילת עבודה.</td><td>בשורש המאגר</td></tr>
+      <tr><td><code>SPEC.md</code></td><td>האפיון: מטרה, משתמשים, מסכים, נתונים, מה לא נבנה.</td><td>בתיקיית <code>docs</code></td></tr>
+      <tr><td><code>SKILL.md</code></td><td>הוראות לעבודה חוזרת על סוג תוצר מסוים. נטען לפי הצורך.</td><td>בתיקיית הסקיל</td></tr>
+      <tr><td><code>README.md</code></td><td>מה האפליקציה עושה ואיך מריצים אותה. לאדם, לא למודל.</td><td>בשורש המאגר</td></tr>
+      <tr><td><code>.env</code></td><td>מפתחות סודיים. לעולם לא נכנס ל-Git.</td><td>מקומי בלבד, ב-<code>.gitignore</code></td></tr>
+      <tr><td><code>.sql</code> (מיגרציות)</td><td>שינויים במבנה הנתונים, בסדר קבוע ובהיסטוריה.</td><td>בתיקיית <code>supabase/migrations</code></td></tr>
+      <tr><td><code>.html</code></td><td>דף בודד שרץ בדפדפן, בלי שרת. מתאים לכלי הדגמה.</td><td>בשורש או בתיקיית <code>public</code></td></tr>
+      <tr><td><code>.json</code></td><td>נתונים מובנים, קלט ופלט בין שלבים.</td><td>בתיקיית <code>data</code></td></tr>
+      <tr><td><code>.csv</code> / <code>.xlsx</code></td><td>טבלאות לקליטה והוצאה. CSV קל לקריאה על ידי כלים.</td><td>בתיקיית <code>data</code></td></tr>
+      <tr><td><code>.shp</code>, <code>.dxf</code>, <code>.dwg</code>, <code>.kml</code></td><td>קבצי GIS ו-CAD של תכנון עירוני. נקראים בכלי ייעודי, לא כטקסט.</td><td>בתיקיית <code>data/gis</code></td></tr>
+      <tr><td><code>.pdf</code> / <code>.docx</code></td><td>מסמכים רשמיים. קודם ממירים ל-Markdown או טקסט, ואז עובדים עליהם.</td><td>בתיקיית <code>docs/source</code></td></tr>
+    </tbody>
+  </table>
+  <div class="warn">קבצים בינאריים כמו DWG לא נקראים כטקסט. אם אין ממיר זמין, רושמים את זה במפורש ולא מניחים מה יש בתוכם.</div>
+</section>
+
+<section id="claudemd">
+  <h2>קובץ הכללים (CLAUDE.md)</h2>
+  <p class="sub">הקובץ שמחליף הסברים חוזרים בכל שיחה. תבנית להעתקה, שממלאים לפי הפרויקט.</p>
+  <div class="block">
+    <div class="lbl">תבנית CLAUDE.md</div>
+    <details class="pr"><summary class="toggle">פתיחה וסגירה: התבנית בעברית</summary>
+      <div class="body">
+        <button class="btn" onclick="copyText('claudemd',this)">העתק תבנית</button><span class="toast"></span>
+        <pre id="claudemd"># שם הפרויקט
+
+## מטרה
+[משפט אחד: מי משתמש, במה, ומה התוצר]
+
+## כללי עבודה
+- קודם אפיון ב-docs/SPEC.md, ואחר כך קוד. לא מתחילים לבנות לפני אישור האפיון.
+- לא מניחים תוכן של קובץ. פותחים אותו לפני שמשנים אותו.
+- משימה אחת בכל פעם. אחרי כל משימה: הרצת בדיקות ודיווח של התוצאה.
+- לא עוצרים לשאלות שאפשר להכריע לבד. מסמנים את ההחלטה ומנמקים בשורה אחת.
+
+## מחסנית טכנולוגית
+- ממשק: [למשל React ו-Tailwind]
+- נתונים: Supabase עם Row Level Security מופעל בכל טבלה
+- פריסה: Vercel, מיזוג ל-main רק אחרי בדיקה ירוקה
+
+## אסור
+- לשים מפתחות או סיסמאות בקוד או ב-Git.
+- להריץ סקריפטים מסקיל שלא נבדק.
+- למחוק נתונים בלי אישור מפורש.
+
+## סיום משימה
+- כתובת סופית אחת, ושורה אחת שמסבירה מה נבנה.
+- לתעד את האפליקציה ב-README: כתובת GitHub, כתובת Vercel, מה היא עושה.</pre>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="tips">
+  <h2>טיפים לעבודה יעילה</h2>
+  <ul class="plain">
+    <li><b>תנו הקשר בתחילת השיחה.</b> מטרה, מסכים קיימים, והכללים. מה שלא כתוב, המודל ינחש.</li>
+    <li><b>החזירו תוצאה שאפשר לבדוק.</b> "הרץ את הבדיקות והחזר את הפלט" עדיף על "תוודא שזה עובד".</li>
+    <li><b>פצלו שיחות.</b> שיחה אחת לאפיון, שיחה נפרדת לכל מודול. שיחה ארוכה מאבדת הקשר.</li>
+    <li><b>שמרו תמיד.</b> commit קטן אחרי כל משימה שעובדת. חזרה לנקודה טובה צריכה להיות פשוטה.</li>
+    <li><b>בדקו את התוצאה במקום המקורי.</b> דף שנבנה נפתח בדפדפן. מספר שנחשב נבדק מול חישוב ידני.</li>
+    <li><b>אל תסמכו על "זה עובד".</b> בקשו הוכחה: פלט בדיקה, צילום מסך, או מספר מהמקור.</li>
+    <li><b>כשמשהו משתבש, חזרו לאפיון.</b> לעיתים הבעיה היא שהאפיון לא ברור, לא שהקוד שבור.</li>
+    <li><b>הפרומפט הוא הכלי.</b> מילות חשיבה מדויקות (זקק, חלץ, בחן) מכוונות את המודל יותר מתיאור כללי של "תעשה טוב".</li>
+  </ul>
+  <h3>מבחן ההסרה למילים בפרומפט</h3>
+  <p>אם מסירים מילה מפרומפט והתוצאה לא משתנה, המילה מיותרת. זה מבחן פשוט, ושווה להפעיל על כל פרומפט לפני שמעתיקים אותו.</p>
+  <h3>שלוש סביבות לפרומפט</h3>
+  <ul class="plain">
+    <li><b>צ'אט:</b> שיחה חד-פעמית. ההקשר כולו חייב להיות בפרומפט.</li>
+    <li><b>פרויקט:</b> הוראות ומסמכים שנשארים. הכללים הקבועים שייכים לכאן.</li>
+    <li><b>סטייג'ינג:</b> ניסוי על קלט ידוע לפני שמשתמשים בפרומפט בתוצר אמיתי.</li>
+  </ul>
+</section>
+
+<section id="safety">
+  <h2>אבטחה</h2>
+  <ul class="plain">
+    <li><b>מפתחות:</b> אף מפתח סודי לא נכנס לקוד, לשיחה או ל-Git. מפתחות נשמרים ב-<code>.env</code> או בהגדרות הפריסה.</li>
+    <li><b>Row Level Security:</b> מופעל בכל טבלה ב-Supabase. טבלה בלי RLS היא טבלה שכל אחד יכול לקרוא.</li>
+    <li><b>סקילים ממאגרים לא מוכרים:</b> קוראים וסוכמים לפני התקנה. לא מריצים סקריפטים שמגיעים איתם בלי בדיקה.</li>
+    <li><b>מחיקה:</b> מחיקה של נתונים או של קבצים דורשת אישור מפורש.</li>
+    <li><b>פריסה:</b> לפני פרסום, בודקים שאין נתונים אישיים או סודיים בתצוגה הציבורית.</li>
+  </ul>
+</section>
+
+<section id="templates">
+  <h2>תבניות להעתקה</h2>
+  <p class="sub">כל תבנית פותחת וננעלת. העתקה עם כפתור.</p>
+
+  <div class="block">
+    <div class="lbl">תבנית אפיון (SPEC.md)</div>
+    <details class="pr"><summary class="toggle">פתיחה וסגירה: תבנית אפיון</summary>
+      <div class="body">
+        <button class="btn" onclick="copyText('spec',this)">העתק תבנית</button><span class="toast"></span>
+        <pre id="spec"># אפיון: [שם האפליקציה]
+
+## הבעיה
+[משפט אחד: מה לא עובד היום, ולמי]
+
+## המשתמש
+[מי, מה הוא יודע, מה הוא צריך להשיג]
+
+## התוצר
+[מה המשתמש מקבל בסוף, בשורה אחת]
+
+## מסכים
+1. [שם המסך]: [מה רואים, מה עושים]
+
+## נתונים
+- [טבלה]: [שדות חובה]
+
+## הקלט והפלט
+- קלט: [קבצים, שדות, פורמטים]
+- פלט: [קבצים, טבלאות, דוחות]
+
+## מה לא נבנה בגרסה הזו
+- [...]
+
+## קריטריוני קבלה
+- [תוצאה צפויה לקלט ידוע]</pre>
+      </div>
+    </details>
+  </div>
+
+  <div class="block">
+    <div class="lbl">תבנית פרומפט למשימה ב-Claude Code</div>
+    <details class="pr"><summary class="toggle">פתיחה וסגירה: תבנית משימה</summary>
+      <div class="body">
+        <button class="btn" onclick="copyText('task',this)">העתק תבנית</button><span class="toast"></span>
+        <pre id="task">קרא את CLAUDE.md ואת docs/SPEC.md. המשימה: [תיאור של משימה אחת].
+
+לפני קוד:
+1. הצע תוכנית של שלושה צעדים, ואל תתחיל לכתוב עד אישור.
+
+אחרי הקוד:
+2. הרץ את הבדיקות והחזר את הפלט המלא.
+3. פתח את הקבצים ששיניתי, והחזר את השינוי בכל קובץ בשורה אחת.
+4. אם בדיקה נכשלה, תקן ובדוק שוב. לא מדווחים על הצלחה לפני בדיקה ירוקה.
+
+אל תשנה קבצים מחוץ לתחום המשימה.</pre>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="open">
+  <h2>מה לאמת לפני השיעור</h2>
+  <p class="sub">הנקודות האלה משתנות לפי גרסאות כלים, ולכן לא נכתבו כעובדה קבועה.</p>
+  <ul class="plain">
+    <li>שמות הפקודות, הקבצים שנקראים אוטומטית, ואופן טעינת הסקילים ב-Claude Code. לבדוק מול התיעוד הרשמי של הגרסה שהסטודנטים מתקינים.</li>
+    <li>מגבלות החינמיות והמכסות של Vercel, Supabase ו-Lovable לסטודנטים.</li>
+    <li>תהליך ההתקנה של gh ו-Supabase CLI על מחשבי הסטודנטים, במיוחד Windows.</li>
+    <li>התבניות בדף נבדקות רק בתוך הדף. עוד לא הורצו על פרויקט אמיתי.</li>
+  </ul>
+</section>
+
+</main>
+
+<script>
+function flash(btn,ok){
+  const toast=btn.parentElement.querySelector(".toast");
+  toast.textContent=ok?"הועתק":"ההעתקה נחסמה בתצוגה הזו";
+  setTimeout(()=>toast.textContent="",2000);
+}
+function copyText(id,btn){
+  const text=document.getElementById(id).textContent;
+  const fallback=()=>{
+    const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();let ok=false;
+    try{ok=document.execCommand("copy");}catch(e){ok=false;}
+    ta.remove();flash(btn,ok);
+  };
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>flash(btn,true),fallback);}
+  else fallback();
+}
+</script>
+</body>
+</html>
