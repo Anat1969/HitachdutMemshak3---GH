@@ -86,6 +86,26 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 .evid{font-size:13px;margin:4px 0}
 .pickrow{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0;flex-wrap:wrap}
 .pickrow select{padding:5px;font:inherit;max-width:100%}
+.wstep{border-right:3px solid var(--ink);padding:10px 16px;margin:18px 0}
+.wstep h3{margin-top:0}
+.live button{background:var(--ink);color:#fff;border:none;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px;margin:4px 6px 4px 0}
+.live button.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.live button:disabled{opacity:.35;cursor:default}
+.busy{display:flex;gap:10px;align-items:center;font-size:14px;padding:8px 0}
+.spin{width:14px;height:14px;border:2px solid var(--g2);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mapwrap{display:grid;grid-template-columns:1fr 210px;gap:14px;align-items:start}
+#map{width:100%;height:auto;background:#fafafa;border:1px solid var(--g2)}
+.legrow{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.sw{display:inline-block;width:16px;height:12px;border:1px solid #999}
+.wtable{width:100%;border-collapse:collapse;font-size:13px}
+.wtable th,.wtable td{text-align:right;padding:6px;border-bottom:1px solid var(--g1);vertical-align:top}
+.wtable td.expl{color:#333;font-size:12.5px;max-width:320px}
+.evid{font-size:13px;margin:4px 0}
+.pickrow{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0;flex-wrap:wrap}
+.pickrow select{padding:5px;font:inherit;max-width:100%}
+.formgrid1{display:grid;grid-template-columns:1fr;gap:4px;margin-top:10px}
+@media (max-width:980px){.mapwrap{grid-template-columns:1fr}}
 #lout[hidden]{display:none}
 @media (max-width:980px){.formgrid{grid-template-columns:1fr}.frow{grid-template-columns:1fr 80px}.frow .src{grid-column:1/-1}.live{padding-left:20px;padding-right:20px}}
 @media (max-width:980px){main{grid-template-columns:1fr}.col{border-left:none;border-bottom:1px solid var(--g2)}.fitgrid{grid-template-columns:1fr}section.fit,section.learn,header{padding-left:20px;padding-right:20px}}
@@ -234,43 +254,64 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 </div>
 
 <section class="live" id="liveMode" hidden>
-  <h2 class="big" style="margin-top:0">מצב המחשה: קלט, מודל, בדיקה ודוח</h2>
-  <p class="note">כל ערך צריך מקור. ערך שמקורו מתחיל ב"דמו" או "ברירת מחדל" הוא דמו ולא מאומת. ערך בלי מקור נחשב טיוטה ומופיע בדוח. כל שינוי מחשב מחדש את המודל, הבדיקות והדוח.</p>
-  <div class="loadbar">
-    <button id="tplBtn" class="alt" type="button">הורד תבנית CSV</button>
-    <label class="filebtn">טען קובץ (CSV או XLSX)<input type="file" id="lfile" accept=".csv,.xlsx,.xls" hidden></label>
-    <span class="toast" id="lload"></span>
-  </div>
-  <div class="docbox">
-    <h3>מסמכי התכנית ומספר מגרש</h3>
-    <label class="plotlbl">מספר מגרש / תא שטח <input id="plotNo" type="text" placeholder="למשל 633"></label>
-    <div class="loadbar">
-      <label class="filebtn">בחר מסמכים (PDF, XLSX, CSV, DXF, SHP+DBF)<input type="file" id="docFiles" multiple accept=".pdf,.xlsx,.xls,.csv,.dxf,.shp,.dbf,.jpg,.jpeg,.png" hidden></label>
-      <button id="runDocs" type="button">בדוק מגרש וחלץ נתונים</button>
-    </div>
+  <h2 class="big" style="margin-top:0">מצב המחשה: שישה שלבים, אחד אחרי השני</h2>
+  <p class="note">כל משימה נפתחת אחרי שהקודמת הושלמה. הנתונים מחושבים רק ממה שחולץ מהמסמכים או הוזן ידנית.</p>
+
+  <div class="wstep" data-step="1">
+    <h3>משימה 1: העלאת מסמכי התכנית</h3>
+    <label class="filebtn">בחר מסמכים (PDF, XLSX, CSV, DXF, SHP+DBF)<input type="file" id="docFiles" multiple accept=".pdf,.xlsx,.xls,.csv,.dxf,.shp,.dbf,.jpg,.jpeg,.png" hidden></label>
     <ul class="doclist" id="docList"><li class="u">לא נבחרו מסמכים</li></ul>
-    <p class="note">הקבצים נקראים בדפדפן ולא נשלחים לשרת. תשריט בתמונה לא נקרא אוטומטית. כל ערך שחולץ מופיע בטופס עם מקורו, ויש לבדוק אותו לפני ההרצה.</p>
-    <div id="docResult"></div>
+    <button id="btnUpload" type="button" disabled>העלה מסמכים</button>
+    <div id="up1"></div>
   </div>
-  <div id="lstatus" class="status"></div>
-  <div class="formgrid">
-    <div><h3>נתוני תב"ע (שלב 1)</h3><div id="lform1"></div></div>
-    <div><h3>חלופות (שלב 2)</h3><div id="lform2"></div></div>
-    <div><h3>יזם וכלכלה (שלב 3)</h3><div id="lform3"></div></div>
+
+  <div class="wstep" data-step="2" hidden>
+    <h3>משימה 2: בחירת מגרש וחילוץ הנתונים</h3>
+    <label class="plotlbl">מספר מגרש / תא שטח <input id="plotNo" type="text" placeholder="למשל 633"></label>
+    <button id="btnExtract" type="button">חלץ נתונים למגרש</button>
+    <div id="out2"></div>
+    <div id="lform1" class="formgrid1"></div>
   </div>
-  <div id="lout" hidden>
-    <h3>מודל תלת-ממד</h3>
-    <div class="seg" id="lAltSeg"></div>
+
+  <div class="wstep" data-step="3" hidden>
+    <h3>משימה 3: מודל נפחי לפי הזכויות על תשריט התב"ע</h3>
+    <div class="mapwrap">
+      <svg id="map" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="legend"></div>
+    </div>
     <div class="seg" id="lViewSeg">
       <button data-lv="iso" class="on" type="button">איזומטרי</button>
       <button data-lv="plan" type="button">תוכנית</button>
       <button data-lv="elev" type="button">חזית</button>
     </div>
-    <div id="scene" class="scene"></div>
-    <p class="note" id="sceneMsg">גרירה מסובבת את המודל, גלגלת העכבר מזמת. לחיצה על תוכנית או חזית מציבה את המצלמה בתצוגה הזו.</p>
-    <h3>בדיקת התאמה</h3>
-    <div id="lfit"></div>
-    <h2 class="big">דוח השוואה</h2>
+    <div id="st3scene"><div id="scene" class="scene"></div></div>
+    <p class="note" id="sceneMsg">גרירה מסובבת את המודל, גלגלת העכבר מזמת. המודל מציג רק את המגרש המבוקש.</p>
+    <div id="out3"></div>
+  </div>
+
+  <div class="wstep" data-step="4" hidden>
+    <h3>משימה 4: יצירת 3 חלופות</h3>
+    <button id="btnAlts" type="button">צור 3 חלופות</button>
+    <div id="out4"></div>
+    <div class="seg" id="lAltSeg"></div>
+    <div id="st4scene"></div>
+  </div>
+
+  <div class="wstep" data-step="5" hidden>
+    <h3>משימה 5: בדיקות</h3>
+    <p class="note">הנתונים הכלכליים אינם מחולצים מהמסמכים. יש להזין אותם כאן, והשדות ריקים עד הזנה.</p>
+    <div id="lform3" class="formgrid1"></div>
+    <div class="loadbar">
+      <button id="btnPlan" type="button">בדיקה בהתאמה לדרישות והנחיות העירייה</button>
+      <button id="btnEcon" type="button">בדיקת כלכליות</button>
+    </div>
+    <div id="out5a"></div>
+    <div id="out5b"></div>
+  </div>
+
+  <div class="wstep" data-step="6" hidden>
+    <h3>משימה 6: המלצה</h3>
+    <button id="btnRec" type="button">המלצה</button>
     <div id="lreport"></div>
     <div class="copybar"><button id="copyRep" type="button">העתק דוח (עברית)</button><span class="toast" id="repToast"></span></div>
   </div>
@@ -508,10 +549,18 @@ document.querySelectorAll(".copybar button[data-key]").forEach(btn=>{
   });
 });
 
-/* ===== מצב המחשה ===== */
-let appMode="demo", lcur="א", lview="iso", LIVE=null, lastReportText="";
+/* ===== מצב המחשה: שישה שלבים, אחד אחרי השני ===== */
+let appMode="demo", lview="iso", lcur="א";
+let DOCS=[], CACHE=null, MATCH=null, PICKS={}, FOUND=false, S3_DONE=false, DONE5={plan:false,econ:false};
+let WZ=1, lastAlt=null, lastReportText="";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
-// [מפתח, תווית, יחידה, ברירת מחדל, מקור ברירת מחדל, סוג n=מספר t=טקסט, קבוצה 1-3]
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const busyHTML=m=>`<div class="busy"><span class="spin"></span><span>${esc(m)}</span></div>`;
+const ALT_DESC={"א":"רחבה: 90% מהתכסית המרבית","ב":"צרה: 60% מהתכסית המרבית","ג":"ביניים: 75% מהתכסית המרבית"};
+const DOC_EXT=/\.(pdf|xlsx|xls|csv|dxf|shp|dbf|jpg|jpeg|png)$/i;
+const STAGE1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","uses","parking"];
+const LABEL_OF={pdf:"PDF",sheet:"טבלה",dxf:"DXF (טקסט)",shp:"שכבת מגרש SHP",dbf:"מאפייני שכבה DBF",image:"תשריט (לא נקרא אוטומטית)"};
+// [מפתח, תווית, יחידה, ערך מוצא, מקור מוצא, סוג n=מספר t=טקסט, שלב]
 const FIELDS=[
   ["plotArea","שטח מגרש","מ\"ר","","","n",1],
   ["cov","תכסית מרבית","%","","","n",1],
@@ -526,18 +575,9 @@ const FIELDS=[
   ["dens","צפיפות מרבית","יח\"ד לדונם","","","n",1],
   ["uses","שימושים מותרים","טקסט","","","t",1],
   ["parking","חניה (מספר מקומות)","מקומות","","","t",1],
-  ["fp_א","חלופה א: שטח קומה","מ\"ר","","","n",2],
-  ["fl_א","חלופה א: מספר קומות","קומות","","","n",2],
-  ["pu_א","חלופה א: שימוש מוצע","טקסט","","","t",2],
-  ["fp_ב","חלופה ב: שטח קומה","מ\"ר","","","n",2],
-  ["fl_ב","חלופה ב: מספר קומות","קומות","","","n",2],
-  ["pu_ב","חלופה ב: שימוש מוצע","טקסט","","","t",2],
-  ["fp_ג","חלופה ג: שטח קומה","מ\"ר","","","n",2],
-  ["fl_ג","חלופה ג: מספר קומות","קומות","","","n",2],
-  ["pu_ג","חלופה ג: שימוש מוצע","טקסט","","","t",2],
   ["fl","גובה קומה","מ'","3.2","הנחיית הפרויקט: 3.2 מ' אלא אם המסמכים קובעים אחרת","n",3],
-  ["sell","שטח נטו למכירה","%","80","אפיון: 80% כערך מוצא","n",3],
-  ["avg","שטח יח\"ד ממוצע","מ\"ר","90","אפיון: 90 מ\"ר כערך מוצא","n",3],
+  ["sell","שטח נטו למכירה","%","80","נוהל האפיון: 80%","n",3],
+  ["avg","שטח יח\"ד ממוצע","מ\"ר","90","נוהל האפיון: 90 מ\"ר","n",3],
   ["target","יעד יח\"ד של היזם","יח\"ד","","","n",3],
   ["pMain","מחיר מכר למ\"ר עיקרי","₪","","","n",3],
   ["cons","עלות בנייה למ\"ר","₪","","","n",3],
@@ -553,201 +593,31 @@ const FIELDS=[
   ["disc","שיעור היוון שנתי","%","","","n",3],
   ["tgtProfit","רווח יזמי יעד (על עלות)","%","","","n",3]
 ];
+const R1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","fl","sell","avg"];
+const E1=["target","pMain","cons","land","fees","plan","cont","mkt","rate","build","sale","disc","tgtProfit"];
+const val=k=>document.getElementById("v_"+k).value.trim();
+const srcOf=k=>document.getElementById("s_"+k).value.trim();
+const numOf=k=>{const t=val(k); if(t==="") return null; const n=Number(t.replace(",",".")); return isNaN(n)?null:n;};
+const labelOf=k=>FIELDS.find(f=>f[0]===k)[1];
+function setField(key,value,src){
+  document.getElementById("v_"+key).value=value===undefined||value===null?"":String(value);
+  document.getElementById("s_"+key).value=src||"";
+}
 function buildForms(){
-  [1,2,3].forEach(g=>{
-    document.getElementById("lform"+g).innerHTML=FIELDS.filter(f=>f[6]===g).map(f=>
-      `<div class="frow"><label for="v_${f[0]}">${esc(f[1])} <span class="u">(${esc(f[2])})</span></label><input id="v_${f[0]}" value="${esc(f[3])}"><input id="s_${f[0]}" class="src" value="${esc(f[4])}" placeholder="מסמך, עמוד, סעיף או תא"></div>`).join("");
-  });
+  const mk=f=>`<div class="frow"><label for="v_${f[0]}">${esc(f[1])} <span class="u">(${esc(f[2])})</span></label><input id="v_${f[0]}" value="${esc(f[3])}"><input id="s_${f[0]}" class="src" value="${esc(f[4])}" placeholder="מסמך, עמוד, סעיף או תא"></div>`;
+  document.getElementById("lform1").innerHTML=FIELDS.filter(f=>f[6]===1).map(mk).join("");
+  document.getElementById("lform3").innerHTML=FIELDS.filter(f=>f[6]===3).map(mk).join("");
 }
-function readLive(){
-  const val=k=>document.getElementById("v_"+k).value.trim();
-  const src=k=>document.getElementById("s_"+k).value.trim();
-  const N={}, miss=[], rows=[], demoList=[], nosrcList=[];
-  FIELDS.forEach(f=>{
-    const k=f[0], v=val(k), s=src(k);
-    rows.push({label:f[1], value:v, src:s});
-    if(v!==""){
-      if(/^(דמו|ברירת מחדל)/.test(s)) demoList.push(f[1]);
-      else if(s==="") nosrcList.push(f[1]);
-    }
-    if(f[5]==="n"){
-      const n=Number(v.replace(",","."));
-      if(v===""||isNaN(n)) miss.push(f[1]); else N[k]=n;
-    }
-  });
-  const bad=[];
-  if(!miss.length){
-    if(N.plotArea<=0) bad.push("שטח מגרש חייב להיות חיובי");
-    if(N.floors<1) bad.push("קומות מעל לקרקע: לפחות 1");
-    if(N.fl<=0) bad.push("גובה קומה חייב להיות חיובי");
-    if(N.sell<=0||N.sell>100) bad.push("שטח נטו למכירה: בין 1 ל-100");
-    ["א","ב","ג"].forEach(k=>{
-      if(N["fp_"+k]<=0) bad.push(`חלופה ${k}: שטח קומה חייב להיות חיובי`);
-      if(N["fl_"+k]<1) bad.push(`חלופה ${k}: לפחות קומה אחת`);
-    });
-  }
-  const RL={plot:N.plotArea,cov:N.cov,bp:N.bp,floors:N.floors,below:N.below,h:N.h,front:N.front,side:N.side,rear:N.rear,units:N.units,dens:N.dens,uses:val("uses")||"לא נמצא",fl:N.fl,sell:N.sell/100,avg:N.avg,target:N.target,pMain:N.pMain,cons:N.cons,plan:N.plan/100,cont:N.cont/100,mkt:N.mkt/100,fees:N.fees,land:N.land,rate:N.rate/100,build:N.build,delay:N.delay,sale:N.sale,disc:N.disc/100,tgtProfit:N.tgtProfit};
-  const AL={};
-  ["א","ב","ג"].forEach(k=>{AL[k]={fp:N["fp_"+k],fl:N["fl_"+k],below:0,purpose:val("pu_"+k)||"לא נמצא"};});
-  return {ok:!(miss.length||bad.length), problems:[...miss.map(x=>"חסר: "+x),...bad], R:RL, ALTS:AL, demo:demoList.length, nosrc:nosrcList.length, demoList, nosrcList, rows};
+function setStep(n){
+  WZ=Math.max(WZ,n);
+  document.querySelectorAll(".wstep").forEach(s=>{ s.hidden=Number(s.dataset.step)>WZ; });
 }
-function fitHTML(){
-  const cols=Object.keys(ALTS).map(k=>{
-    const c=calc(ALTS[k]), ch=checks(c), s=score(ch), reds=ch.filter(x=>x[2]==="r").length;
-    return `<div><h3>חלופה ${esc(k)}</h3><div class="score">${s}%</div><div class="label">אחוזי התאמה · ${reds?"חורגת ב-"+reds+" בדיקות":"עומדת בכל התנאים"}</div><ul>${ch.map(x=>`<li><span>${esc(x[0])}</span><span><span class="dot ${x[2]}"></span>${esc(x[1])}</span></li>`).join("")}</ul></div>`;
-  }).join("");
-  return `<div class="fitgrid">${cols}</div>`;
+/* ---------- משימה 1: העלאה וקריאה ---------- */
+function renderDocList(){
+  document.getElementById("docList").innerHTML=DOCS.length
+    ? DOCS.map(d=>`<li><span>${esc(d.name)}</span><span class="u">${esc(LABEL_OF[d.kind]||"לא נתמך")}</span></li>`).join("")
+    : `<li class="u">לא נבחרו מסמכים</li>`;
 }
-function renderLAltSeg(){
-  document.getElementById("lAltSeg").innerHTML=Object.keys(ALTS).map(k=>`<button type="button" data-la="${k}" class="${k===lcur?"on":""}">חלופה ${k}</button>`).join("");
-}
-function pushScene(){
-  const c=calc(ALTS[lcur]), g=c.g, P=Math.sqrt(R.plot);
-  const p={P, x0:-P/2+R.side, x1:P/2-R.side, z0:-P/2+R.rear, z1:P/2-R.front, w:g.w, d:g.d, H:c.h, fl:R.fl, floors:ALTS[lcur].fl, maxH:R.h, breach:Math.min(g.mx,g.my)<0, view:lview};
-  if(window.scene3d) window.scene3d.update(p); else window.__scenePending=p;
-}
-function renderLive(){
-  if(appMode!=="live") return;
-  const r=readLive(); LIVE=r;
-  const st=document.getElementById("lstatus"), out=document.getElementById("lout");
-  if(!r.ok){
-    st.className="status bad";
-    st.textContent="לא ניתן לחשב: "+r.problems.join("; ")+". המודל והבדיקות יופיעו אחרי תיקון.";
-    out.hidden=true; return;
-  }
-  st.className="status";
-  st.textContent=`כל השדות מולאו. ערכי דמו: ${r.demo}. ערכים בלי מקור: ${r.nosrc}.`;
-  out.hidden=false;
-  R=r.R; ALTS=r.ALTS;
-  if(!ALTS[lcur]) lcur="א";
-  renderLAltSeg();
-  document.getElementById("lfit").innerHTML=fitHTML();
-  renderReport();
-  pushScene();
-}
-function buildReport(){
-  const rows=Object.keys(ALTS).map(k=>{const c=calc(ALTS[k]),chk=checks(c),s=score(chk),r=chk.filter(x=>x[2]==="r").length;return {k,c,chk,s,r};});
-  const b=[...rows].sort((x,y)=>x.r-y.r||y.s-x.s||y.c.pct-x.c.pct)[0];
-  const greens=b.chk.filter(x=>x[2]==="g").length, pg=profitGrade(b.c);
-  const s1=`המלצה: חלופה ${b.k}, עם ציון התאמה ${b.s}% ו-${b.r} בדיקות אדומות.`;
-  const s2=`היא עומדת ב-${greens} מתוך ${b.chk.length} בדיקות בירוק, ורווחיות היזם שלה: ${GN[pg]} (רווח על עלות ${fmt(b.c.pct)}%).`;
-  const s3=(LIVE.demo?"הנתונים הכלכליים כוללים ערכי דמו שלא אומתו במקור.":"הערכים הכלכליים הוזנו ממקור.")+(LIVE.nosrc?` יש ${LIVE.nosrc} ערכים בלי מקור, והם נחשבים טיוטה.`:" כל הערכים מסומנים במקור.");
-  const W={g:"ירוק",y:"צהוב",r:"אדום"};
-  const labels=rows[0].chk.map(x=>x[0]);
-  const table={head:["פרמטר",...rows.map(x=>"חלופה "+x.k),"סטטוס"],
-    rows:labels.map((lb,i)=>{
-      const cells=rows.map(x=>x.chk[i]);
-      const st=cells.some(x=>x[2]==="r")?"חורג באחת החלופות":cells.some(x=>x[2]==="y")?"מרווח צר":"עומד";
-      return [{t:lb},...cells.map(x=>({t:`${x[1]} (${W[x[2]]})`,c:x[2]})),{t:st}];
-    })};
-  const pc=rows.map(x=>{
-    const g=x.chk.find(y=>y[2]==="g"), bd=x.chk.find(y=>y[2]==="r")||x.chk.find(y=>y[2]==="y");
-    return `חלופה ${x.k}: יתרון: ${g?g[0]+" ("+g[1]+")":"אין"}. חיסרון: ${bd?bd[0]+" ("+bd[1]+")":"אין חריגה"}.`;
-  });
-  const ver=rows.flatMap(x=>x.chk.filter(y=>y[2]!=="g").map(y=>`חלופה ${x.k}: ${y[0]} (${y[1]})`));
-  const asm=[
-    "המגרש מרובע בשטח שהוזן. צורת המגרש לא נלקחה מתשריט.",
-    `השטח הבנוי ממוקם במרכז אזור הבנייה. סף אזהרה לקווי בניין: ${SB_WARN} מ'.`,
-    "קומות מתחת לקרקע בחלופות: 0, כי לא הוגדר באפיון.",
-    "חניה לא נבדקת בשלב 3.",
-    `יעד רווח היזם: ${R.tgtProfit}% על עלות.`,
-    LIVE.demoList.length?`ערכי דמו: ${LIVE.demoList.join(", ")}.`:"אין ערכי דמו.",
-    LIVE.nosrcList.length?`ערכים בלי מקור: ${LIVE.nosrcList.join(", ")}.`:"כל הערכים עם מקור."
-  ];
-  const src=LIVE.rows.map(r=>`${r.label}: ${r.value||"לא נמצא"} · ${r.src||"בלי מקור"}`);
-  return [
-    {h:"מסקנה", p:[s1,s2,s3]},
-    {h:"טבלת השוואה", table},
-    {h:"יתרונות וחסרונות", p:pc},
-    {h:"מה לבדוק מול הרשות", p:ver.length?ver:["אין פריטים לבדיקה מול הרשות."]},
-    {h:"המלצה והנחות", li:asm, p:["הכלי מציג את ההמלצה ואת הנתונים שעליה, ולא מחליט במקום היזם או הרשות."]},
-    {h:"מקור לכל מספר", li:[...src,"מספרים מחושבים (תכסית, אחוזי בנייה, גובה, יח\"ד, צפיפות, ניצול, רווח ו-NPV) חושבו מהערכים לעיל."]}
-  ];
-}
-function tblHTML(t){
-  return `<table><thead><tr>${t.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(c=>`<td class="num">${esc(c.t)}${c.c?` <span class="dot ${c.c}"></span>`:""}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-}
-function renderReport(){
-  const rep=buildReport();
-  document.getElementById("lreport").innerHTML=rep.map(s=>`<h3>${esc(s.h)}</h3>`+(s.table?tblHTML(s.table):"")+(s.p||[]).map(t=>`<p>${esc(t)}</p>`).join("")+(s.li?`<ul>${s.li.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"")).join("");
-  lastReportText=rep.map(s=>[s.h,...(s.table?[s.table.head.join(" | "),...s.table.rows.map(r=>r.map(c=>c.t).join(" | "))]:[]),...(s.p||[]),...(s.li||[]).map(t=>"- "+t)].join("\n")).join("\n\n");
-}
-async function copyText(text,toast){
-  let ok=false;
-  try{ await navigator.clipboard.writeText(text); ok=true; }catch(err){
-    const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
-    document.body.appendChild(ta); ta.select();
-    try{ ok=document.execCommand("copy"); }catch(e2){ ok=false; }
-    ta.remove();
-  }
-  toast.textContent=ok?"הועתק":"ההעתקה נחסמה בתצוגה הזו";
-  setTimeout(()=>toast.textContent="",2000);
-}
-function downloadTemplate(){
-  const rows=[["שדה","ערך","מקור"],...FIELDS.map(f=>[f[1],f[3],f[4]])];
-  const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
-  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
-  const a=document.createElement("a"); a.href=url; a.download="tba603_inputs.csv";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-async function loadFile(file){
-  const buf=await file.arrayBuffer();
-  let rows;
-  if(window.XLSX){
-    const wb=XLSX.read(new Uint8Array(buf),{type:"array"});
-    rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:""});
-  } else {
-    rows=new TextDecoder("utf-8").decode(buf).replace(/^﻿/,"").split(/\r?\n/).filter(x=>x.trim()).map(line=>line.split(",").map(c=>c.trim().replace(/^"|"$/g,"").replace(/""/g,'"')));
-  }
-  let set=0; const unk=[];
-  rows.forEach(r=>{
-    const label=String(r[0]??"").trim();
-    if(!label||label==="שדה") return;
-    const f=FIELDS.find(x=>x[1]===label);
-    if(!f){ unk.push(label); return; }
-    const v=String(r[1]??"").trim(), s=String(r[2]??"").trim();
-    if(v!==""){ document.getElementById("v_"+f[0]).value=v; set++; }
-    if(s!==""){ document.getElementById("s_"+f[0]).value=s; }
-  });
-  document.getElementById("lload").textContent=`נטענו ${set} ערכים.`+(unk.length?` לא זוהו: ${unk.join(", ")}.`:"");
-  renderLive();
-}
-function setMode(m){
-  appMode=m;
-  document.querySelectorAll(".modes button").forEach(b=>b.classList.toggle("on",b.dataset.mode===m));
-  document.getElementById("demoMode").hidden=m!=="demo";
-  document.getElementById("liveMode").hidden=m!=="live";
-  if(m==="demo"){
-    DEMO_R.target=Number(document.getElementById("target").value)||0;
-    R=DEMO_R; ALTS=DEMO_ALTS;
-    renderRights(); renderAltSeg(); renderView(); renderFit();
-  } else {
-    renderLive();
-  }
-}
-document.querySelectorAll(".modes button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
-document.getElementById("lAltSeg").addEventListener("click",e=>{const b=e.target.closest("button[data-la]"); if(!b) return; lcur=b.dataset.la; renderLive();});
-document.getElementById("lViewSeg").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-lv]"); if(!b) return;
-  lview=b.dataset.lv;
-  document.querySelectorAll("#lViewSeg button").forEach(x=>x.classList.toggle("on",x===b));
-  pushScene();
-});
-document.getElementById("liveMode").addEventListener("input",renderLive);
-document.getElementById("tplBtn").addEventListener("click",downloadTemplate);
-document.getElementById("lfile").addEventListener("change",e=>{
-  const f=e.target.files[0];
-  if(f) loadFile(f).catch(err=>{document.getElementById("lload").textContent="קריאת הקובץ נכשלה: "+err.message;});
-});
-document.getElementById("copyRep").addEventListener("click",()=>copyText(lastReportText,document.getElementById("repToast")));
-setTimeout(()=>{ if(!window.scene3d) document.getElementById("sceneMsg").textContent="התצוגה התלת-ממדית לא נטענה (אין חיבור ל-CDN). הבדיקות והדוח פועלים."; },8000);
-/* ===== מסמכים ומספר מגרש ===== */
-let DOCS=[];
-if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-const DOC_EXT=/\.(pdf|xlsx|xls|csv|dxf|shp|dbf|jpg|jpeg|png)$/i;
-const STAGE1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","uses","parking"];
-const LABEL_OF={pdf:"PDF",sheet:"טבלה",dxf:"DXF (טקסט)",shp:"שכבת מגרש SHP",dbf:"מאפייני שכבה DBF",image:"תשריט (לא נקרא אוטומטית)"};
 function baseName(n){return n.replace(/\.[^.]+$/,"").toLowerCase();}
 function kindOf(n){
   const e=(n.match(/\.([^.]+)$/)||["",""])[1].toLowerCase();
@@ -755,14 +625,10 @@ function kindOf(n){
   if(["jpg","jpeg","png"].includes(e)) return "image";
   return e;
 }
-function renderDocList(){
-  document.getElementById("docList").innerHTML=DOCS.length
-    ? DOCS.map(d=>`<li><span>${esc(d.name)}</span><span class="u">${esc(LABEL_OF[d.kind]||"לא נתמך")}</span></li>`).join("")
-    : `<li class="u">לא נבחרו מסמכים</li>`;
-}
 document.getElementById("docFiles").addEventListener("change",e=>{
   DOCS=[...e.target.files].filter(f=>DOC_EXT.test(f.name)).map(f=>({name:f.name,file:f,kind:kindOf(f.name)}));
   renderDocList();
+  document.getElementById("btnUpload").disabled=!DOCS.length;
 });
 // PDF רבים שומרים טקסט עברי בסדר חזותי: התווים הפוכים והמספרים נשארים משמאל לימין.
 function visualToLogical(s){
@@ -824,27 +690,25 @@ function parseDbf(buf){
   }
   return recs;
 }
-function parseShpAreas(buf){
+// צורות מצולעות: טבעת לכל חלק, ושטח מחושב מנוסחת השטח (shoelace)
+function parseShp(buf){
   const dv=new DataView(buf), out=[]; let off=100;
   while(off+8<=buf.byteLength){
     const clen=dv.getInt32(off+4,false)*2, c=off+8, type=dv.getInt32(c,true);
-    let area=null;
+    let shape=null;
     if(type===5||type===15||type===25){
       const np=dv.getInt32(c+36,true), npt=dv.getInt32(c+40,true), pts0=c+44+np*4;
-      const parts=[]; for(let i=0;i<np;i++) parts.push(dv.getInt32(c+44+i*4,true));
-      let sum=0;
+      const starts=[]; for(let i=0;i<np;i++) starts.push(dv.getInt32(c+44+i*4,true));
+      const rings=[]; let sum=0;
       for(let i=0;i<np;i++){
-        const s=parts[i], e=i+1<np?parts[i+1]:npt;
-        for(let j=s;j<e;j++){
-          const j2=j+1<e?j+1:s;
-          const x1=dv.getFloat64(pts0+j*16,true), y1=dv.getFloat64(pts0+j*16+8,true);
-          const x2=dv.getFloat64(pts0+j2*16,true), y2=dv.getFloat64(pts0+j2*16+8,true);
-          sum+=x1*y2-x2*y1;
-        }
+        const s=starts[i], e=i+1<np?starts[i+1]:npt, ring=[];
+        for(let j=s;j<e;j++) ring.push([dv.getFloat64(pts0+j*16,true), dv.getFloat64(pts0+j*16+8,true)]);
+        for(let j=0;j<ring.length;j++){ const a=ring[j], b=ring[(j+1)%ring.length]; sum+=a[0]*b[1]-b[0]*a[1]; }
+        rings.push(ring);
       }
-      area=Math.abs(sum)/2;
+      shape={area:Math.abs(sum)/2, rings};
     }
-    out.push(area);
+    out.push(shape);
     off=c+clen;
   }
   return out;
@@ -857,6 +721,7 @@ function plotPattern(p){
   const e=p.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
   return "(?:מגרש|תא שטח|תא|חלקה)\\s*(?:מס'|מספר|מס)?\\s*[:.]?\\s*"+e+"(?!\\d)";
 }
+const firstLine=s=>s.split("\n")[0].trim();
 function findInTexts(list,plotNo){
   const out=[];
   list.forEach(t=>{
@@ -890,7 +755,6 @@ const TEXT_RX={
   dens:/(\d+(?:\.\d+)?)\s*יח["״']ד\s*לדונם/g,
   plotArea:/שטח מגרש[^0-9]{0,30}(\d[\d,.]*)\s*מ/g
 };
-const firstLine=s=>s.split("\n")[0].trim();
 function textCandidates(pages){
   const out={};
   Object.keys(TEXT_RX).forEach(k=>{
@@ -906,15 +770,14 @@ function textCandidates(pages){
   return out;
 }
 function tableValues(sheet,plotNo){
-  const rows=sheet.rows, pn=String(plotNo).trim();
-  const hits=[];
+  const rows=sheet.rows, pn=String(plotNo).trim(), hits=[];
   rows.forEach((row,i)=>{ if(row.some(c=>sameNo(c,pn)&&String(c).trim()!=="")) hits.push(i); });
   let hdr=-1;
   for(let i=0;i<rows.length&&hdr<0;i++){
     const n=rows[i].filter(c=>typeof c==="string"&&Object.values(PRED).some(f=>f(c))).length;
     if(n>=2) hdr=i;
   }
-  if(!hits.length||hdr<0) return {hits:hits.length, values:{}};
+  if(!hits.length||hdr<0) return {};
   const heads=rows[hdr].map(c=>String(c));
   const values={};
   Object.keys(PRED).forEach(k=>{
@@ -922,133 +785,394 @@ function tableValues(sheet,plotNo){
     if(j<0) return;
     const raw=rows[hits[0]][j];
     const v=Number(String(raw).replace(/,/g,""));
-    if(String(raw).trim()!==""&&!isNaN(v)) values[k]={v, where:`${sheet.doc}, גיליון ${sheet.name}, שורה ${hits[0]+1}, עמודה "${heads[j].trim()}"`, snippet:String(raw)};
+    if(String(raw).trim()!==""&&!isNaN(v)) values[k]={v, where:`${sheet.doc}, גיליון ${sheet.name}, שורה ${hits[0]+1}, עמודה "${heads[j].trim()}"`};
   });
-  return {hits:hits.length, values};
+  return values;
 }
-function setField(key,value,src){
-  document.getElementById("v_"+key).value=value===undefined||value===null?"":String(value);
-  document.getElementById("s_"+key).value=src||"";
+async function readOne(d,C){
+  try{
+    if(d.kind==="pdf"){
+      const pages=await readPdf(d.file);
+      if(pages.some(p=>p.text.trim())){ pages.forEach(p=>C.pdf.push({doc:d.name,...p})); C.read.push(`${d.name} (${pages.length} עמודים)`); }
+      else C.unread.push(`${d.name}: אין טקסט קריא, כנראה סריקה`);
+    } else if(d.kind==="sheet"){
+      const sh=await readSheets(d.file);
+      sh.forEach(s=>C.sheets.push({doc:d.name,...s}));
+      C.read.push(`${d.name} (${sh.length} גיליונות)`);
+    } else if(d.kind==="dxf"){
+      const tx=parseDxf(await d.file.text());
+      tx.forEach(x=>C.dxf.push({doc:d.name,...x}));
+      C.read.push(`${d.name} (${tx.length} טקסטים)`);
+    } else if(d.kind==="dbf"){
+      C.dbf[baseName(d.name)]={name:d.name, recs:parseDbf(await d.file.arrayBuffer())};
+      C.read.push(`${d.name} (מאפיינים)`);
+    } else if(d.kind==="shp"){
+      C.shp[baseName(d.name)]={name:d.name, shapes:parseShp(await d.file.arrayBuffer())};
+      C.read.push(`${d.name} (צורות)`);
+    } else C.unread.push(`${d.name}: ${LABEL_OF[d.kind]||"לא נתמך"}`);
+  }catch(err){ C.unread.push(`${d.name}: שגיאה בקריאה (${err.message})`); }
 }
-async function runDocs(){
-  const plotNo=document.getElementById("plotNo").value.trim();
-  const out=document.getElementById("docResult");
-  if(!plotNo){ out.innerHTML=`<p class="status bad">יש להזין מספר מגרש או תא שטח לפני החילוץ.</p>`; return; }
-  if(!DOCS.length){ out.innerHTML=`<p class="status bad">לא נבחרו מסמכים.</p>`; return; }
-  out.innerHTML=`<p class="status">קורא את המסמכים בדפדפן...</p>`;
-  const read=[], unread=[], pdfPages=[], sheets=[], dxfTexts=[], shp={}, dbf={};
-  for(const d of DOCS){
-    try{
-      if(d.kind==="pdf"){
-        const pages=await readPdf(d.file);
-        if(pages.some(p=>p.text.trim())){
-          pages.forEach(p=>pdfPages.push({doc:d.name,...p}));
-          read.push(`${d.name} (${pages.length} עמודים)`);
-        } else unread.push(`${d.name}: אין טקסט קריא, כנראה סריקה`);
-      } else if(d.kind==="sheet"){
-        const sh=await readSheets(d.file);
-        sh.forEach(s=>sheets.push({doc:d.name,...s}));
-        read.push(`${d.name} (${sh.length} גיליונות)`);
-      } else if(d.kind==="dxf"){
-        const tx=parseDxf(await d.file.text());
-        tx.forEach(x=>dxfTexts.push({doc:d.name,...x}));
-        read.push(`${d.name} (${tx.length} טקסטים)`);
-      } else if(d.kind==="dbf"){
-        dbf[baseName(d.name)]={name:d.name, recs:parseDbf(await d.file.arrayBuffer())};
-        read.push(`${d.name} (מאפיינים)`);
-      } else if(d.kind==="shp"){
-        shp[baseName(d.name)]={name:d.name, areas:parseShpAreas(await d.file.arrayBuffer())};
-        read.push(`${d.name} (צורות)`);
-      } else unread.push(`${d.name}: ${LABEL_OF[d.kind]||"לא נתמך"}`);
-    }catch(err){ unread.push(`${d.name}: שגיאה בקריאה (${err.message})`); }
+document.getElementById("btnUpload").addEventListener("click", async()=>{
+  const box=document.getElementById("up1");
+  const C={pdf:[],sheets:[],dxf:[],dbf:{},shp:{},read:[],unread:[]};
+  for(let i=0;i<DOCS.length;i++){
+    box.innerHTML=busyHTML(`מעלה ומעבד: ${DOCS[i].name} (${i+1} מתוך ${DOCS.length})`);
+    await readOne(DOCS[i],C);
+    await wait(500);
   }
-  // חיפוש המגרש
+  CACHE=C;
+  box.innerHTML=`<p class="status">עלו ${C.read.length} קבצים: ${esc(C.read.join(", ")||"אין")}.</p>`+
+    (C.unread.length?`<p class="note">לא נקראו: ${esc(C.unread.join(", "))}</p>`:"");
+  document.getElementById("btnUpload").disabled=true;
+  setStep(2);
+});
+/* ---------- משימה 2: מציאת המגרש וחילוץ ---------- */
+function extract(C,plotNo){
   const evid=[];
-  evid.push(...findInTexts(pdfPages,plotNo), ...findInTexts(dxfTexts,plotNo));
-  sheets.forEach(s=>{
-    s.rows.forEach((row,i)=>{
-      row.forEach((c,j)=>{
-        if(String(c).trim()!==""&&sameNo(c,plotNo)) evid.push({doc:s.doc, where:`גיליון ${s.name}, שורה ${i+1}`, snippet:String(c)});
-      });
-    });
-  });
-  let shpArea=null;
-  Object.keys(shp).forEach(key=>{
-    const db=dbf[key]; if(!db) return;
+  evid.push(...findInTexts(C.pdf,plotNo), ...findInTexts(C.dxf,plotNo));
+  C.sheets.forEach(s=>s.rows.forEach((row,i)=>row.forEach(c=>{
+    if(String(c).trim()!==""&&sameNo(c,plotNo)) evid.push({doc:s.doc, where:`גיליון ${s.name}, שורה ${i+1}`, snippet:String(c)});
+  })));
+  let match=null;
+  Object.keys(C.shp).forEach(key=>{
+    const db=C.dbf[key]; if(!db) return;
     db.recs.forEach((rec,i)=>{
       if(!rec) return;
       const f=Object.keys(rec).find(k=>sameNo(rec[k],plotNo));
-      if(f){
-        const area=shp[key].areas[i]??null;
-        evid.push({doc:shp[key].name, where:`רשומה ${i+1}, שדה ${f}`, snippet:`שטח ${area!==null?area.toFixed(2)+" מ\"ר":"לא חושב"}`});
-        if(shpArea===null&&area!==null) shpArea={v:area, where:`${shp[key].name}, רשומה ${i+1}`};
-      }
+      if(!f) return;
+      const sh=C.shp[key].shapes[i], area=sh?sh.area:null;
+      evid.push({doc:C.shp[key].name, where:`רשומה ${i+1}, שדה ${f}`, snippet:`שטח ${area!==null?area.toFixed(2)+" מ\"ר":"לא חושב"}`});
+      if(!match&&sh) match={key, idx:i, area, doc:C.shp[key].name, where:`רשומה ${i+1}`};
     });
   });
-  const evidDocs=[...new Set(evid.map(e=>e.doc))];
-  if(!evid.length){
-    STAGE1.forEach(k=>setField(k,"","לא נמצא: המגרש לא נמצא במסמכים"));
-    renderLive();
-    out.innerHTML=`<p class="status bad">המגרש ${esc(plotNo)} לא נמצא באף אחד מהמסמכים שנקראו. לא חולצו נתונים. בדוק את המספר או העלה מסמך נוסף.</p>`+
-      `<p class="note">נקראו: ${esc(read.join(", ")||"אין")}. לא נקראו: ${esc(unread.join(", ")||"אין")}.</p>`;
-    return;
-  }
-  // חילוץ מטבלאות (שורת המגרש) ומטקסט
+  if(!evid.length) return {found:false, evid};
   const tbl={};
-  sheets.forEach(s=>{ const r=tableValues(s,plotNo); Object.keys(r.values).forEach(k=>{ if(!tbl[k]) tbl[k]=r.values[k]; }); });
-  const cands=textCandidates(pdfPages);
-  const picks={};
-  const notFound=[];
-  let statusNote="";
+  C.sheets.forEach(s=>{ const v=tableValues(s,plotNo); Object.keys(v).forEach(k=>{ if(!tbl[k]) tbl[k]=v[k]; }); });
+  return {found:true, evid, tbl, cands:textCandidates(C.pdf), match};
+}
+function applyExtract(res){
+  const picks={}, notFound=[];
   STAGE1.forEach(k=>{
     if(k==="uses"||k==="parking"){ setField(k,"","לא נמצא במסמכים: להזין ידנית"); return; }
-    if(k==="plotArea"){
-      if(tbl.plotArea){ setField(k,tbl.plotArea.v,tbl.plotArea.where); return; }
-      if(shpArea){ setField(k,shpArea.v.toFixed(2),shpArea.where+" (חושב מהצורה)"); return; }
-      const pl=cands.plotArea||[];
-      if(new Set(pl.map(x=>x.v)).size===1){ const c=pl[0]; setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`); return; }
-      setField(k,"","לא נמצא במסמכים"); notFound.push(FIELDS.find(f=>f[0]===k)[1]); return;
+    if(k==="plotArea"&&!res.tbl.plotArea&&res.match&&res.match.area!==null){
+      setField(k,res.match.area.toFixed(2),`שכבת SHP (${res.match.doc}), ${res.match.where}, שטח מחושב מהצורה`); return;
     }
-    if(tbl[k]){ setField(k,tbl[k].v,tbl[k].where); return; }
-    const list=cands[k]||[];
-    const distinct=[...new Set(list.map(x=>x.v))];
+    if(res.tbl[k]){ setField(k,res.tbl[k].v,res.tbl[k].where); return; }
+    const list=res.cands[k]||[], distinct=[...new Set(list.map(x=>x.v))];
     if(distinct.length===1){ const c=list[0]; setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`); return; }
     if(distinct.length>1){ picks[k]=list; setField(k,"","ממתין לבחירה מהמועמדים"); return; }
-    setField(k,"","לא נמצא במסמכים"); notFound.push(FIELDS.find(f=>f[0]===k)[1]);
+    setField(k,"","לא נמצא במסמכים"); notFound.push(labelOf(k));
   });
-  // בדיקת שטח מגרש: טבלה מול שכבה
-  if(tbl.plotArea&&shpArea){
-    const diff=Math.abs(tbl.plotArea.v-shpArea.v)/shpArea.v*100;
-    statusNote=`שטח מגרש: טבלה ${fmt(tbl.plotArea.v,0)} מ"ר מול שכבה ${fmt(shpArea.v,0)} מ"ר, סטייה ${fmt(diff,2)}%. ${diff<=0.5?"תקין (עד 0.5%).":"חורג מ-0.5%: ממצא לאימות באדום."}`;
-  }
-  window.__picks=picks;
-  let pickHTML="";
-  Object.keys(picks).forEach(k=>{
-    const opts=picks[k].map((c,i)=>`<option value="${i}">${esc(c.v)} · ${esc(c.where)} · "${esc(c.snippet)}"</option>`).join("");
-    pickHTML+=`<div class="pickrow"><span>${esc(FIELDS.find(f=>f[0]===k)[1])}: נמצאו מועמדים שונים. בחר אחד:</span><select data-pick="${k}"><option value="">בחר</option>${opts}</select></div>`;
-  });
-  out.innerHTML=
-    `<h3>המגרש נמצא</h3>`+
-    evid.slice(0,12).map(e=>`<p class="evid">${esc(e.doc)} · ${esc(e.where)} · ${esc(e.snippet)}</p>`).join("")+
-    (evid.length>12?`<p class="note">ועוד ${evid.length-12} מקומות.</p>`:"")+
-    `<p class="note">נמצא ב-${evidDocs.length} מסמכים. נקראו: ${esc(read.join(", ")||"אין")}. לא נקראו: ${esc(unread.join(", ")||"אין")}.</p>`+
-    (statusNote?`<p class="status">${esc(statusNote)}</p>`:"")+
-    (notFound.length?`<p class="status bad">לא נמצא במסמכים, להזין ידנית: ${esc(notFound.join(", "))}.</p>`:"")+
-    pickHTML+
-    `<p class="note">הערכים הוזנו לטופס עם מקורם. בדוק כל ערך מול המקור לפני הרצת המודל.</p>`;
-  renderLive();
+  return {picks, notFound};
 }
-document.getElementById("docResult").addEventListener("change",e=>{
+function tryAdvance2(){
+  if(S3_DONE||!FOUND) return;
+  if(readRights().ok) renderStep3();
+}
+document.getElementById("btnExtract").addEventListener("click", async()=>{
+  const out=document.getElementById("out2"), plotNo=document.getElementById("plotNo").value.trim();
+  if(!CACHE){ out.innerHTML=`<p class="status bad">יש להעלות מסמכים במשימה 1.</p>`; return; }
+  if(!plotNo){ out.innerHTML=`<p class="status bad">יש להזין מספר מגרש או תא שטח.</p>`; return; }
+  out.innerHTML=busyHTML("מחפש את המגרש בכל המסמכים..."); await wait(700);
+  const res=extract(CACHE,plotNo);
+  if(!res.found){
+    FOUND=false; MATCH=null;
+    STAGE1.forEach(k=>setField(k,"","לא נמצא: המגרש לא נמצא במסמכים"));
+    out.innerHTML=`<p class="status bad">המגרש ${esc(plotNo)} לא נמצא באף אחד מהמסמכים שנקראו. לא חולצו נתונים. בדוק את המספר או העלה מסמך נוסף.</p>`;
+    return;
+  }
+  out.innerHTML=busyHTML("מחלץ את הפרמטרים ומקשר כל ערך למקורו..."); await wait(700);
+  FOUND=true; MATCH=res.match;
+  const ap=applyExtract(res); PICKS=ap.picks;
+  const docs=[...new Set(res.evid.map(e=>e.doc))];
+  let areaNote="";
+  if(res.tbl.plotArea&&res.match&&res.match.area) {
+    const diff=Math.abs(res.tbl.plotArea.v-res.match.area)/res.match.area*100;
+    areaNote=`<p class="status ${diff>0.5?"bad":""}">שטח מגרש: טבלה ${fmt(res.tbl.plotArea.v,0)} מ"ר מול שכבה ${fmt(res.match.area,0)} מ"ר, סטייה ${fmt(diff,2)}%. ${diff<=0.5?"תקין (עד 0.5%).":"חורג מ-0.5%: ממצא לאימות באדום."}</p>`;
+  }
+  const picksHTML=Object.keys(PICKS).map(k=>`<div class="pickrow"><span>${esc(labelOf(k))}: נמצאו מועמדים שונים. בחר אחד:</span><select data-pick="${k}"><option value="">בחר</option>${PICKS[k].map((c,i)=>`<option value="${i}">${esc(c.v)} · ${esc(c.where)} · "${esc(c.snippet)}"</option>`).join("")}</select></div>`).join("");
+  out.innerHTML=`<p class="status">המגרש ${esc(plotNo)} נמצא ב-${docs.length} מסמכים. הערכים מופיעים בטופס למטה עם מקורם.</p>`+
+    res.evid.slice(0,10).map(e=>`<p class="evid">${esc(e.doc)} · ${esc(e.where)} · ${esc(e.snippet)}</p>`).join("")+
+    areaNote+
+    (ap.notFound.length?`<p class="status bad">לא נמצא במסמכים, להזין ידנית: ${esc(ap.notFound.join(", "))}.</p>`:"")+
+    picksHTML+
+    `<p class="note">לפני המעבר לשלב הבא, יש לבדוק כל ערך מול המקור. ערך ממתין לבחירה יחסום את המודל.</p>`;
+  tryAdvance2();
+});
+document.getElementById("out2").addEventListener("change",e=>{
   const k=e.target.dataset.pick; if(!k) return;
   const i=e.target.value; if(i==="") return;
-  const c=window.__picks[k][Number(i)];
+  const c=PICKS[k][Number(i)];
   setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`);
-  renderLive();
+  delete PICKS[k];
+  tryAdvance2();
 });
-document.getElementById("runDocs").addEventListener("click",()=>runDocs().catch(err=>{
-  document.getElementById("docResult").innerHTML=`<p class="status bad">שגיאה בחילוץ: ${esc(err.message)}</p>`;
-}));
+document.getElementById("lform1").addEventListener("input",()=>{ if(FOUND&&!S3_DONE) tryAdvance2(); });
+/* ---------- זכויות, כלכלה, וגיאומטריה ---------- */
+function readRights(){
+  const miss=R1.filter(k=>numOf(k)===null).map(labelOf);
+  if(miss.length) return {ok:false, miss};
+  const n=numOf;
+  const r={plot:n("plotArea"),cov:n("cov"),bp:n("bp"),floors:n("floors"),below:n("below"),h:n("h"),front:n("front"),side:n("side"),rear:n("rear"),units:n("units"),dens:n("dens"),uses:val("uses")||"לא נמצא",fl:n("fl"),sell:n("sell")/100,avg:n("avg")};
+  const bad=[];
+  if(r.plot<=0) bad.push("שטח מגרש חייב להיות חיובי");
+  if(r.floors<1) bad.push("קומות מעל לקרקע: לפחות 1");
+  if(r.fl<=0) bad.push("גובה קומה חייב להיות חיובי");
+  if(r.sell<=0||r.sell>1) bad.push("שטח נטו: בין 1 ל-100");
+  return bad.length?{ok:false, miss:bad}:{ok:true, R:r};
+}
+function readEcon(){
+  const miss=E1.filter(k=>numOf(k)===null).map(labelOf);
+  if(miss.length) return {ok:false, miss};
+  const n=numOf;
+  return {ok:true, E:{target:n("target"),pMain:n("pMain"),cons:n("cons"),land:n("land"),fees:n("fees"),plan:n("plan")/100,cont:n("cont")/100,mkt:n("mkt")/100,rate:n("rate")/100,build:n("build"),sale:n("sale"),delay:numOf("delay")??0,disc:n("disc")/100,tgtProfit:n("tgtProfit")}};
+}
+function currentR(){
+  const rr=readRights(); if(!rr.ok) return null;
+  const er=readEcon();
+  R=Object.assign({}, rr.R, er.ok?er.E:{});
+  return {econOk:er.ok, econMiss:er.miss||[]};
+}
+function genAlts(){
+  const area=R.plot, maxFp=R.cov/100*area, gross=R.bp/100*area, fMax=Math.min(R.floors, Math.floor(R.h/R.fl));
+  const mk=ratio=>{ const fp=maxFp*ratio; const fl=Math.max(1,Math.min(fMax, Math.floor(gross/fp))); return {fp:Math.round(fp), fl, below:0, purpose:R.uses}; };
+  return {"א":mk(0.9),"ב":mk(0.6),"ג":mk(0.75)};
+}
+function envelopeAlt(){
+  const area=R.plot, fp=R.cov/100*area, gross=R.bp/100*area, fMax=Math.min(R.floors, Math.floor(R.h/R.fl));
+  return {fp:Math.round(fp), fl:Math.max(1,Math.min(fMax, Math.floor(gross/fp))), below:0, purpose:R.uses};
+}
+function scenePayload(alt){
+  const P=Math.sqrt(R.plot), g=geo(alt);
+  return {P, x0:-P/2+R.side, x1:P/2-R.side, z0:-P/2+R.rear, z1:P/2-R.front, w:g.w, d:g.d, H:alt.fl*R.fl, fl:R.fl, floors:alt.fl, maxH:R.h, breach:Math.min(g.mx,g.my)<0, view:lview};
+}
+function pushScene(alt){
+  lastAlt=alt;
+  const p=scenePayload(alt);
+  if(window.scene3d) window.scene3d.update(p); else window.__scenePending=p;
+}
+/* ---------- מפה ---------- */
+function drawMap(){
+  const svg=document.getElementById("map"), leg=document.getElementById("legend");
+  const layer=MATCH&&CACHE.shp[MATCH.key];
+  if(!layer){
+    svg.innerHTML=""; leg.innerHTML=`<p class="note">אין שכבת מגרשים (SHP+DBF) להצגה על התשריט.</p>`;
+    return;
+  }
+  const shapes=layer.shapes, db=CACHE.dbf[MATCH.key];
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  shapes.forEach(s=>{ if(s) s.rings.forEach(r=>r.forEach(([x,y])=>{ xmin=Math.min(xmin,x); xmax=Math.max(xmax,x); ymin=Math.min(ymin,y); ymax=Math.max(ymax,y); })); });
+  const W=600, span=Math.max(xmax-xmin,ymax-ymin,1), sc=(W-40)/span, H=(ymax-ymin)*sc+40;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H.toFixed(0)}`);
+  const first=db&&db.recs.find(r=>r);
+  const useKey=first?Object.keys(first).find(k=>/use|usage|שימוש|סוג/i.test(k)):null;
+  const palette=["#e8e8e8","#f3dcc9","#d6eadb","#dbe3f3","#f0e4b8","#eedbeb"];
+  const seen={}; let pi=0;
+  const colorOf=v=>{ if(!(v in seen)) seen[v]=palette[pi++%palette.length]; return seen[v]; };
+  const P=([x,y])=>[20+(x-xmin)*sc, H-20-(y-ymin)*sc];
+  let body="";
+  shapes.forEach((s,i)=>{
+    if(!s) return;
+    const d=s.rings.map(r=>"M"+r.map(p=>P(p).map(v=>v.toFixed(1)).join(",")).join(" L")+" Z").join(" ");
+    const use=useKey&&db.recs[i]?db.recs[i][useKey]:"";
+    const isMatch=i===MATCH.idx;
+    const base=useKey?colorOf(use||"לא מוגדר"):"#fafafa";
+    const fill=isMatch?"#fff3c4":base;
+    body+=`<path d="${d}" fill="${fill}" stroke="#1f5fbf" stroke-width="${isMatch?2.5:1}"/>`;
+  });
+  svg.innerHTML=body;
+  leg.innerHTML=`<h3>מקרא</h3>`+
+    (useKey?Object.keys(seen).map(v=>`<div class="legrow"><span class="sw" style="background:${seen[v]}"></span>${esc(v)}</div>`).join(""):`<p class="note">אין שדה שימוש בשכבה, ולכן השימושים לא מוצגים.</p>`)+
+    `<div class="legrow"><span class="sw" style="background:#fff3c4;border:2px solid #1f5fbf"></span>המגרש המבוקש</div>`+
+    `<div class="legrow"><span class="sw" style="border:1px solid #1f5fbf"></span>קו מגרש (כחול)</div>`;
+}
+/* ---------- משימה 3: מודל נפחי לפי זכויות ---------- */
+async function renderStep3(){
+  if(S3_DONE) return;
+  S3_DONE=true;
+  setStep(3);
+  const out=document.getElementById("out3");
+  out.innerHTML=busyHTML("בונה מודל נפחי לפי הזכויות ומפת המגרשים..."); await wait(900);
+  currentR();
+  drawMap();
+  document.getElementById("st3scene").appendChild(document.getElementById("scene"));
+  const env=envelopeAlt();
+  pushScene(env);
+  out.innerHTML=`<p class="status">נפח מרבי לפי הזכויות: שטח קומה ${fmt(env.fp,0)} מ"ר (תכסית ${fmt(R.cov,0)}%), ${env.fl} קומות, גובה ${fmt(env.fl*R.fl)} מ'. זה מה שמותר, ולא מחויב לאף חלופה.</p>`+
+    (MATCH?"":`<p class="note">המגרש לא הופיע בשכבה, ולכן המודל מוצג בלי מפה.</p>`);
+  setStep(4);
+}
+/* ---------- משימה 4: שלוש חלופות ---------- */
+function altTable(list){
+  const first=list[0].rows;
+  const head=`<tr><th>קריטריון</th>${list.map(a=>`<th>חלופה ${esc(a.k)}</th>`).join("")}<th>גבול</th><th>הסבר</th></tr>`;
+  const body=first.map((row,i)=>`<tr><td>${esc(row.l)}</td>${list.map(a=>{const r=a.rows[i]; return `<td class="num">${esc(r.v)} <span class="dot ${r.s}"></span></td>`;}).join("")}<td>${esc(row.lim)}</td><td class="expl">${esc(row.e)}</td></tr>`).join("");
+  return `<table class="wtable"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+document.getElementById("btnAlts").addEventListener("click", async()=>{
+  const out=document.getElementById("out4");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות. חזור למשימה 2.</p>`; return; }
+  out.innerHTML=busyHTML("מייצר שלוש חלופות בתוך הזכויות..."); await wait(1000);
+  ALTS=genAlts(); lcur="א";
+  const list=Object.keys(ALTS).map(k=>({k, c:calc(ALTS[k])}));
+  out.innerHTML=`<table class="wtable"><thead><tr><th>פרמטר</th>${list.map(a=>`<th>חלופה ${a.k}</th>`).join("")}<th>גבול מהזכויות</th></tr></thead><tbody>`+
+    [
+      ["שטח קומה (מ\"ר)", a=>fmt(a.c.fp,0), "לפי תכסית מרבית"],
+      ["מספר קומות", a=>a.c.fl, "עד "+R.floors],
+      ["שטח כולל (מ\"ר)", a=>fmt(a.c.gross,0), "עד "+fmt(R.bp/100*R.plot,0)+" מ\"ר"],
+      ["תכסית (%)", a=>fmt(a.c.cov)+"%", "עד "+R.cov+"%"],
+      ["אחוזי בנייה (%)", a=>fmt(a.c.bp,0)+"%", "עד "+R.bp+"%"],
+      ["גובה (מ')", a=>fmt(a.c.h)+" מ'", "עד "+R.h+" מ'"],
+      ["ניצול זכויות (%)", a=>fmt(a.c.use,0)+"%", "100% = ניצול מלא"]
+    ].map(([l,f,lim])=>`<tr><td>${esc(l)}</td>${list.map(a=>`<td class="num">${esc(f(a))}</td>`).join("")}<td>${esc(lim)}</td></tr>`).join("")+
+    `</tbody></table><p class="note">החלופות נוצרו לפי כללי היצירה של הממשק: 90%, 60% ו-75% מהתכסית המרבית, ובתוך הגובה והקומות המותרים. אלה לא מאפיון ולא דרישת הרשות.</p>`;
+  const sel=Object.keys(ALTS).map(k=>`<button type="button" data-la="${k}" class="${k===lcur?"on":"alt"}">חלופה ${k}: ${esc(ALT_DESC[k])}</button>`).join("");
+  document.getElementById("lAltSeg").innerHTML=sel;
+  document.getElementById("st4scene").appendChild(document.getElementById("scene"));
+  pushScene(ALTS[lcur]);
+  setStep(5);
+});
+document.getElementById("lAltSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-la]"); if(!b) return;
+  lcur=b.dataset.la;
+  document.querySelectorAll("#lAltSeg button").forEach(x=>x.className=x===b?"on":"alt");
+  pushScene(ALTS[lcur]);
+});
+document.getElementById("lViewSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-lv]"); if(!b) return;
+  lview=b.dataset.lv;
+  document.querySelectorAll("#lViewSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  if(lastAlt) pushScene(lastAlt);
+});
+/* ---------- שורות בדיקה ---------- */
+function planRows(c){
+  const sb=Math.min(c.g.mx,c.g.my);
+  return [
+    {l:"תכסית", v:fmt(c.cov)+"%", lim:"עד "+R.cov+"%", s:stMax(c.cov,R.cov), e:"שטח הקרקע הבנוי מתוך שטח המגרש."},
+    {l:"אחוזי בנייה", v:fmt(c.bp,0)+"%", lim:"עד "+R.bp+"%", s:stMax(c.bp,R.bp), e:"השטח הכולל מחולק לשטח המגרש."},
+    {l:"קומות מעל לקרקע", v:c.fl, lim:"עד "+R.floors, s:stMax(c.fl,R.floors), e:"מספר הקומות בנפח."},
+    {l:"קומות מתחת לקרקע", v:c.below, lim:"עד "+R.below, s:stMax(c.below,R.below), e:"החלופות ללא קומות מרתף."},
+    {l:"גובה", v:fmt(c.h)+" מ'", lim:"עד "+R.h+" מ'", s:stMax(c.h,R.h), e:"גובה הנפח לפי גובה קומה."},
+    {l:"יח\"ד", v:c.units, lim:"עד "+R.units, s:stMax(c.units,R.units), e:"יחידות דיור לפי שטח נטו ושטח יח\"ד ממוצע."},
+    {l:"צפיפות", v:fmt(c.dens)+" יח\"ד לדונם", lim:"עד "+R.dens, s:stMax(c.dens,R.dens), e:"יח\"ד לדונם משטח המגרש."},
+    {l:"שימוש", v:c.purpose, lim:R.uses, s:R.uses==="לא נמצא"?"y":(c.purpose===R.uses?"g":"r"), e:"השימוש המוצע חייב להיות מותר בתכנית. אם השימושים לא נמצאו במסמכים, הבדיקה דורשת אימות."},
+    {l:"קווי בניין", v:sb<0?"חריגה "+fmt(-sb)+" מ'":"מרווח "+fmt(sb)+" מ'", lim:R.front+" / "+R.side+" / "+R.rear+" מ'", s:sb<0?"r":(sb<SB_WARN?"y":"g"), e:"הנפח חייב להיכנס לאזור הבנייה. מרווח קטן מ-1 מ' הוא אזהרה לצורך בגמישות."}
+  ];
+}
+function econRows(c){
+  const pg=profitGrade(c);
+  return [
+    {l:"רווח על עלות", v:fmt(c.pct)+"%", lim:"יעד "+R.tgtProfit+"%", s:c.pct>=R.tgtProfit?"g":(c.pct>=0?"y":"r"), e:"הרווח מתוך העלות הכוללת. מגיע ליעד: ירוק. מתחת: צהוב. שלילי: אדום."},
+    {l:"רווח על הכנסה", v:fmt(c.profit/c.rev*100)+"%", lim:"", s:c.profit>=0?"g":"r", e:"הרווח מתוך ההכנסה. להשוואה בלבד."},
+    {l:"NPV (קירוב)", v:fmt(c.npv,0)+" ₪", lim:"לא שלילי", s:c.npv<0?"r":"g", e:"ערך נוכחי נקי לפי שיעור ההיוון ומועדי התזרים."},
+    {l:"יח\"ד מול יעד היזם", v:c.units, lim:"יעד "+R.target, s:stMin(c.units,R.target), e:"כלל זה לא הוגדר באפיון (שאלה פתוחה). מוחל זמנית."},
+    {l:"ניצול זכויות", v:fmt(c.use,0)+"%", lim:"מעל 90% ירוק", s:stUse(c.use), e:"השטח המנוצל מתוך הזכויות המותרות."},
+    {l:"דירוג רווחיות", v:GN[pg], lim:"רווחי / בסדר / לא רווחי", s:pg, e:"רווחי: NPV לא שלילי ורווח ליעד. בסדר: NPV לא שלילי, רווח מתחת ליעד. לא רווחי: NPV או רווח שלילי."}
+  ];
+}
+function maybeStep6(){ if(DONE5.plan&&DONE5.econ) setStep(6); }
+document.getElementById("btnPlan").addEventListener("click",()=>{
+  const out=document.getElementById("out5a");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות.</p>`; return; }
+  const list=Object.keys(ALTS).map(k=>({k, rows:planRows(calc(ALTS[k]))}));
+  out.innerHTML=`<h3>בדיקה בהתאמה לדרישות והנחיות העירייה</h3>`+altTable(list)+
+    `<p class="note">כל שורה מציגה את הערך של החלופה, את הגבול מהתכנית, והסבר. ירוק: עומד בתנאי עם מרווח של לפחות 5%. צהוב: עומד במרווח קטן מ-5%. אדום: חורג.</p>`;
+  DONE5.plan=true; maybeStep6();
+});
+document.getElementById("btnEcon").addEventListener("click",()=>{
+  const out=document.getElementById("out5b");
+  const cur=currentR();
+  if(!cur||!cur.econOk){ out.innerHTML=`<p class="status bad">חסרים נתונים כלכליים: ${esc((cur?readEcon().miss:readRights().miss).join(", "))}.</p>`; return; }
+  const list=Object.keys(ALTS).map(k=>({k, rows:econRows(calc(ALTS[k]))}));
+  out.innerHTML=`<h3>בדיקת כלכליות</h3>`+altTable(list)+
+    `<p class="note">אחוזי הרווח מוצגים לצורך השוואה בין החלופות. הדירוג לפי NPV ורווח על עלות מול יעד היזם.</p>`;
+  DONE5.econ=true; maybeStep6();
+});
+/* ---------- משימה 6: המלצה ---------- */
+function buildReport(){
+  const cur=currentR();
+  const econOk=!!(cur&&cur.econOk);
+  const rows=Object.keys(ALTS).map(k=>{
+    const c=calc(ALTS[k]), pr=planRows(c), er=econOk?econRows(c):null;
+    const reds=pr.filter(x=>x.s==="r").length;
+    const sc=Math.round(pr.reduce((s,x)=>s+(x.s==="g"?1:x.s==="y"?0.5:0),0)/pr.length*100);
+    return {k, c, pr, er, reds, sc, pg:econOk?profitGrade(c):null};
+  });
+  const rank=g=>({g:0,y:1,r:2})[g]??3;
+  const sorted=[...rows].sort((a,b)=>a.reds-b.reds||(econOk?rank(a.pg)-rank(b.pg):0)||b.sc-a.sc);
+  const b=sorted[0];
+  const s1=`המלצה: חלופה ${b.k} (${ALT_DESC[b.k]}), עם ${b.reds} חריגות בדרישות העירייה וציון התאמה ${b.sc}%.`;
+  const s2=econOk?`רווחיות היזם שלה: ${GN[b.pg]} (רווח על עלות ${fmt(b.c.pct)}%).`:"הנתונים הכלכליים לא הוזנו, ולכן ההמלצה נשענת על הדרישות בלבד.";
+  const s3=b.reds?"יש בדיקות אדומות בחלופה, ולכן יש לבדוק אותן מול הרשות לפני קבלת ההחלטה.":"אין בדיקות אדומות מול דרישות העירייה.";
+  const list=rows.map(r=>({k:r.k, rows:r.er?r.pr.concat(r.er):r.pr}));
+  const pc=rows.map(r=>{
+    const all=r.er?r.pr.concat(r.er):r.pr;
+    const g=all.find(x=>x.s==="g"), bd=all.find(x=>x.s==="r")||all.find(x=>x.s==="y");
+    return `חלופה ${r.k} (${ALT_DESC[r.k]}): יתרון: ${g?g.l+" ("+g.v+")":"אין"}. חיסרון: ${bd?bd.l+" ("+bd.v+")":"אין חריגה"}.`;
+  });
+  const ver=rows.flatMap(r=>r.pr.filter(x=>x.s!=="g").map(x=>`חלופה ${r.k}: ${x.l} (${x.v})`));
+  const asm=[
+    "הנפח המרבי מחושב מהתכסית ואחוזי הבנייה שחולצו. גובה הקומה 3.2 מ' לפי נוהל האפיון, אלא אם המסמכים קובעים אחרת.",
+    "המגרש בתלת-ממד הוא מלבן בשטח המגרש, לא הצורה המדויקת. המפה מציגה את הצורה המדויקת.",
+    "החלופות נוצרו לפי כללי היצירה של הממשק (90%, 60% ו-75% מהתכסית). אלה לא מאפיון ולא דרישת הרשות.",
+    `השטח הבנוי ממוקם במרכז אזור הבנייה. סף אזהרה לקווי בניין: ${SB_WARN} מ'.`,
+    "קומות מתחת לקרקע בחלופות: 0, כי לא הוגדר באפיון. חניה לא נבדקה.",
+    "כלל יעד היזם לגבי יחידות הדיור הוא שאלה פתוחה באפיון."
+  ];
+  const src=(LIVE_SOURCES()).map(r=>`${r.label}: ${r.value||"לא נמצא"} · ${r.src||"בלי מקור"}`);
+  return [
+    {h:"מסקנה", p:[s1,s2,s3]},
+    {h:"טבלת השוואה", table:{head:["קריטריון",...list.map(a=>"חלופה "+a.k),"גבול","הסבר"], rows:list[0].rows.map((row,i)=>[{t:row.l},...list.map(a=>({t:`${a.rows[i].v} (${W3[a.rows[i].s]})`, c:a.rows[i].s})),{t:row.lim},{t:row.e}])}},
+    {h:"יתרונות וחסרונות", p:pc},
+    {h:"מה לבדוק מול הרשות", p:ver.length?ver:["אין פריטים לבדיקה מול הרשות."]},
+    {h:"המלצה והנחות", li:asm},
+    {h:"מקור לכל מספר", li:[...src,"מספרים מחושבים (תכסית, אחוזי בנייה, גובה, יח\"ד, צפיפות, ניצול, רווח ו-NPV) חושבו מהערכים לעיל."]}
+  ];
+}
+const W3={g:"ירוק",y:"צהוב",r:"אדום"};
+function LIVE_SOURCES(){
+  return FIELDS.filter(f=>f[6]===1||f[6]===3).map(f=>({label:f[1], value:val(f[0]), src:srcOf(f[0])}));
+}
+function tblHTML(t){
+  return `<table class="wtable"><thead><tr>${t.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(c=>`<td class="num">${esc(c.t)}${c.c?` <span class="dot ${c.c}"></span>`:""}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+document.getElementById("btnRec").addEventListener("click", async()=>{
+  const out=document.getElementById("lreport");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות.</p>`; return; }
+  out.innerHTML=busyHTML("מנסח את ההמלצה ואת דוח ההשוואה..."); await wait(900);
+  const rep=buildReport();
+  out.innerHTML=rep.map(s=>`<h3>${esc(s.h)}</h3>`+(s.table?tblHTML(s.table):"")+(s.p||[]).map(t=>`<p>${esc(t)}</p>`).join("")+(s.li?`<ul>${s.li.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"")).join("");
+  lastReportText=rep.map(s=>[s.h,...(s.table?[s.table.head.join(" | "),...s.table.rows.map(r=>r.map(c=>c.t).join(" | "))]:[]),...(s.p||[]),...(s.li||[]).map(t=>"- "+t)].join("\n")).join("\n\n");
+});
+async function copyText(text,toast){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(text); ok=true; }catch(err){
+    const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ ok=document.execCommand("copy"); }catch(e2){ ok=false; }
+    ta.remove();
+  }
+  toast.textContent=ok?"הועתק":"ההעתקה נחסמה בתצוגה הזו";
+  setTimeout(()=>toast.textContent="",2000);
+}
+document.getElementById("copyRep").addEventListener("click",()=>copyText(lastReportText,document.getElementById("repToast")));
+function setMode(m){
+  appMode=m;
+  document.querySelectorAll(".modes button").forEach(b=>b.classList.toggle("on",b.dataset.mode===m));
+  document.getElementById("demoMode").hidden=m!=="demo";
+  document.getElementById("liveMode").hidden=m!=="live";
+  if(m==="demo"){
+    DEMO_R.target=Number(document.getElementById("target").value)||0;
+    R=DEMO_R; ALTS=DEMO_ALTS;
+    renderRights(); renderAltSeg(); renderView(); renderFit();
+  } else {
+    setStep(WZ);
+  }
+}
+document.querySelectorAll(".modes button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+setTimeout(()=>{ if(!window.scene3d) document.getElementById("sceneMsg").textContent="התצוגה התלת-ממדית לא נטענה (אין חיבור ל-CDN). המפה והבדיקות פועלים."; },8000);
 buildForms();
+setStep(1);
 renderRights(); renderAltSeg(); renderView(); renderFit();
 </script>
 <script type="module">
