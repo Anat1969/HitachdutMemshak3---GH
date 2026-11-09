@@ -47,14 +47,15 @@ Build a 3D massing model from the rights extracted in stage 1 only. Inputs: plot
 ### עברית
 בחן כל חלופה לאורך שני צירים.
 ציר תב"ע ועירייה: כל פרמטר מהשלב הראשון מול החלופה. ירוק: עומד בתנאי עם מרווח של לפחות 5%. צהוב: עומד בתנאי עם מרווח קטן מ-5%. אדום: חורג.
-ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום.
+קווי בניין: בדוק שהחלופה נכנסת לאזור הבנייה, שהוא המגרש פחות קווי הבניין. חריגה מסומנת באדום עם המרחק המדויק. מרווח קטן מ-1 מ' בתוך האזור מסומן בצהוב כאזהרה לצורך בגמישות. קומות מתחת לקרקע, צפיפות ושימוש מותר נבדקים מול הערכים מהשלב הראשון.
+ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום. רווחיות היזם: רווחי (ירוק) כש-NPV אינו שלילי ורווח על עלות מגיע ליעד היזם; בסדר (צהוב) כש-NPV אינו שלילי ורווח על עלות מתחת ליעד; לא רווחי (אדום) כש-NPV שלילי או כשהרווח שלילי. NPV מחושב לפי מודל כדאיות עם שיעור ההיוון ומועדי התזרים שהוגדרו בו.
 חשב אחוזי התאמה: ירוק = 1, צהוב = 0.5, אדום = 0, ממוצע על כל הבדיקות כפול 100.
 לכל חלופה: טבלה, אחוזי התאמה, יתרון אחד, חיסרון אחד, ומה לבדוק מול הרשות. אם נתון מהשלב הראשון חסר, זקק את הפער וסמן אותו, ואל תשלים אותו.
 
 ### English
 Examine each alternative on two axes.
-Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit.
-Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%.
+Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit. Setbacks: check that the alternative fits within the permitted building zone (plot minus setbacks). Exceedance is red, with the exact distance. A margin under 1 m inside the zone is yellow, as a warning that flexibility is needed. Underground floors, density and permitted use are checked against the stage 1 values.
+Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%. Profitability: profitable (green) when NPV is not negative and profit on cost reaches the developer target; fine (yellow) when NPV is not negative and profit on cost is below target; not profitable (red) when NPV is negative or profit is negative. NPV follows the feasibility model: discount rate and cash-flow timing as defined there.
 Fit score: green = 1, yellow = 0.5, red = 0, averaged over all checks, times 100.
 For each alternative show the table, the score, one advantage, one disadvantage, and what to verify with the planning authority. Distill the gap if a stage 1 value is missing, and do not fill it in.
 

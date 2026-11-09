@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <title>מפגש א: זכויות בנייה, חלופות והתאמה</title>
 <style>
 :root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e;--bg:#fff}
@@ -38,7 +42,7 @@ th{font-size:12px;color:var(--g3);font-weight:500}
 td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .src{font-size:11.5px;color:var(--g3)}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:4px;vertical-align:middle}
-.g{background:var(--gr)}.y{background:var(--ye)}.r{background:var(--rd)}
+.g{background:var(--gr)}.y{background:var(--ye)}.r{background:var(--rd)}.n{background:#bbb}
 .score{font-size:30px;font-weight:700;margin:4px 0}
 section.fit{padding:24px 40px;border-bottom:1px solid var(--g2)}
 .fitgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
@@ -60,6 +64,50 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 .copybar button{background:var(--ink);color:#fff;border:none;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px}
 .copybar button.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
 .toast{font-size:12px;color:var(--gr);align-self:center}
+.modes{display:flex;margin-top:16px}
+.modes button{border:1px solid var(--ink);background:#fff;padding:7px 16px;font:inherit;cursor:pointer;color:var(--ink)}
+.modes button.on{background:var(--ink);color:#fff}
+.live{padding:24px 40px 60px;border-top:1px solid var(--g2)}
+.live h3{font-size:15px;margin:18px 0 6px}
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.frow{display:grid;grid-template-columns:1.3fr .8fr 1.3fr;gap:6px;align-items:center;margin-bottom:6px;font-size:13px}
+.frow input{padding:5px 6px;border:1px solid var(--g2);font:inherit;width:100%;min-width:0;background:#fff}
+.u{color:var(--g3);font-size:11px}
+.status{font-size:14px;margin:12px 0;padding:8px 10px;border:1px solid var(--g2)}
+.status.bad{border-color:var(--rd);color:var(--rd)}
+.loadbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.filebtn{border:1px solid var(--ink);padding:8px 14px;cursor:pointer;font-size:13px}
+.scene{height:440px;width:100%;background:#f4f4f4;margin-top:10px}
+.docbox{border:1px solid var(--g2);padding:14px 16px;margin:14px 0}
+.docbox .plotlbl{display:flex;gap:10px;align-items:center;font-size:14px;margin-bottom:8px}
+.docbox .plotlbl input{padding:6px 8px;border:1px solid var(--g2);font:inherit;width:160px}
+.doclist{list-style:none;padding:0;margin:8px 0}
+.doclist li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--g1);font-size:13.5px}
+.evid{font-size:13px;margin:4px 0}
+.pickrow{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0;flex-wrap:wrap}
+.pickrow select{padding:5px;font:inherit;max-width:100%}
+.wstep{border-right:3px solid var(--ink);padding:10px 16px;margin:18px 0}
+.wstep h3{margin-top:0}
+.live button{background:var(--ink);color:#fff;border:none;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px;margin:4px 6px 4px 0}
+.live button.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.live button:disabled{opacity:.35;cursor:default}
+.busy{display:flex;gap:10px;align-items:center;font-size:14px;padding:8px 0}
+.spin{width:14px;height:14px;border:2px solid var(--g2);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mapwrap{display:grid;grid-template-columns:1fr 210px;gap:14px;align-items:start}
+#map{width:100%;height:auto;background:#fafafa;border:1px solid var(--g2)}
+.legrow{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.sw{display:inline-block;width:16px;height:12px;border:1px solid #999}
+.wtable{width:100%;border-collapse:collapse;font-size:13px}
+.wtable th,.wtable td{text-align:right;padding:6px;border-bottom:1px solid var(--g1);vertical-align:top}
+.wtable td.expl{color:#333;font-size:12.5px;max-width:320px}
+.evid{font-size:13px;margin:4px 0}
+.pickrow{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0;flex-wrap:wrap}
+.pickrow select{padding:5px;font:inherit;max-width:100%}
+.formgrid1{display:grid;grid-template-columns:1fr;gap:4px;margin-top:10px}
+@media (max-width:980px){.mapwrap{grid-template-columns:1fr}}
+#lout[hidden]{display:none}
+@media (max-width:980px){.formgrid{grid-template-columns:1fr}.frow{grid-template-columns:1fr 80px}.frow .src{grid-column:1/-1}.live{padding-left:20px;padding-right:20px}}
 @media (max-width:980px){main{grid-template-columns:1fr}.col{border-left:none;border-bottom:1px solid var(--g2)}.fitgrid{grid-template-columns:1fr}section.fit,section.learn,header{padding-left:20px;padding-right:20px}}
 </style>
 </head>
@@ -74,8 +122,13 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
     <a href="#s2">שלב 2 · מודל וחלופות</a>
     <a href="#s3">שלב 3 · בדיקת התאמה</a>
   </nav>
+  <div class="modes">
+    <button type="button" data-mode="demo" class="on">דוגמה</button>
+    <button type="button" data-mode="live">המחשה</button>
+  </div>
 </header>
 
+<div id="demoMode">
 <main>
   <div class="col" id="s1">
     <h2>קלט</h2>
@@ -117,6 +170,9 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
 <section class="fit" id="s3">
   <h2>בדיקת התאמה: תב"ע ועירייה מול יזם</h2>
+  <div class="label">יעד יח"ד של היזם (דמו, שדה קלט)</div>
+  <input type="number" id="target" value="32" min="0" aria-label="יעד יח&quot;ד של היזם" style="max-width:200px">
+  <p class="note">נתוני הרווחיות דמו בלבד. מודל הכדאיות בתיק הריפו (docs/feasibility_model_tba603.xlsx) ריק, ולכן אין בו ערכים מאומתים.</p>
   <div class="fitgrid" id="fit"></div>
 </section>
 
@@ -126,11 +182,11 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">שלב 1: מיפוי זכויות בנייה למגרש</h2>
   <details open><summary><span class="step">1</span>מה משנה במספר אחוזי הבנייה</summary>
-    <p>מאז תיקון דצמבר 2023 לתקנות חישוב השטחים (התשנ"ב-1992), אין חובה לפצל בתכנית בין שטחים עיקריים לשטחי שירות. לכן הקלט חייב לזהות איזה נוסח חל על התכנית לפני שמחשבים אחוזים.</p>
+    <p>מאז תיקון דצמבר 2023 לתקנות חישוב השטחים (התשנ"ב-1992), אין חובה לפצל בתכנית בין שטחים עיקריים לשטחי שירות. לכן הקלט חייב לזהות איזה נוסח חל על התכנית לפני שמחשבים אחוזים. (לא אומת בבדיקה: תיקון 2025 קיים ולא נבדק.)</p>
     <p><b>נבין:</b> האם הטבלה מציגה שטח כולל או פיצול? מה קורה כשהתכנית ישנה יותר מ-1992?</p>
   </details>
   <details><summary><span class="step">2</span>שטח מגרש, תכסית וקווי בניין</summary>
-    <p>שטח המגרש נלקח מטבלת הזכויות ומתאם לשכבת המגרש. סטייה של עד 0.5% בין השייפ לטבלה נחשבת תקינה. תכסית וקווי בניין מגיעים מההוראות, לא מהתשריט בלבד.</p>
+    <p>שטח המגרש נלקח מטבלת הזכויות ומתאם לשכבת המגרש. סטייה של עד 0.5% בין השייפ לטבלה נחשבת תקינה. תכסית וקווי בניין מגיעים מההוראות, לא מהתשריט בלבד. קו בניין קדמי, צדדי ואחורי נבדקים בנפרד.</p>
   </details>
   <details><summary><span class="step">3</span>קומות, גובה וזכויות מתחת לקרקע</summary>
     <p>מספר קומות מעל ומתחת לקרקע מופיע בהוראות. גובה מרבי נמדד לפי ההגדרה שבתכנית, לא לפי הנחה כללית.</p>
@@ -168,10 +224,10 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">שלב 3: בדיקת התאמה</h2>
   <details open><summary><span class="step">1</span>צד תב"ע ועירייה</summary>
-    <p>כל פרמטר מהשלב הראשון נבדק מול החלופה. <b>ירוק:</b> עומד בתנאי עם מרווח של לפחות 5%. <b>צהוב:</b> עומד בתנאי, אך במרווח קטן מ-5%. <b>אדום:</b> חורג.</p>
+    <p>כל פרמטר מהשלב הראשון נבדק מול החלופה. <b>ירוק:</b> עומד בתנאי עם מרווח של לפחות 5%. <b>צהוב:</b> עומד בתנאי, אך במרווח קטן מ-5%. <b>אדום:</b> חורג. בקווי בניין, חריגה מסומנת באדום עם המרחק המדויק. מרווח קטן מ-1 מ' בתוך אזור הבנייה מסומן בצהוב כאזהרה לצורך בגמישות.</p>
   </details>
   <details><summary><span class="step">2</span>צד יזם</summary>
-    <p>שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%), מספר יח"ד מול יעד היזם, שטח יח"ד ממוצע, וניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום.</p>
+    <p>שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%), מספר יח"ד מול יעד היזם, שטח יח"ד ממוצע, וניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום. <b>רווחיות:</b> רווחי (ירוק), בסדר (צהוב), לא רווחי (אדום), לפי NPV ורווח על עלות מול יעד היזם.</p>
   </details>
   <details><summary><span class="step">3</span>אחוזי התאמה</summary>
     <p>ירוק = 1, צהוב = 0.5, אדום = 0. הממוצע על כל הבדיקות כפול 100. המספר מסייע להשוואה, אבל לא מחליף את הפירוט.</p>
@@ -189,16 +245,86 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">איך נמדדת האמינות של הכלי</h2>
   <details open><summary>מקרה מבחן ראשון</summary>
-    <p>תב"ע 603 כבר נבדקה ידנית, ונמצאו בה שישה ממצאים לאימות: סיכומי שטח שאינם תואמים לרכיבים, שורת סיכום שמשתנה לאחר תיקון, ושגיאת הקלדה באחוזי בנייה. הכלי צריך לזהות את כל הממצאים האלה לבד.</p>
+    <p>תב"ע 603-0811588 כבר נבדקה ידנית, ונמצאו בה שישה ממצאים לאימות: סיכומי שטח שאינם תואמים לרכיבים, שורת סיכום שמשתנה לאחר תיקון, ושגיאת הקלדה באחוזי בנייה. הכלי צריך לזהות את כל הממצאים האלה לבד.</p>
   </details>
   <details><summary>מדדים</summary>
     <p>כל ערך מהשלב הראשון מקושר למקור: יעד 100%. סטיית שטח מול שייפ: עד 0.5%. ממצא עקביות שלא זוהה במקרה המבחן נרשם ככשל של הכלי.</p>
   </details>
 </section>
+</div>
+
+<section class="live" id="liveMode" hidden>
+  <h2 class="big" style="margin-top:0">מצב המחשה: שישה שלבים, אחד אחרי השני</h2>
+  <p class="note">כל משימה נפתחת אחרי שהקודמת הושלמה. הנתונים מחושבים רק ממה שחולץ מהמסמכים או הוזן ידנית.</p>
+
+  <div class="wstep" data-step="1">
+    <h3>משימה 1: העלאת מסמכי התכנית</h3>
+    <label class="filebtn">בחר מסמכים (PDF, XLSX, CSV, DXF, SHP+DBF)<input type="file" id="docFiles" multiple accept=".pdf,.xlsx,.xls,.csv,.dxf,.shp,.dbf,.jpg,.jpeg,.png" hidden></label>
+    <ul class="doclist" id="docList"><li class="u">לא נבחרו מסמכים</li></ul>
+    <button id="btnUpload" type="button" disabled>העלה מסמכים</button>
+    <div id="up1"></div>
+  </div>
+
+  <div class="wstep" data-step="2" hidden>
+    <h3>משימה 2: בחירת מגרש וחילוץ הנתונים</h3>
+    <label class="plotlbl">מספר מגרש / תא שטח <input id="plotNo" type="text" placeholder="למשל 633"></label>
+    <button id="btnExtract" type="button">חלץ נתונים למגרש</button>
+    <div id="out2"></div>
+    <div id="lform1" class="formgrid1"></div>
+  </div>
+
+  <div class="wstep" data-step="3" hidden>
+    <h3>משימה 3: מודל נפחי לפי הזכויות על תשריט התב"ע</h3>
+    <div class="mapwrap">
+      <svg id="map" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="legend"></div>
+    </div>
+    <div class="seg" id="lViewSeg">
+      <button data-lv="iso" class="on" type="button">איזומטרי</button>
+      <button data-lv="plan" type="button">תוכנית</button>
+      <button data-lv="elev" type="button">חזית</button>
+    </div>
+    <div id="st3scene"><div id="scene" class="scene"></div></div>
+    <p class="note" id="sceneMsg">גרירה מסובבת את המודל, גלגלת העכבר מזמת. המודל מציג רק את המגרש המבוקש.</p>
+    <div id="out3"></div>
+  </div>
+
+  <div class="wstep" data-step="4" hidden>
+    <h3>משימה 4: יצירת 3 חלופות</h3>
+    <button id="btnAlts" type="button">צור 3 חלופות</button>
+    <div id="out4"></div>
+    <div class="seg" id="lAltSeg"></div>
+    <div id="st4scene"></div>
+  </div>
+
+  <div class="wstep" data-step="5" hidden>
+    <h3>משימה 5: בדיקות</h3>
+    <p class="note">הנתונים הכלכליים אינם מחולצים מהמסמכים. יש להזין אותם כאן, והשדות ריקים עד הזנה.</p>
+    <div id="lform3" class="formgrid1"></div>
+    <div class="loadbar">
+      <button id="btnPlan" type="button">בדיקה בהתאמה לדרישות והנחיות העירייה</button>
+      <button id="btnEcon" type="button">בדיקת כלכליות</button>
+    </div>
+    <div id="out5a"></div>
+    <div id="out5b"></div>
+  </div>
+
+  <div class="wstep" data-step="6" hidden>
+    <h3>משימה 6: המלצה</h3>
+    <button id="btnRec" type="button">המלצה</button>
+    <div id="lreport"></div>
+    <div class="copybar"><button id="copyRep" type="button">העתק דוח (עברית)</button><span class="toast" id="repToast"></span></div>
+  </div>
+</section>
 
 <script>
-const R={plot:2000,cov:35,bp:250,floors:8,h:28,units:40,fl:3.2,sell:0.8,avg:90,target:32};
-const ALTS={"א":{fp:650,fl:6},"ב":{fp:600,fl:8},"ג":{fp:700,fl:7}};
+const DEMO_R={plot:2000,cov:35,bp:250,floors:8,below:1,h:28,units:40,dens:20,front:5,side:4,rear:4,uses:"מגורים",fl:3.2,sell:0.8,avg:90,target:32,
+  pMain:50000,cons:12000,plan:0.05,cont:0.05,mkt:0.03,fees:5000000,land:80000000,rate:0.06,build:30,delay:0,sale:12,disc:0.10,tgtProfit:30};
+let R=DEMO_R;
+const SB_WARN=1;
+const DEMO_ALTS={"א":{fp:650,fl:6,below:0,purpose:"מגורים"},"ב":{fp:600,fl:8,below:0,purpose:"מגורים"},"ג":{fp:700,fl:7,below:0,purpose:"מגורים"}};
+let ALTS=DEMO_ALTS;
+const GN={g:"רווחי",y:"בסדר",r:"לא רווחי"};
 let cur="א", mode="iso";
 
 const PROMPTS={
@@ -232,12 +358,13 @@ p2e:`Build a 3D massing model from the rights extracted in stage 1 only. Inputs:
 6. Place all numbers in collapsible panels so the screen stays uncluttered.`,
 p3h:`בחן כל חלופה לאורך שני צירים.
 ציר תב"ע ועירייה: כל פרמטר מהשלב הראשון מול החלופה. ירוק: עומד בתנאי עם מרווח של לפחות 5%. צהוב: עומד בתנאי עם מרווח קטן מ-5%. אדום: חורג.
-ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום.
+קווי בניין: בדוק שהחלופה נכנסת לאזור הבנייה, שהוא המגרש פחות קווי הבניין. חריגה מסומנת באדום עם המרחק המדויק. מרווח קטן מ-1 מ' בתוך האזור מסומן בצהוב כאזהרה לצורך בגמישות. קומות מתחת לקרקע, צפיפות ושימוש מותר נבדקים מול הערכים מהשלב הראשון.
+ציר יזם: שטח נטו למכירה מתוך השטח הכולל (ברירת מחדל 80%, ניתן לשינוי); מספר יח"ד מול יעד היזם (שדה קלט); שטח יח"ד ממוצע (ברירת מחדל 90 מ"ר); ניצול זכויות מתוך המותר. ניצול מעל 90% ירוק, בין 75% ל-90% צהוב, מתחת ל-75% אדום. רווחיות היזם: רווחי (ירוק) כש-NPV אינו שלילי ורווח על עלות מגיע ליעד היזם; בסדר (צהוב) כש-NPV אינו שלילי ורווח על עלות מתחת ליעד; לא רווחי (אדום) כש-NPV שלילי או כשהרווח שלילי. NPV מחושב לפי מודל כדאיות עם שיעור ההיוון ומועדי התזרים שהוגדרו בו.
 חשב אחוזי התאמה: ירוק = 1, צהוב = 0.5, אדום = 0, ממוצע על כל הבדיקות כפול 100.
 לכל חלופה: טבלה, אחוזי התאמה, יתרון אחד, חיסרון אחד, ומה לבדוק מול הרשות. אם נתון מהשלב הראשון חסר, זקק את הפער וסמן אותו, ואל תשלים אותו.`,
 p3e:`Examine each alternative on two axes.
-Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit.
-Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%.
+Planning axis: each parameter from stage 1 against the alternative. Green: meets the limit with at least 5% margin. Yellow: meets the limit with less than 5% margin. Red: exceeds the limit. Setbacks: check that the alternative fits within the permitted building zone (plot minus setbacks). Exceedance is red, with the exact distance. A margin under 1 m inside the zone is yellow, as a warning that flexibility is needed. Underground floors, density and permitted use are checked against the stage 1 values.
+Developer axis: net sellable share of gross area (default 80%, editable); unit count against the developer target (input field); average unit size (default 90 sqm, editable); rights utilization as a share of permitted rights: green above 90%, yellow 75% to 90%, red below 75%. Profitability: profitable (green) when NPV is not negative and profit on cost reaches the developer target; fine (yellow) when NPV is not negative and profit on cost is below target; not profitable (red) when NPV is negative or profit is negative. NPV follows the feasibility model: discount rate and cash-flow timing as defined there.
 Fit score: green = 1, yellow = 0.5, red = 0, averaged over all checks, times 100.
 For each alternative show the table, the score, one advantage, one disadvantage, and what to verify with the planning authority. Distill the gap if a stage 1 value is missing, and do not fill it in.`,
 p4h:`סנתז דוח השוואה בין החלופות. מבנה הדוח:
@@ -250,44 +377,71 @@ p4h:`סנתז דוח השוואה בין החלופות. מבנה הדוח:
 p4e:`Synthesize a comparison report for the alternatives. Structure: 1. Conclusion: the recommended alternative in three sentences. 2. Comparison table: parameter, A, B, C, status. 3. Advantages and disadvantages per alternative. 4. Recommendation and the assumptions behind it; expose every assumption not taken from a document. 5. Source for every number. Write plainly, with no preamble. Do not present a conclusion without naming the data it rests on.`
 };
 
+function geo(a){
+  const P=Math.sqrt(R.plot), w=Math.sqrt(a.fp*1.4), d=a.fp/w;
+  const zW=P-2*R.side, zD=P-R.front-R.rear;
+  return {w,d,mx:(zW-w)/2,my:(zD-d)/2};
+}
 function calc(a){
   const gross=a.fp*a.fl, cov=a.fp/R.plot*100, bp=gross/R.plot*100;
   const h=a.fl*R.fl, units=Math.floor(gross*R.sell/R.avg), use=bp/R.bp*100;
-  return {fp:a.fp,fl:a.fl,gross,cov,bp,h,units,use};
+  const dens=units/(R.plot/1000), g=geo(a);
+  const rev=gross*R.pMain, mkt=rev*R.mkt, cons=gross*R.cons, pl=cons*R.plan, co=cons*R.cont;
+  const fin=(R.land+R.fees+cons+pl+co)*R.rate*(R.build/24+R.delay/12);
+  const cost=R.land+R.fees+cons+pl+co+mkt+fin, profit=rev-cost;
+  const tB=R.build/12/2, tS=(R.build+R.delay+R.sale/2)/12;
+  const npv=(rev-mkt)/Math.pow(1+R.disc,tS)-(R.land+(R.fees+cons+pl+co)/Math.pow(1+R.disc,tB));
+  return {fp:a.fp,fl:a.fl,gross,cov,bp,h,units,use,dens,below:a.below,purpose:a.purpose,g,rev,cost,profit,pct:profit/cost*100,npv};
 }
-const stMax=(v,m)=>v>m?"r":(v>=m*0.95?"y":"g");
+const profitGrade=c=>(c.npv<0||c.profit<0)?"r":(c.pct>=R.tgtProfit?"g":"y");
+const stMax=(v,m)=>v>m?"r":(v>m*0.95?"y":"g");
 const stMin=(v,m)=>v<m?"r":(v<m*1.05?"y":"g");
-const stUse=v=>v>=90?"g":(v>=75?"y":"r");
+const stUse=v=>v>90?"g":(v>=75?"y":"r");
 const fmt=(n,d=1)=>Number(n).toLocaleString("he-IL",{maximumFractionDigits:d});
 
 function checks(c){
+  const sb=Math.min(c.g.mx,c.g.my), pg=profitGrade(c);
   return [
     ["תכסית מרבית ("+R.cov+"%)", fmt(c.cov)+"%", stMax(c.cov,R.cov)],
     ["אחוזי בנייה מרביים ("+R.bp+"%)", fmt(c.bp,0)+"%", stMax(c.bp,R.bp)],
-    ["מספר קומות ("+R.floors+")", c.fl, stMax(c.fl,R.floors)],
+    ["מספר קומות מעל ("+R.floors+")", c.fl, stMax(c.fl,R.floors)],
+    ["קומות מתחת לקרקע ("+R.below+")", c.below, stMax(c.below,R.below)],
     ["גובה מרבי ("+R.h+" מ')", fmt(c.h)+" מ'", stMax(c.h,R.h)],
     ["יח\"ד מול תקרה ("+R.units+")", c.units, stMax(c.units,R.units)],
+    ["צפיפות ("+R.dens+" יח\"ד לדונם)", fmt(c.dens), stMax(c.dens,R.dens)],
+    ["שימוש מותר ("+R.uses+")", c.purpose, c.purpose===R.uses?"g":"r"],
+    ["קווי בניין ("+R.front+" / "+R.side+" / "+R.rear+" מ')", sb<0?"חריגה "+fmt(-sb)+" מ'":"מרווח "+fmt(sb)+" מ'", sb<0?"r":(sb<SB_WARN?"y":"g")],
     ["יח\"ד מול יעד יזם ("+R.target+")", c.units, stMin(c.units,R.target)],
-    ["ניצול זכויות יזם", fmt(c.use,0)+"%", stUse(c.use)]
+    ["ניצול זכויות יזם", fmt(c.use,0)+"%", stUse(c.use)],
+    ["רווחיות יזם ("+fmt(c.pct)+"%)", GN[pg], pg]
   ];
 }
 const score=ch=>Math.round(ch.reduce((s,x)=>s+(x[2]==="g"?1:x[2]==="y"?0.5:0),0)/ch.length*100);
 
 function renderRights(){
+  const D="דמו: טרם חולץ ממסמך";
   const rows=[
-    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", "מקור: יוזן מהמסמכים", "g"],
-    ["תכסית מרבית", R.cov+"%", "מקור: יוזן מהמסמכים", "g"],
-    ["אחוזי בנייה", R.bp+"%", "מקור: יוזן מהמסמכים", "g"],
-    ["קומות מרבי", R.floors, "מקור: יוזן מהמסמכים", "g"],
-    ["גובה מרבי", R.h+" מ'", "מקור: יוזן מהמסמכים", "g"],
-    ["קו בניין קדמי / צדדי", "5 / 4 מ'", "מקור: יוזן מהמסמכים", "y"],
-    ["יח\"ד מרבי", R.units, "מקור: יוזן מהמסמכים", "g"],
-    ["חניה", "לא נמצא", "מקור: יוזן מהמסמכים", "r"]
+    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", D, "n"],
+    ["תכסית מרבית", R.cov+"%", D, "n"],
+    ["אחוזי בנייה", R.bp+"%", D, "n"],
+    ["קומות מעל לקרקע", R.floors, D, "n"],
+    ["קומות מתחת לקרקע", R.below, D, "n"],
+    ["גובה מרבי", R.h+" מ'", D, "n"],
+    ["קו בניין קדמי", R.front+" מ'", D, "n"],
+    ["קו בניין צדדי", R.side+" מ'", D, "n"],
+    ["קו בניין אחורי", R.rear+" מ'", D, "n"],
+    ["יח\"ד מרבי", R.units, D, "n"],
+    ["צפיפות מרבית", R.dens+" יח\"ד לדונם", D, "n"],
+    ["שימושים מותרים", R.uses, D, "n"],
+    ["חניה", "לא נמצא", "לא נמצא: לבדוק בהוראות התכנית", "n"]
   ];
   document.getElementById("rights").innerHTML=rows.map(r=>
     `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td><span class="dot ${r[3]}"></span></td></tr>
      <tr><td colspan="3" class="src">${r[2]}</td></tr>`).join("");
 }
+document.getElementById("target").addEventListener("input",e=>{
+  R.target=Number(e.target.value)||0; renderFit();
+});
 
 function renderAltSeg(){
   document.getElementById("altSeg").innerHTML=Object.keys(ALTS).map(k=>
@@ -316,7 +470,7 @@ function renderFit(){
 function renderView(){
   const k=ALTS[cur], c=calc(k), P=Math.sqrt(R.plot);
   const w=Math.sqrt(k.fp*1.4), d=k.fp/w, H=c.h;
-  const ox=(P-w)/2, oy=(P-d)/2, sf=5, ss=4, sr=4;
+  const sf=R.front, ss=R.side, sr=R.rear, ox=ss+((P-2*ss)-w)/2, oy=sr+((P-sf-sr)-d)/2;
   let svg="";
   if(mode==="iso"){
     const cs=Math.cos(Math.PI/6), sn=Math.sin(Math.PI/6), s=5;
@@ -395,7 +549,679 @@ document.querySelectorAll(".copybar button[data-key]").forEach(btn=>{
   });
 });
 
+/* ===== מצב המחשה: שישה שלבים, אחד אחרי השני ===== */
+let appMode="demo", lview="iso", lcur="א";
+let DOCS=[], CACHE=null, MATCH=null, PICKS={}, FOUND=false, S3_DONE=false, DONE5={plan:false,econ:false};
+let WZ=1, lastAlt=null, lastReportText="";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const busyHTML=m=>`<div class="busy"><span class="spin"></span><span>${esc(m)}</span></div>`;
+const ALT_DESC={"א":"רחבה: 90% מהתכסית המרבית","ב":"צרה: 60% מהתכסית המרבית","ג":"ביניים: 75% מהתכסית המרבית"};
+const DOC_EXT=/\.(pdf|xlsx|xls|csv|dxf|shp|dbf|jpg|jpeg|png)$/i;
+const STAGE1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","uses","parking"];
+const LABEL_OF={pdf:"PDF",sheet:"טבלה",dxf:"DXF (טקסט)",shp:"שכבת מגרש SHP",dbf:"מאפייני שכבה DBF",image:"תשריט (לא נקרא אוטומטית)"};
+// [מפתח, תווית, יחידה, ערך מוצא, מקור מוצא, סוג n=מספר t=טקסט, שלב]
+const FIELDS=[
+  ["plotArea","שטח מגרש","מ\"ר","","","n",1],
+  ["cov","תכסית מרבית","%","","","n",1],
+  ["bp","אחוזי בנייה מרביים","%","","","n",1],
+  ["floors","קומות מעל לקרקע (מרבי)","קומות","","","n",1],
+  ["below","קומות מתחת לקרקע (מרבי)","קומות","","","n",1],
+  ["h","גובה מרבי","מ'","","","n",1],
+  ["front","קו בניין קדמי","מ'","","","n",1],
+  ["side","קו בניין צדדי","מ'","","","n",1],
+  ["rear","קו בניין אחורי","מ'","","","n",1],
+  ["units","יח\"ד מרבי","יח\"ד","","","n",1],
+  ["dens","צפיפות מרבית","יח\"ד לדונם","","","n",1],
+  ["uses","שימושים מותרים","טקסט","","","t",1],
+  ["parking","חניה (מספר מקומות)","מקומות","","","t",1],
+  ["fl","גובה קומה","מ'","3.2","הנחיית הפרויקט: 3.2 מ' אלא אם המסמכים קובעים אחרת","n",3],
+  ["sell","שטח נטו למכירה","%","80","נוהל האפיון: 80%","n",3],
+  ["avg","שטח יח\"ד ממוצע","מ\"ר","90","נוהל האפיון: 90 מ\"ר","n",3],
+  ["target","יעד יח\"ד של היזם","יח\"ד","","","n",3],
+  ["pMain","מחיר מכר למ\"ר עיקרי","₪","","","n",3],
+  ["cons","עלות בנייה למ\"ר","₪","","","n",3],
+  ["land","שווי קרקע","₪","","","n",3],
+  ["fees","היטלים ואגרות","₪","","","n",3],
+  ["plan","תכנון ופיקוח","%","","","n",3],
+  ["cont","עתודה לבלתי צפוי","%","","","n",3],
+  ["mkt","שיווק וניהול מכירה","%","","","n",3],
+  ["rate","ריבית מימון שנתית","%","","","n",3],
+  ["build","משך בנייה","חודשים","","","n",3],
+  ["sale","משך מכירה","חודשים","","","n",3],
+  ["delay","עיכוב נוסף","חודשים","0","הנחה: 0 חודשים (אין עיכוב מתוכנן)","n",3],
+  ["disc","שיעור היוון שנתי","%","","","n",3],
+  ["tgtProfit","רווח יזמי יעד (על עלות)","%","","","n",3]
+];
+const R1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","fl","sell","avg"];
+const E1=["target","pMain","cons","land","fees","plan","cont","mkt","rate","build","sale","disc","tgtProfit"];
+const val=k=>document.getElementById("v_"+k).value.trim();
+const srcOf=k=>document.getElementById("s_"+k).value.trim();
+const numOf=k=>{const t=val(k); if(t==="") return null; const n=Number(t.replace(",",".")); return isNaN(n)?null:n;};
+const labelOf=k=>FIELDS.find(f=>f[0]===k)[1];
+function setField(key,value,src){
+  document.getElementById("v_"+key).value=value===undefined||value===null?"":String(value);
+  document.getElementById("s_"+key).value=src||"";
+}
+function buildForms(){
+  const mk=f=>`<div class="frow"><label for="v_${f[0]}">${esc(f[1])} <span class="u">(${esc(f[2])})</span></label><input id="v_${f[0]}" value="${esc(f[3])}"><input id="s_${f[0]}" class="src" value="${esc(f[4])}" placeholder="מסמך, עמוד, סעיף או תא"></div>`;
+  document.getElementById("lform1").innerHTML=FIELDS.filter(f=>f[6]===1).map(mk).join("");
+  document.getElementById("lform3").innerHTML=FIELDS.filter(f=>f[6]===3).map(mk).join("");
+}
+function setStep(n){
+  WZ=Math.max(WZ,n);
+  document.querySelectorAll(".wstep").forEach(s=>{ s.hidden=Number(s.dataset.step)>WZ; });
+}
+/* ---------- משימה 1: העלאה וקריאה ---------- */
+function renderDocList(){
+  document.getElementById("docList").innerHTML=DOCS.length
+    ? DOCS.map(d=>`<li><span>${esc(d.name)}</span><span class="u">${esc(LABEL_OF[d.kind]||"לא נתמך")}</span></li>`).join("")
+    : `<li class="u">לא נבחרו מסמכים</li>`;
+}
+function baseName(n){return n.replace(/\.[^.]+$/,"").toLowerCase();}
+function kindOf(n){
+  const e=(n.match(/\.([^.]+)$/)||["",""])[1].toLowerCase();
+  if(["xls","xlsx","csv"].includes(e)) return "sheet";
+  if(["jpg","jpeg","png"].includes(e)) return "image";
+  return e;
+}
+document.getElementById("docFiles").addEventListener("change",e=>{
+  DOCS=[...e.target.files].filter(f=>DOC_EXT.test(f.name)).map(f=>({name:f.name,file:f,kind:kindOf(f.name)}));
+  renderDocList();
+  document.getElementById("btnUpload").disabled=!DOCS.length;
+});
+// PDF רבים שומרים טקסט עברי בסדר חזותי: התווים הפוכים והמספרים נשארים משמאל לימין.
+function visualToLogical(s){
+  const r=[...s].reverse().join("");
+  return r.replace(/[%\d][\d.,%\-\/]*/g, m=>[...m].reverse().join(""));
+}
+function pageText(tc){
+  const lines={};
+  tc.items.forEach(it=>{ const y=Math.round(it.transform[5]); (lines[y]=lines[y]||[]).push(it); });
+  return Object.keys(lines).map(Number).sort((a,b)=>b-a)
+    .map(y=>lines[y].slice().sort((a,b)=>b.transform[4]-a.transform[4]).map(it=>visualToLogical(it.str)).join(" "))
+    .join("\n");
+}
+async function readPdf(file){
+  if(!window.pdfjsLib) throw new Error("pdf.js לא נטען");
+  const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    const tc=await (await pdf.getPage(i)).getTextContent();
+    pages.push({where:`עמוד ${i}`, text:pageText(tc)});
+  }
+  return pages;
+}
+async function readSheets(file){
+  if(!window.XLSX) throw new Error("SheetJS לא נטען");
+  const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:"array"});
+  return wb.SheetNames.map(n=>({name:n, rows:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:"",raw:true})}));
+}
+function parseDxf(text){
+  const L=text.split(/\r?\n/).map(s=>s.trim()), out=[];
+  let cur=null;
+  const flush=()=>{ if(cur&&cur.text!==undefined&&cur.text!=="") out.push({where:`שכבה ${cur.layer||"-"}`, text:cur.text}); };
+  for(let k=0;k+1<L.length;k+=2){
+    const code=L[k], v=L[k+1];
+    if(code==="0"){ flush(); cur={ent:v, layer:"", text:undefined}; }
+    else if(!cur) continue;
+    else if(code==="8") cur.layer=v;
+    else if((code==="1"||code==="3")&&(cur.ent==="TEXT"||cur.ent==="MTEXT")) cur.text=(cur.text||"")+v;
+  }
+  flush();
+  return out;
+}
+const decodeStr=b=>{ try{ return new TextDecoder("windows-1255").decode(b); }catch(e){ return new TextDecoder().decode(b); } };
+function parseDbf(buf){
+  const dv=new DataView(buf), u8=new Uint8Array(buf);
+  const n=dv.getUint32(4,true), hl=dv.getUint16(8,true), rl=dv.getUint16(10,true);
+  const fields=[]; let p=32;
+  while(p<hl-1&&u8[p]!==0x0D){
+    fields.push({name:decodeStr(u8.slice(p,p+11)).replace(/\0.*$/,"").trim(), len:u8[p+16]});
+    p+=32;
+  }
+  const recs=[];
+  for(let r=0;r<n;r++){
+    const base=hl+r*rl;
+    if(u8[base]===0x2A){ recs.push(null); continue; }
+    const rec={}; let fo=base+1;
+    fields.forEach(f=>{ rec[f.name]=decodeStr(u8.slice(fo,fo+f.len)).trim(); fo+=f.len; });
+    recs.push(rec);
+  }
+  return recs;
+}
+// צורות מצולעות: טבעת לכל חלק, ושטח מחושב מנוסחת השטח (shoelace)
+function parseShp(buf){
+  const dv=new DataView(buf), out=[]; let off=100;
+  while(off+8<=buf.byteLength){
+    const clen=dv.getInt32(off+4,false)*2, c=off+8, type=dv.getInt32(c,true);
+    let shape=null;
+    if(type===5||type===15||type===25){
+      const np=dv.getInt32(c+36,true), npt=dv.getInt32(c+40,true), pts0=c+44+np*4;
+      const starts=[]; for(let i=0;i<np;i++) starts.push(dv.getInt32(c+44+i*4,true));
+      const rings=[]; let sum=0;
+      for(let i=0;i<np;i++){
+        const s=starts[i], e=i+1<np?starts[i+1]:npt, ring=[];
+        for(let j=s;j<e;j++) ring.push([dv.getFloat64(pts0+j*16,true), dv.getFloat64(pts0+j*16+8,true)]);
+        for(let j=0;j<ring.length;j++){ const a=ring[j], b=ring[(j+1)%ring.length]; sum+=a[0]*b[1]-b[0]*a[1]; }
+        rings.push(ring);
+      }
+      shape={area:Math.abs(sum)/2, rings};
+    }
+    out.push(shape);
+    off=c+clen;
+  }
+  return out;
+}
+const sameNo=(a,b)=>{
+  const x=String(a).trim(), y=String(b).trim();
+  return x===y || (/^\d+(\.0+)?$/.test(x) && Number(x)===Number(y));
+};
+function plotPattern(p){
+  const e=p.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return "(?:מגרש|תא שטח|תא|חלקה)\\s*(?:מס'|מספר|מס)?\\s*[:.]?\\s*"+e+"(?!\\d)";
+}
+const firstLine=s=>s.split("\n")[0].trim();
+function findInTexts(list,plotNo){
+  const out=[];
+  list.forEach(t=>{
+    const re=new RegExp(plotPattern(plotNo),"g"); let m, n=0;
+    while((m=re.exec(t.text))&&n<3){
+      out.push({doc:t.doc, where:t.where, snippet:firstLine(t.text.slice(Math.max(0,m.index-30),m.index+m[0].length+40))});
+      n++;
+    }
+  });
+  return out;
+}
+const PRED={
+  plotArea:s=>/שטח/.test(s)&&/(מגרש|קרקע)/.test(s),
+  cov:s=>/תכסית/.test(s),
+  bp:s=>/אחוזי/.test(s)&&/בני/.test(s),
+  floors:s=>/קומות/.test(s)&&!/מתחת/.test(s),
+  below:s=>/מתחת/.test(s),
+  h:s=>/גובה/.test(s),
+  units:s=>/יח/.test(s)&&!/צפיפות|לדונם/.test(s)
+};
+const TEXT_RX={
+  cov:/תכסית[^0-9%]{0,40}(\d+(?:\.\d+)?)\s*%/g,
+  bp:/(?:אחוזי בנייה|אחוזי הבנייה|אחוזי בניה)[^0-9%]{0,40}(\d+(?:\.\d+)?)\s*%/g,
+  floors:/(?:קומות מעל|מספר קומות)[^0-9]{0,30}(\d+)/g,
+  below:/(?:קומות מתחת|מתחת לקרקע)[^0-9]{0,30}(\d+)/g,
+  h:/גובה (?:מרבי|מירבי)?[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  front:/קדמי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  side:/צדדי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  rear:/אחורי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  units:/(?:(\d+)\s*יח["״']ד(?!\s*לדונם)|יח["״']ד מרבי[^0-9]{0,30}(\d+))/g,
+  dens:/(\d+(?:\.\d+)?)\s*יח["״']ד\s*לדונם/g,
+  plotArea:/שטח מגרש[^0-9]{0,30}(\d[\d,.]*)\s*מ/g
+};
+function textCandidates(pages){
+  const out={};
+  Object.keys(TEXT_RX).forEach(k=>{
+    out[k]=[];
+    pages.forEach(p=>{
+      const re=new RegExp(TEXT_RX[k].source,"g"); let m;
+      while((m=re.exec(p.text))){
+        const num=m.slice(1).find(x=>x!==undefined).replace(/,/g,"");
+        out[k].push({v:Number(num), where:`${p.doc}, ${p.where}`, snippet:firstLine(p.text.slice(Math.max(0,m.index),m.index+m[0].length+20))});
+      }
+    });
+  });
+  return out;
+}
+function tableValues(sheet,plotNo){
+  const rows=sheet.rows, pn=String(plotNo).trim(), hits=[];
+  rows.forEach((row,i)=>{ if(row.some(c=>sameNo(c,pn)&&String(c).trim()!=="")) hits.push(i); });
+  let hdr=-1;
+  for(let i=0;i<rows.length&&hdr<0;i++){
+    const n=rows[i].filter(c=>typeof c==="string"&&Object.values(PRED).some(f=>f(c))).length;
+    if(n>=2) hdr=i;
+  }
+  if(!hits.length||hdr<0) return {};
+  const heads=rows[hdr].map(c=>String(c));
+  const values={};
+  Object.keys(PRED).forEach(k=>{
+    const j=heads.findIndex(h=>PRED[k](h));
+    if(j<0) return;
+    const raw=rows[hits[0]][j];
+    const v=Number(String(raw).replace(/,/g,""));
+    if(String(raw).trim()!==""&&!isNaN(v)) values[k]={v, where:`${sheet.doc}, גיליון ${sheet.name}, שורה ${hits[0]+1}, עמודה "${heads[j].trim()}"`};
+  });
+  return values;
+}
+async function readOne(d,C){
+  try{
+    if(d.kind==="pdf"){
+      const pages=await readPdf(d.file);
+      if(pages.some(p=>p.text.trim())){ pages.forEach(p=>C.pdf.push({doc:d.name,...p})); C.read.push(`${d.name} (${pages.length} עמודים)`); }
+      else C.unread.push(`${d.name}: אין טקסט קריא, כנראה סריקה`);
+    } else if(d.kind==="sheet"){
+      const sh=await readSheets(d.file);
+      sh.forEach(s=>C.sheets.push({doc:d.name,...s}));
+      C.read.push(`${d.name} (${sh.length} גיליונות)`);
+    } else if(d.kind==="dxf"){
+      const tx=parseDxf(await d.file.text());
+      tx.forEach(x=>C.dxf.push({doc:d.name,...x}));
+      C.read.push(`${d.name} (${tx.length} טקסטים)`);
+    } else if(d.kind==="dbf"){
+      C.dbf[baseName(d.name)]={name:d.name, recs:parseDbf(await d.file.arrayBuffer())};
+      C.read.push(`${d.name} (מאפיינים)`);
+    } else if(d.kind==="shp"){
+      C.shp[baseName(d.name)]={name:d.name, shapes:parseShp(await d.file.arrayBuffer())};
+      C.read.push(`${d.name} (צורות)`);
+    } else C.unread.push(`${d.name}: ${LABEL_OF[d.kind]||"לא נתמך"}`);
+  }catch(err){ C.unread.push(`${d.name}: שגיאה בקריאה (${err.message})`); }
+}
+document.getElementById("btnUpload").addEventListener("click", async()=>{
+  const box=document.getElementById("up1");
+  const C={pdf:[],sheets:[],dxf:[],dbf:{},shp:{},read:[],unread:[]};
+  for(let i=0;i<DOCS.length;i++){
+    box.innerHTML=busyHTML(`מעלה ומעבד: ${DOCS[i].name} (${i+1} מתוך ${DOCS.length})`);
+    await readOne(DOCS[i],C);
+    await wait(500);
+  }
+  CACHE=C;
+  box.innerHTML=`<p class="status">עלו ${C.read.length} קבצים: ${esc(C.read.join(", ")||"אין")}.</p>`+
+    (C.unread.length?`<p class="note">לא נקראו: ${esc(C.unread.join(", "))}</p>`:"");
+  document.getElementById("btnUpload").disabled=true;
+  setStep(2);
+});
+/* ---------- משימה 2: מציאת המגרש וחילוץ ---------- */
+function extract(C,plotNo){
+  const evid=[];
+  evid.push(...findInTexts(C.pdf,plotNo), ...findInTexts(C.dxf,plotNo));
+  C.sheets.forEach(s=>s.rows.forEach((row,i)=>row.forEach(c=>{
+    if(String(c).trim()!==""&&sameNo(c,plotNo)) evid.push({doc:s.doc, where:`גיליון ${s.name}, שורה ${i+1}`, snippet:String(c)});
+  })));
+  let match=null;
+  Object.keys(C.shp).forEach(key=>{
+    const db=C.dbf[key]; if(!db) return;
+    db.recs.forEach((rec,i)=>{
+      if(!rec) return;
+      const f=Object.keys(rec).find(k=>sameNo(rec[k],plotNo));
+      if(!f) return;
+      const sh=C.shp[key].shapes[i], area=sh?sh.area:null;
+      evid.push({doc:C.shp[key].name, where:`רשומה ${i+1}, שדה ${f}`, snippet:`שטח ${area!==null?area.toFixed(2)+" מ\"ר":"לא חושב"}`});
+      if(!match&&sh) match={key, idx:i, area, doc:C.shp[key].name, where:`רשומה ${i+1}`};
+    });
+  });
+  if(!evid.length) return {found:false, evid};
+  const tbl={};
+  C.sheets.forEach(s=>{ const v=tableValues(s,plotNo); Object.keys(v).forEach(k=>{ if(!tbl[k]) tbl[k]=v[k]; }); });
+  return {found:true, evid, tbl, cands:textCandidates(C.pdf), match};
+}
+function applyExtract(res){
+  const picks={}, notFound=[];
+  STAGE1.forEach(k=>{
+    if(k==="uses"||k==="parking"){ setField(k,"","לא נמצא במסמכים: להזין ידנית"); return; }
+    if(k==="plotArea"&&!res.tbl.plotArea&&res.match&&res.match.area!==null){
+      setField(k,res.match.area.toFixed(2),`שכבת SHP (${res.match.doc}), ${res.match.where}, שטח מחושב מהצורה`); return;
+    }
+    if(res.tbl[k]){ setField(k,res.tbl[k].v,res.tbl[k].where); return; }
+    const list=res.cands[k]||[], distinct=[...new Set(list.map(x=>x.v))];
+    if(distinct.length===1){ const c=list[0]; setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`); return; }
+    if(distinct.length>1){ picks[k]=list; setField(k,"","ממתין לבחירה מהמועמדים"); return; }
+    setField(k,"","לא נמצא במסמכים"); notFound.push(labelOf(k));
+  });
+  return {picks, notFound};
+}
+function tryAdvance2(){
+  if(S3_DONE||!FOUND) return;
+  if(readRights().ok) renderStep3();
+}
+document.getElementById("btnExtract").addEventListener("click", async()=>{
+  const out=document.getElementById("out2"), plotNo=document.getElementById("plotNo").value.trim();
+  if(!CACHE){ out.innerHTML=`<p class="status bad">יש להעלות מסמכים במשימה 1.</p>`; return; }
+  if(!plotNo){ out.innerHTML=`<p class="status bad">יש להזין מספר מגרש או תא שטח.</p>`; return; }
+  out.innerHTML=busyHTML("מחפש את המגרש בכל המסמכים..."); await wait(700);
+  const res=extract(CACHE,plotNo);
+  if(!res.found){
+    FOUND=false; MATCH=null;
+    STAGE1.forEach(k=>setField(k,"","לא נמצא: המגרש לא נמצא במסמכים"));
+    out.innerHTML=`<p class="status bad">המגרש ${esc(plotNo)} לא נמצא באף אחד מהמסמכים שנקראו. לא חולצו נתונים. בדוק את המספר או העלה מסמך נוסף.</p>`;
+    return;
+  }
+  out.innerHTML=busyHTML("מחלץ את הפרמטרים ומקשר כל ערך למקורו..."); await wait(700);
+  FOUND=true; MATCH=res.match;
+  const ap=applyExtract(res); PICKS=ap.picks;
+  const docs=[...new Set(res.evid.map(e=>e.doc))];
+  let areaNote="";
+  if(res.tbl.plotArea&&res.match&&res.match.area) {
+    const diff=Math.abs(res.tbl.plotArea.v-res.match.area)/res.match.area*100;
+    areaNote=`<p class="status ${diff>0.5?"bad":""}">שטח מגרש: טבלה ${fmt(res.tbl.plotArea.v,0)} מ"ר מול שכבה ${fmt(res.match.area,0)} מ"ר, סטייה ${fmt(diff,2)}%. ${diff<=0.5?"תקין (עד 0.5%).":"חורג מ-0.5%: ממצא לאימות באדום."}</p>`;
+  }
+  const picksHTML=Object.keys(PICKS).map(k=>`<div class="pickrow"><span>${esc(labelOf(k))}: נמצאו מועמדים שונים. בחר אחד:</span><select data-pick="${k}"><option value="">בחר</option>${PICKS[k].map((c,i)=>`<option value="${i}">${esc(c.v)} · ${esc(c.where)} · "${esc(c.snippet)}"</option>`).join("")}</select></div>`).join("");
+  out.innerHTML=`<p class="status">המגרש ${esc(plotNo)} נמצא ב-${docs.length} מסמכים. הערכים מופיעים בטופס למטה עם מקורם.</p>`+
+    res.evid.slice(0,10).map(e=>`<p class="evid">${esc(e.doc)} · ${esc(e.where)} · ${esc(e.snippet)}</p>`).join("")+
+    areaNote+
+    (ap.notFound.length?`<p class="status bad">לא נמצא במסמכים, להזין ידנית: ${esc(ap.notFound.join(", "))}.</p>`:"")+
+    picksHTML+
+    `<p class="note">לפני המעבר לשלב הבא, יש לבדוק כל ערך מול המקור. ערך ממתין לבחירה יחסום את המודל.</p>`;
+  tryAdvance2();
+});
+document.getElementById("out2").addEventListener("change",e=>{
+  const k=e.target.dataset.pick; if(!k) return;
+  const i=e.target.value; if(i==="") return;
+  const c=PICKS[k][Number(i)];
+  setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`);
+  delete PICKS[k];
+  tryAdvance2();
+});
+document.getElementById("lform1").addEventListener("input",()=>{ if(FOUND&&!S3_DONE) tryAdvance2(); });
+/* ---------- זכויות, כלכלה, וגיאומטריה ---------- */
+function readRights(){
+  const miss=R1.filter(k=>numOf(k)===null).map(labelOf);
+  if(miss.length) return {ok:false, miss};
+  const n=numOf;
+  const r={plot:n("plotArea"),cov:n("cov"),bp:n("bp"),floors:n("floors"),below:n("below"),h:n("h"),front:n("front"),side:n("side"),rear:n("rear"),units:n("units"),dens:n("dens"),uses:val("uses")||"לא נמצא",fl:n("fl"),sell:n("sell")/100,avg:n("avg")};
+  const bad=[];
+  if(r.plot<=0) bad.push("שטח מגרש חייב להיות חיובי");
+  if(r.floors<1) bad.push("קומות מעל לקרקע: לפחות 1");
+  if(r.fl<=0) bad.push("גובה קומה חייב להיות חיובי");
+  if(r.sell<=0||r.sell>1) bad.push("שטח נטו: בין 1 ל-100");
+  return bad.length?{ok:false, miss:bad}:{ok:true, R:r};
+}
+function readEcon(){
+  const miss=E1.filter(k=>numOf(k)===null).map(labelOf);
+  if(miss.length) return {ok:false, miss};
+  const n=numOf;
+  return {ok:true, E:{target:n("target"),pMain:n("pMain"),cons:n("cons"),land:n("land"),fees:n("fees"),plan:n("plan")/100,cont:n("cont")/100,mkt:n("mkt")/100,rate:n("rate")/100,build:n("build"),sale:n("sale"),delay:numOf("delay")??0,disc:n("disc")/100,tgtProfit:n("tgtProfit")}};
+}
+function currentR(){
+  const rr=readRights(); if(!rr.ok) return null;
+  const er=readEcon();
+  R=Object.assign({}, rr.R, er.ok?er.E:{});
+  return {econOk:er.ok, econMiss:er.miss||[]};
+}
+function genAlts(){
+  const area=R.plot, maxFp=R.cov/100*area, gross=R.bp/100*area, fMax=Math.min(R.floors, Math.floor(R.h/R.fl));
+  const mk=ratio=>{ const fp=maxFp*ratio; const fl=Math.max(1,Math.min(fMax, Math.floor(gross/fp))); return {fp:Math.round(fp), fl, below:0, purpose:R.uses}; };
+  return {"א":mk(0.9),"ב":mk(0.6),"ג":mk(0.75)};
+}
+function envelopeAlt(){
+  const area=R.plot, fp=R.cov/100*area, gross=R.bp/100*area, fMax=Math.min(R.floors, Math.floor(R.h/R.fl));
+  return {fp:Math.round(fp), fl:Math.max(1,Math.min(fMax, Math.floor(gross/fp))), below:0, purpose:R.uses};
+}
+function scenePayload(alt){
+  const P=Math.sqrt(R.plot), g=geo(alt);
+  return {P, x0:-P/2+R.side, x1:P/2-R.side, z0:-P/2+R.rear, z1:P/2-R.front, w:g.w, d:g.d, H:alt.fl*R.fl, fl:R.fl, floors:alt.fl, maxH:R.h, breach:Math.min(g.mx,g.my)<0, view:lview};
+}
+function pushScene(alt){
+  lastAlt=alt;
+  const p=scenePayload(alt);
+  if(window.scene3d) window.scene3d.update(p); else window.__scenePending=p;
+}
+/* ---------- מפה ---------- */
+function drawMap(){
+  const svg=document.getElementById("map"), leg=document.getElementById("legend");
+  const layer=MATCH&&CACHE.shp[MATCH.key];
+  if(!layer){
+    svg.innerHTML=""; leg.innerHTML=`<p class="note">אין שכבת מגרשים (SHP+DBF) להצגה על התשריט.</p>`;
+    return;
+  }
+  const shapes=layer.shapes, db=CACHE.dbf[MATCH.key];
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+  shapes.forEach(s=>{ if(s) s.rings.forEach(r=>r.forEach(([x,y])=>{ xmin=Math.min(xmin,x); xmax=Math.max(xmax,x); ymin=Math.min(ymin,y); ymax=Math.max(ymax,y); })); });
+  const W=600, span=Math.max(xmax-xmin,ymax-ymin,1), sc=(W-40)/span, H=(ymax-ymin)*sc+40;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H.toFixed(0)}`);
+  const first=db&&db.recs.find(r=>r);
+  const useKey=first?Object.keys(first).find(k=>/use|usage|שימוש|סוג/i.test(k)):null;
+  const palette=["#e8e8e8","#f3dcc9","#d6eadb","#dbe3f3","#f0e4b8","#eedbeb"];
+  const seen={}; let pi=0;
+  const colorOf=v=>{ if(!(v in seen)) seen[v]=palette[pi++%palette.length]; return seen[v]; };
+  const P=([x,y])=>[20+(x-xmin)*sc, H-20-(y-ymin)*sc];
+  let body="";
+  shapes.forEach((s,i)=>{
+    if(!s) return;
+    const d=s.rings.map(r=>"M"+r.map(p=>P(p).map(v=>v.toFixed(1)).join(",")).join(" L")+" Z").join(" ");
+    const use=useKey&&db.recs[i]?db.recs[i][useKey]:"";
+    const isMatch=i===MATCH.idx;
+    const base=useKey?colorOf(use||"לא מוגדר"):"#fafafa";
+    const fill=isMatch?"#fff3c4":base;
+    body+=`<path d="${d}" fill="${fill}" stroke="#1f5fbf" stroke-width="${isMatch?2.5:1}"/>`;
+  });
+  svg.innerHTML=body;
+  leg.innerHTML=`<h3>מקרא</h3>`+
+    (useKey?Object.keys(seen).map(v=>`<div class="legrow"><span class="sw" style="background:${seen[v]}"></span>${esc(v)}</div>`).join(""):`<p class="note">אין שדה שימוש בשכבה, ולכן השימושים לא מוצגים.</p>`)+
+    `<div class="legrow"><span class="sw" style="background:#fff3c4;border:2px solid #1f5fbf"></span>המגרש המבוקש</div>`+
+    `<div class="legrow"><span class="sw" style="border:1px solid #1f5fbf"></span>קו מגרש (כחול)</div>`;
+}
+/* ---------- משימה 3: מודל נפחי לפי זכויות ---------- */
+async function renderStep3(){
+  if(S3_DONE) return;
+  S3_DONE=true;
+  setStep(3);
+  const out=document.getElementById("out3");
+  out.innerHTML=busyHTML("בונה מודל נפחי לפי הזכויות ומפת המגרשים..."); await wait(900);
+  currentR();
+  drawMap();
+  document.getElementById("st3scene").appendChild(document.getElementById("scene"));
+  const env=envelopeAlt();
+  pushScene(env);
+  out.innerHTML=`<p class="status">נפח מרבי לפי הזכויות: שטח קומה ${fmt(env.fp,0)} מ"ר (תכסית ${fmt(R.cov,0)}%), ${env.fl} קומות, גובה ${fmt(env.fl*R.fl)} מ'. זה מה שמותר, ולא מחויב לאף חלופה.</p>`+
+    (MATCH?"":`<p class="note">המגרש לא הופיע בשכבה, ולכן המודל מוצג בלי מפה.</p>`);
+  setStep(4);
+}
+/* ---------- משימה 4: שלוש חלופות ---------- */
+function altTable(list){
+  const first=list[0].rows;
+  const head=`<tr><th>קריטריון</th>${list.map(a=>`<th>חלופה ${esc(a.k)}</th>`).join("")}<th>גבול</th><th>הסבר</th></tr>`;
+  const body=first.map((row,i)=>`<tr><td>${esc(row.l)}</td>${list.map(a=>{const r=a.rows[i]; return `<td class="num">${esc(r.v)} <span class="dot ${r.s}"></span></td>`;}).join("")}<td>${esc(row.lim)}</td><td class="expl">${esc(row.e)}</td></tr>`).join("");
+  return `<table class="wtable"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+document.getElementById("btnAlts").addEventListener("click", async()=>{
+  const out=document.getElementById("out4");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות. חזור למשימה 2.</p>`; return; }
+  out.innerHTML=busyHTML("מייצר שלוש חלופות בתוך הזכויות..."); await wait(1000);
+  ALTS=genAlts(); lcur="א";
+  const list=Object.keys(ALTS).map(k=>({k, c:calc(ALTS[k])}));
+  out.innerHTML=`<table class="wtable"><thead><tr><th>פרמטר</th>${list.map(a=>`<th>חלופה ${a.k}</th>`).join("")}<th>גבול מהזכויות</th></tr></thead><tbody>`+
+    [
+      ["שטח קומה (מ\"ר)", a=>fmt(a.c.fp,0), "לפי תכסית מרבית"],
+      ["מספר קומות", a=>a.c.fl, "עד "+R.floors],
+      ["שטח כולל (מ\"ר)", a=>fmt(a.c.gross,0), "עד "+fmt(R.bp/100*R.plot,0)+" מ\"ר"],
+      ["תכסית (%)", a=>fmt(a.c.cov)+"%", "עד "+R.cov+"%"],
+      ["אחוזי בנייה (%)", a=>fmt(a.c.bp,0)+"%", "עד "+R.bp+"%"],
+      ["גובה (מ')", a=>fmt(a.c.h)+" מ'", "עד "+R.h+" מ'"],
+      ["ניצול זכויות (%)", a=>fmt(a.c.use,0)+"%", "100% = ניצול מלא"]
+    ].map(([l,f,lim])=>`<tr><td>${esc(l)}</td>${list.map(a=>`<td class="num">${esc(f(a))}</td>`).join("")}<td>${esc(lim)}</td></tr>`).join("")+
+    `</tbody></table><p class="note">החלופות נוצרו לפי כללי היצירה של הממשק: 90%, 60% ו-75% מהתכסית המרבית, ובתוך הגובה והקומות המותרים. אלה לא מאפיון ולא דרישת הרשות.</p>`;
+  const sel=Object.keys(ALTS).map(k=>`<button type="button" data-la="${k}" class="${k===lcur?"on":"alt"}">חלופה ${k}: ${esc(ALT_DESC[k])}</button>`).join("");
+  document.getElementById("lAltSeg").innerHTML=sel;
+  document.getElementById("st4scene").appendChild(document.getElementById("scene"));
+  pushScene(ALTS[lcur]);
+  setStep(5);
+});
+document.getElementById("lAltSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-la]"); if(!b) return;
+  lcur=b.dataset.la;
+  document.querySelectorAll("#lAltSeg button").forEach(x=>x.className=x===b?"on":"alt");
+  pushScene(ALTS[lcur]);
+});
+document.getElementById("lViewSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-lv]"); if(!b) return;
+  lview=b.dataset.lv;
+  document.querySelectorAll("#lViewSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  if(lastAlt) pushScene(lastAlt);
+});
+/* ---------- שורות בדיקה ---------- */
+function planRows(c){
+  const sb=Math.min(c.g.mx,c.g.my);
+  return [
+    {l:"תכסית", v:fmt(c.cov)+"%", lim:"עד "+R.cov+"%", s:stMax(c.cov,R.cov), e:"שטח הקרקע הבנוי מתוך שטח המגרש."},
+    {l:"אחוזי בנייה", v:fmt(c.bp,0)+"%", lim:"עד "+R.bp+"%", s:stMax(c.bp,R.bp), e:"השטח הכולל מחולק לשטח המגרש."},
+    {l:"קומות מעל לקרקע", v:c.fl, lim:"עד "+R.floors, s:stMax(c.fl,R.floors), e:"מספר הקומות בנפח."},
+    {l:"קומות מתחת לקרקע", v:c.below, lim:"עד "+R.below, s:stMax(c.below,R.below), e:"החלופות ללא קומות מרתף."},
+    {l:"גובה", v:fmt(c.h)+" מ'", lim:"עד "+R.h+" מ'", s:stMax(c.h,R.h), e:"גובה הנפח לפי גובה קומה."},
+    {l:"יח\"ד", v:c.units, lim:"עד "+R.units, s:stMax(c.units,R.units), e:"יחידות דיור לפי שטח נטו ושטח יח\"ד ממוצע."},
+    {l:"צפיפות", v:fmt(c.dens)+" יח\"ד לדונם", lim:"עד "+R.dens, s:stMax(c.dens,R.dens), e:"יח\"ד לדונם משטח המגרש."},
+    {l:"שימוש", v:c.purpose, lim:R.uses, s:R.uses==="לא נמצא"?"y":(c.purpose===R.uses?"g":"r"), e:"השימוש המוצע חייב להיות מותר בתכנית. אם השימושים לא נמצאו במסמכים, הבדיקה דורשת אימות."},
+    {l:"קווי בניין", v:sb<0?"חריגה "+fmt(-sb)+" מ'":"מרווח "+fmt(sb)+" מ'", lim:R.front+" / "+R.side+" / "+R.rear+" מ'", s:sb<0?"r":(sb<SB_WARN?"y":"g"), e:"הנפח חייב להיכנס לאזור הבנייה. מרווח קטן מ-1 מ' הוא אזהרה לצורך בגמישות."}
+  ];
+}
+function econRows(c){
+  const pg=profitGrade(c);
+  return [
+    {l:"רווח על עלות", v:fmt(c.pct)+"%", lim:"יעד "+R.tgtProfit+"%", s:c.pct>=R.tgtProfit?"g":(c.pct>=0?"y":"r"), e:"הרווח מתוך העלות הכוללת. מגיע ליעד: ירוק. מתחת: צהוב. שלילי: אדום."},
+    {l:"רווח על הכנסה", v:fmt(c.profit/c.rev*100)+"%", lim:"", s:c.profit>=0?"g":"r", e:"הרווח מתוך ההכנסה. להשוואה בלבד."},
+    {l:"NPV (קירוב)", v:fmt(c.npv,0)+" ₪", lim:"לא שלילי", s:c.npv<0?"r":"g", e:"ערך נוכחי נקי לפי שיעור ההיוון ומועדי התזרים."},
+    {l:"יח\"ד מול יעד היזם", v:c.units, lim:"יעד "+R.target, s:stMin(c.units,R.target), e:"כלל זה לא הוגדר באפיון (שאלה פתוחה). מוחל זמנית."},
+    {l:"ניצול זכויות", v:fmt(c.use,0)+"%", lim:"מעל 90% ירוק", s:stUse(c.use), e:"השטח המנוצל מתוך הזכויות המותרות."},
+    {l:"דירוג רווחיות", v:GN[pg], lim:"רווחי / בסדר / לא רווחי", s:pg, e:"רווחי: NPV לא שלילי ורווח ליעד. בסדר: NPV לא שלילי, רווח מתחת ליעד. לא רווחי: NPV או רווח שלילי."}
+  ];
+}
+function maybeStep6(){ if(DONE5.plan&&DONE5.econ) setStep(6); }
+document.getElementById("btnPlan").addEventListener("click",()=>{
+  const out=document.getElementById("out5a");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות.</p>`; return; }
+  const list=Object.keys(ALTS).map(k=>({k, rows:planRows(calc(ALTS[k]))}));
+  out.innerHTML=`<h3>בדיקה בהתאמה לדרישות והנחיות העירייה</h3>`+altTable(list)+
+    `<p class="note">כל שורה מציגה את הערך של החלופה, את הגבול מהתכנית, והסבר. ירוק: עומד בתנאי עם מרווח של לפחות 5%. צהוב: עומד במרווח קטן מ-5%. אדום: חורג.</p>`;
+  DONE5.plan=true; maybeStep6();
+});
+document.getElementById("btnEcon").addEventListener("click",()=>{
+  const out=document.getElementById("out5b");
+  const cur=currentR();
+  if(!cur||!cur.econOk){ out.innerHTML=`<p class="status bad">חסרים נתונים כלכליים: ${esc((cur?readEcon().miss:readRights().miss).join(", "))}.</p>`; return; }
+  const list=Object.keys(ALTS).map(k=>({k, rows:econRows(calc(ALTS[k]))}));
+  out.innerHTML=`<h3>בדיקת כלכליות</h3>`+altTable(list)+
+    `<p class="note">אחוזי הרווח מוצגים לצורך השוואה בין החלופות. הדירוג לפי NPV ורווח על עלות מול יעד היזם.</p>`;
+  DONE5.econ=true; maybeStep6();
+});
+/* ---------- משימה 6: המלצה ---------- */
+function buildReport(){
+  const cur=currentR();
+  const econOk=!!(cur&&cur.econOk);
+  const rows=Object.keys(ALTS).map(k=>{
+    const c=calc(ALTS[k]), pr=planRows(c), er=econOk?econRows(c):null;
+    const reds=pr.filter(x=>x.s==="r").length;
+    const sc=Math.round(pr.reduce((s,x)=>s+(x.s==="g"?1:x.s==="y"?0.5:0),0)/pr.length*100);
+    return {k, c, pr, er, reds, sc, pg:econOk?profitGrade(c):null};
+  });
+  const rank=g=>({g:0,y:1,r:2})[g]??3;
+  const sorted=[...rows].sort((a,b)=>a.reds-b.reds||(econOk?rank(a.pg)-rank(b.pg):0)||b.sc-a.sc);
+  const b=sorted[0];
+  const s1=`המלצה: חלופה ${b.k} (${ALT_DESC[b.k]}), עם ${b.reds} חריגות בדרישות העירייה וציון התאמה ${b.sc}%.`;
+  const s2=econOk?`רווחיות היזם שלה: ${GN[b.pg]} (רווח על עלות ${fmt(b.c.pct)}%).`:"הנתונים הכלכליים לא הוזנו, ולכן ההמלצה נשענת על הדרישות בלבד.";
+  const s3=b.reds?"יש בדיקות אדומות בחלופה, ולכן יש לבדוק אותן מול הרשות לפני קבלת ההחלטה.":"אין בדיקות אדומות מול דרישות העירייה.";
+  const list=rows.map(r=>({k:r.k, rows:r.er?r.pr.concat(r.er):r.pr}));
+  const pc=rows.map(r=>{
+    const all=r.er?r.pr.concat(r.er):r.pr;
+    const g=all.find(x=>x.s==="g"), bd=all.find(x=>x.s==="r")||all.find(x=>x.s==="y");
+    return `חלופה ${r.k} (${ALT_DESC[r.k]}): יתרון: ${g?g.l+" ("+g.v+")":"אין"}. חיסרון: ${bd?bd.l+" ("+bd.v+")":"אין חריגה"}.`;
+  });
+  const ver=rows.flatMap(r=>r.pr.filter(x=>x.s!=="g").map(x=>`חלופה ${r.k}: ${x.l} (${x.v})`));
+  const asm=[
+    "הנפח המרבי מחושב מהתכסית ואחוזי הבנייה שחולצו. גובה הקומה 3.2 מ' לפי נוהל האפיון, אלא אם המסמכים קובעים אחרת.",
+    "המגרש בתלת-ממד הוא מלבן בשטח המגרש, לא הצורה המדויקת. המפה מציגה את הצורה המדויקת.",
+    "החלופות נוצרו לפי כללי היצירה של הממשק (90%, 60% ו-75% מהתכסית). אלה לא מאפיון ולא דרישת הרשות.",
+    `השטח הבנוי ממוקם במרכז אזור הבנייה. סף אזהרה לקווי בניין: ${SB_WARN} מ'.`,
+    "קומות מתחת לקרקע בחלופות: 0, כי לא הוגדר באפיון. חניה לא נבדקה.",
+    "כלל יעד היזם לגבי יחידות הדיור הוא שאלה פתוחה באפיון."
+  ];
+  const src=(LIVE_SOURCES()).map(r=>`${r.label}: ${r.value||"לא נמצא"} · ${r.src||"בלי מקור"}`);
+  return [
+    {h:"מסקנה", p:[s1,s2,s3]},
+    {h:"טבלת השוואה", table:{head:["קריטריון",...list.map(a=>"חלופה "+a.k),"גבול","הסבר"], rows:list[0].rows.map((row,i)=>[{t:row.l},...list.map(a=>({t:`${a.rows[i].v} (${W3[a.rows[i].s]})`, c:a.rows[i].s})),{t:row.lim},{t:row.e}])}},
+    {h:"יתרונות וחסרונות", p:pc},
+    {h:"מה לבדוק מול הרשות", p:ver.length?ver:["אין פריטים לבדיקה מול הרשות."]},
+    {h:"המלצה והנחות", li:asm},
+    {h:"מקור לכל מספר", li:[...src,"מספרים מחושבים (תכסית, אחוזי בנייה, גובה, יח\"ד, צפיפות, ניצול, רווח ו-NPV) חושבו מהערכים לעיל."]}
+  ];
+}
+const W3={g:"ירוק",y:"צהוב",r:"אדום"};
+function LIVE_SOURCES(){
+  return FIELDS.filter(f=>f[6]===1||f[6]===3).map(f=>({label:f[1], value:val(f[0]), src:srcOf(f[0])}));
+}
+function tblHTML(t){
+  return `<table class="wtable"><thead><tr>${t.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(c=>`<td class="num">${esc(c.t)}${c.c?` <span class="dot ${c.c}"></span>`:""}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+document.getElementById("btnRec").addEventListener("click", async()=>{
+  const out=document.getElementById("lreport");
+  if(!currentR()){ out.innerHTML=`<p class="status bad">חסרים נתוני זכויות.</p>`; return; }
+  out.innerHTML=busyHTML("מנסח את ההמלצה ואת דוח ההשוואה..."); await wait(900);
+  const rep=buildReport();
+  out.innerHTML=rep.map(s=>`<h3>${esc(s.h)}</h3>`+(s.table?tblHTML(s.table):"")+(s.p||[]).map(t=>`<p>${esc(t)}</p>`).join("")+(s.li?`<ul>${s.li.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"")).join("");
+  lastReportText=rep.map(s=>[s.h,...(s.table?[s.table.head.join(" | "),...s.table.rows.map(r=>r.map(c=>c.t).join(" | "))]:[]),...(s.p||[]),...(s.li||[]).map(t=>"- "+t)].join("\n")).join("\n\n");
+});
+async function copyText(text,toast){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(text); ok=true; }catch(err){
+    const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ ok=document.execCommand("copy"); }catch(e2){ ok=false; }
+    ta.remove();
+  }
+  toast.textContent=ok?"הועתק":"ההעתקה נחסמה בתצוגה הזו";
+  setTimeout(()=>toast.textContent="",2000);
+}
+document.getElementById("copyRep").addEventListener("click",()=>copyText(lastReportText,document.getElementById("repToast")));
+function setMode(m){
+  appMode=m;
+  document.querySelectorAll(".modes button").forEach(b=>b.classList.toggle("on",b.dataset.mode===m));
+  document.getElementById("demoMode").hidden=m!=="demo";
+  document.getElementById("liveMode").hidden=m!=="live";
+  if(m==="demo"){
+    DEMO_R.target=Number(document.getElementById("target").value)||0;
+    R=DEMO_R; ALTS=DEMO_ALTS;
+    renderRights(); renderAltSeg(); renderView(); renderFit();
+  } else {
+    setStep(WZ);
+  }
+}
+document.querySelectorAll(".modes button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+setTimeout(()=>{ if(!window.scene3d) document.getElementById("sceneMsg").textContent="התצוגה התלת-ממדית לא נטענה (אין חיבור ל-CDN). המפה והבדיקות פועלים."; },8000);
+buildForms();
+setStep(1);
 renderRights(); renderAltSeg(); renderView(); renderFit();
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const host=document.getElementById("scene");
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+host.appendChild(renderer.domElement);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0xf4f4f4);
+scene.add(new THREE.AmbientLight(0xffffff,0.85));
+const sun=new THREE.DirectionalLight(0xffffff,0.6); sun.position.set(60,120,80); scene.add(sun);
+const cam=new THREE.PerspectiveCamera(40,1,0.1,5000);
+const ctl=new OrbitControls(cam,renderer.domElement); ctl.enableDamping=true;
+const group=new THREE.Group(); scene.add(group);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const ring=(pts,color)=>new THREE.Line(new THREE.BufferGeometry().setFromPoints([...pts,pts[0]]),new THREE.LineBasicMaterial({color}));
+function size(){const w=host.clientWidth||600, h=host.clientHeight||440; renderer.setSize(w,h); renderer.domElement.style.display="block"; cam.aspect=w/h; cam.updateProjectionMatrix();}
+window.addEventListener("resize",size); size();
+function update(p){
+  size();
+  while(group.children.length){
+    const o=group.children.pop();
+    if(o.geometry) o.geometry.dispose();
+    if(o.material&&o.material.dispose) o.material.dispose();
+  }
+  const y0=0.02, cx=(p.x0+p.x1)/2, cz=(p.z0+p.z1)/2, hw=p.w/2, hd=p.d/2;
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(p.P,p.P),new THREE.MeshBasicMaterial({color:0xfafafa}));
+  ground.rotation.x=-Math.PI/2; group.add(ground);
+  group.add(ring([V(-p.P/2,y0,-p.P/2),V(p.P/2,y0,-p.P/2),V(p.P/2,y0,p.P/2),V(-p.P/2,y0,p.P/2)],0x111111));
+  group.add(ring([V(p.x0,y0,p.z0),V(p.x1,y0,p.z0),V(p.x1,y0,p.z1),V(p.x0,y0,p.z1)],0x6b6b6b));
+  const body=new THREE.Mesh(new THREE.BoxGeometry(p.w,p.H,p.d),new THREE.MeshLambertMaterial({color:p.breach?0xb83a2e:0xcfcfcf}));
+  body.position.set(cx,p.H/2,cz); group.add(body);
+  const edges=new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry),new THREE.LineBasicMaterial({color:0x111111}));
+  edges.position.copy(body.position); group.add(edges);
+  for(let i=1;i<p.floors;i++){
+    const y=i*p.fl;
+    group.add(ring([V(cx-hw,y,cz-hd),V(cx+hw,y,cz-hd),V(cx+hw,y,cz+hd),V(cx-hw,y,cz+hd)],0x6b6b6b));
+  }
+  group.add(ring([V(p.x0,p.maxH,p.z0),V(p.x1,p.maxH,p.z0),V(p.x1,p.maxH,p.z1),V(p.x0,p.maxH,p.z1)],0xd4a017));
+  const top=Math.max(p.H,p.maxH);
+  if(p.view==="plan"){ cam.up.set(0,0,-1); cam.position.set(0,p.P*1.9,0.001); ctl.target.set(0,0,0); }
+  else if(p.view==="elev"){ cam.up.set(0,1,0); cam.position.set(0,top*0.6+1,p.P*2.4); ctl.target.set(0,top*0.5,0); }
+  else { cam.up.set(0,1,0); cam.position.set(p.P*0.95,top*1.4+p.P*0.5,p.P*0.95); ctl.target.set(0,p.H/2,0); }
+  ctl.update();
+}
+(function loop(){ requestAnimationFrame(loop); ctl.update(); renderer.render(scene,cam); })();
+window.scene3d={update};
+if(window.__scenePending) update(window.__scenePending);
 </script>
 </body>
 </html>
