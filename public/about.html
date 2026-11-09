@@ -3,160 +3,265 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>אודות הקורס</title>
+<meta name="description" content="ענת שטרן — אדריכלית וקורסת בינה מלאכותית">
+<title>ענת שטרן · קורס בינה מלאכותית לאדריכלים</title>
 <style>
 :root {
+  /* צבעים: בסיס + תוכן */
   --bg: #ffffff;
-  --fg: #111111;
-  --fg-light: #6b6b6b;
-  --fg-lighter: #a0a0a0;
-  --edge: #d9d9d9;
-  --surface: #f8f8f8;
+  --bg-accent: #fafafa;
+  --fg: #0f0f0f;
+  --fg-secondary: #555555;
+  --fg-tertiary: #888888;
+  --edge: #e0e0e0;
+  --accent-primary: #2d7a4a;
+  --accent-secondary: #d4a017;
+  --accent-tertiary: #b83a2e;
+
+  /* טיפוגרפיה */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Courier New", monospace;
+
+  /* רווחים */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0a0a0a;
+    --bg: #0d0d0d;
+    --bg-accent: #1a1a1a;
     --fg: #f5f5f5;
-    --fg-light: #a0a0a0;
-    --fg-lighter: #707070;
+    --fg-secondary: #aaaaaa;
+    --fg-tertiary: #777777;
     --edge: #2a2a2a;
-    --surface: #1a1a1a;
+    --accent-primary: #5ed47d;
+    --accent-secondary: #e8b923;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #0a0a0a;
+  --bg: #0d0d0d;
+  --bg-accent: #1a1a1a;
   --fg: #f5f5f5;
-  --fg-light: #a0a0a0;
-  --fg-lighter: #707070;
+  --fg-secondary: #aaaaaa;
+  --fg-tertiary: #777777;
   --edge: #2a2a2a;
-  --surface: #1a1a1a;
+  --accent-primary: #5ed47d;
+  --accent-secondary: #e8b923;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box }
-html { direction: rtl }
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
-  padding: max(16px, env(safe-area-inset-left, 0px));
-  font-family: system-ui, "Segoe UI", Arial, sans-serif;
+  padding: 0;
+  font-family: var(--font-sans);
   color: var(--fg);
   background: var(--bg);
-  line-height: 1.7;
-  font-size: 15px;
-}
-
-.container {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 60px 32px;
-}
-
-.header {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-  margin-bottom: 80px;
-}
-
-.header-text h1 {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 16px;
-  color: var(--fg);
-}
-
-.header-text .tagline {
+  line-height: 1.6;
   font-size: 16px;
-  color: var(--fg-light);
-  margin: 0 0 32px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ניווט */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--edge);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-2xl);
+  z-index: 1000;
+}
+
+@media (prefers-color-scheme: dark) {
+  nav:not([data-theme="light"]) {
+    background: rgba(13, 13, 13, 0.95);
+  }
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+nav a:hover {
+  color: var(--accent-primary);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-2xl);
+  padding-top: calc(64px + var(--space-3xl));
+}
+
+/* Header */
+header {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
+  gap: var(--space-4xl);
+  align-items: center;
+  margin-bottom: var(--space-4xl);
+}
+
+header h1 {
+  font-size: clamp(28px, 6vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 var(--space-lg);
+  letter-spacing: -0.5px;
+}
+
+header .subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--fg-secondary);
+  margin: 0 0 var(--space-3xl);
   line-height: 1.6;
 }
 
-.meta {
+.meta-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--fg-lighter);
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--edge);
+  gap: var(--space-sm);
+  padding-bottom: var(--space-2xl);
+  border-bottom: 2px solid var(--edge);
+  margin-bottom: var(--space-2xl);
 }
 
-.meta-item {
-  display: flex;
-  gap: 8px;
+.meta-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: var(--space-lg);
+  align-items: baseline;
 }
 
 .meta-label {
-  font-weight: 600;
-  color: var(--fg-light);
-  min-width: 60px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}
+
+.meta-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-secondary);
+}
+
+.meta-value a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.meta-value a:hover {
+  opacity: 0.8;
+}
+
+/* תמונה */
+.photo-wrapper {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  background: var(--bg-accent);
 }
 
 .photo {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  aspect-ratio: 1;
+  height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+/* סקציות */
+section {
+  margin-bottom: var(--space-4xl);
+}
+
+.vision-box {
+  background: var(--bg-accent);
+  padding: var(--space-3xl);
+  border-radius: 12px;
   border: 1px solid var(--edge);
 }
 
-.vision {
-  background: var(--surface);
-  padding: 48px 40px;
-  border-radius: 8px;
-  margin-bottom: 60px;
-  border: 1px solid var(--edge);
-}
-
-.vision h2 {
-  font-size: 18px;
+.vision-box h2 {
+  font-size: 20px;
   font-weight: 700;
-  margin: 0 0 24px;
+  margin: 0 0 var(--space-2xl);
   color: var(--fg);
 }
 
-.vision-text {
-  font-size: 15px;
+.vision-box p {
+  font-size: 16px;
   line-height: 1.8;
-  color: var(--fg-light);
+  color: var(--fg-secondary);
   margin: 0;
 }
 
+/* Manifesto */
 .manifesto {
-  background: var(--surface);
-  padding: 40px;
-  border-radius: 8px;
+  background: var(--bg-accent);
+  padding: var(--space-3xl);
+  border-radius: 12px;
   border: 1px solid var(--edge);
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
   line-height: 1.8;
-  color: var(--fg-light);
-  font-family: "Courier New", monospace;
-  overflow-x: auto;
+  color: var(--fg-secondary);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
 }
 
-.manifesto-line {
-  min-height: 1.4em;
+.manifesto-text {
   white-space: pre-wrap;
   word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.9;
 }
 
 .cursor {
   display: inline-block;
   width: 2px;
   height: 1em;
-  background: var(--fg-light);
+  background: var(--fg-secondary);
   margin-left: 2px;
-  animation: blink 1s infinite;
+  animation: blink 0.8s infinite;
+  vertical-align: text-bottom;
 }
 
 @keyframes blink {
@@ -164,111 +269,156 @@ body {
   50%, 100% { opacity: 0 }
 }
 
-@media (max-width: 768px) {
-  .header {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
+/* Sound toggle */
+.sound-control {
+  position: fixed;
+  bottom: var(--space-2xl);
+  left: var(--space-2xl);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
 
-  .header-text h1 {
-    font-size: 24px;
+.sound-control:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+}
+
+.sound-control:active {
+  transform: scale(0.95);
+}
+
+/* Footer */
+footer {
+  margin-top: var(--space-4xl);
+  padding-top: var(--space-3xl);
+  border-top: 1px solid var(--edge);
+  text-align: center;
+  color: var(--fg-tertiary);
+  font-size: 13px;
+}
+
+footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+footer a:hover {
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav {
+    height: 56px;
+    padding: 0 var(--space-lg);
   }
 
   .container {
-    padding: 40px 20px;
+    padding: var(--space-2xl) var(--space-lg);
+    padding-top: calc(56px + var(--space-2xl));
   }
 
-  .vision {
-    padding: 32px 24px;
+  header {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
   }
 
+  header h1 {
+    font-size: 32px;
+  }
+
+  .vision-box,
   .manifesto {
-    padding: 24px;
-    font-size: 11px;
+    padding: var(--space-2xl);
+  }
+
+  .sound-control {
+    bottom: var(--space-lg);
+    left: var(--space-lg);
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cursor {
-    animation: none;
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
-}
-
-footer {
-  margin-top: 80px;
-  padding-top: 40px;
-  border-top: 1px solid var(--edge);
-  text-align: center;
-  font-size: 13px;
-  color: var(--fg-lighter);
-}
-
-a {
-  color: var(--fg);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 </style>
 </head>
 <body>
 
+<nav>
+  <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">קורס בינה מלאכותית</div>
+  <a href="guide.html">← חזור לקורס</a>
+</nav>
+
 <div class="container">
 
-<div class="header">
-  <div class="header-text">
+<header>
+  <div>
     <h1>קורס בינה מלאכותית לאדריכלים</h1>
-    <p class="tagline">כלים לחשיבה מעודכנת בעידן השינוי.</p>
-    <div class="meta">
-      <div class="meta-item">
-        <span class="meta-label">שם:</span>
-        <span>ענת שטרן</span>
+    <p class="subtitle">כלים לחשיבה מעודכנת בעידן השינוי.</p>
+
+    <div class="meta-info">
+      <div class="meta-row">
+        <span class="meta-label">שם</span>
+        <span class="meta-value">ענת שטרן</span>
       </div>
-      <div class="meta-item">
-        <span class="meta-label">מייל:</span>
-        <span><a href="mailto:shtanat5@gmail.com">shtanat5@gmail.com</a></span>
+      <div class="meta-row">
+        <span class="meta-label">מייל</span>
+        <span class="meta-value"><a href="mailto:shtanat5@gmail.com">shtanat5@gmail.com</a></span>
       </div>
-      <div class="meta-item">
-        <span class="meta-label">תאריך:</span>
-        <span id="current-date"></span>
+      <div class="meta-row">
+        <span class="meta-label">תאריך</span>
+        <span class="meta-value" id="date"></span>
       </div>
     </div>
   </div>
-  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="" class="photo" style="background: #f0f0f0;">
-</div>
 
-<div class="vision">
-  <h2>המטרה</h2>
-  <p class="vision-text">
-    בנייה של כלים בינה מלאכותית אשר מסייעים לאדריכלים וללקוחותיהם לחשוב טוב יותר במהלך תהליך תכנוני. לא עוד טבלאות מסובכות וטופסים שמעייפים — אלא שיחות ברורות וחזון המומחש בעיניים.
-  </p>
-</div>
+  <div class="photo-wrapper">
+    <img src="author.png" alt="ענת שטרן" class="photo">
+  </div>
+</header>
 
-<div class="manifesto">
-  <div class="manifesto-line" id="line1"></div>
-  <div class="manifesto-line" id="line2"></div>
-  <div class="manifesto-line" id="line3"></div>
-  <div class="manifesto-line" id="line4"></div>
-  <div class="manifesto-line" id="line5"></div>
-  <div class="manifesto-line" id="line6"></div>
-  <div class="manifesto-line" id="line7"></div>
-</div>
+<section>
+  <div class="vision-box">
+    <h2>המטרה</h2>
+    <p>בנייה של כלים בינה מלאכותית אשר מסייעים לאדריכלים וללקוחותיהם לחשוב טוב יותר במהלך תהליך תכנוני. לא עוד טבלאות מסובכות וטופסים שמעייפים — אלא שיחות ברורות וחזון המומחש בעיניים.</p>
+  </div>
+</section>
+
+<section>
+  <div class="manifesto">
+    <div class="manifesto-text" id="manifesto"></div>
+  </div>
+</section>
 
 <footer>
-  <p><a href="guide.html">← חזור לקורס</a></p>
+  <p>© 2026 ענת שטרן. זה קורס בתהליך. <a href="guide.html">חזור לקורס</a></p>
 </footer>
 
 </div>
 
-<script>
-// צילום תמונה
-const photoImg = document.querySelector('.photo');
-photoImg.src = 'author.png';
-photoImg.style.width = '100%';
-photoImg.style.height = 'auto';
+<button class="sound-control" id="soundToggle" title="הפעל/בטל קול" aria-label="הפעל או בטל קול">🔊</button>
 
+<script>
 // תאריך
 const today = new Date();
 const dateStr = new Intl.DateTimeFormat('he-IL', {
@@ -276,44 +426,103 @@ const dateStr = new Intl.DateTimeFormat('he-IL', {
   month: 'long',
   day: 'numeric'
 }).format(today);
-document.getElementById('current-date').textContent = dateStr;
+document.getElementById('date').textContent = dateStr;
 
-// Typewriter effect
-const text = `למדתי ברומא, במילאנו ובוונציה, ועדיין אני מגלה את אשדוד מחדש בכל יום בתור אדריכלית העיר שלה.
+// טקסט המניפסטו
+const manifestoText = `למדתי ברומא, במילאנו ובוונציה,
+ועדיין אני מגלה את אשדוד מחדש בכל יום
+בתור אדריכלית העיר שלה.
 
-הקולנוע וההדרכה בטיולים לימדו אותי שגם אדריכל וגם מדריך מבלים את חייהם בהסבר למישהו איפה הוא נמצא, ואני עדיין לא בטוחה אם זה מחמיא או מביך.
+הקולנוע וההדרכה בטיולים לימדו אותי
+שגם אדריכל וגם מדריך מבלים את חייהם
+בהסבר למישהו איפה הוא נמצא,
+ואני עדיין לא בטוחה אם זה מחמיא או מביך.
 
-אז אני בונה כלים לקורס הזה בבינה מלאכותית, כי מי שכבר מטפל בתוכניות לא צריך עוד תוכנית, אלא כלי שעובד.`;
+אז אני בונה כלים לקורס הזה בבינה מלאכותית,
+כי מי שכבר מטפל בתוכניות
+לא צריך עוד תוכנית, אלא כלי שעובד.`;
 
-const lines = text.split('\n\n');
-let lineIndex = 0;
+// Typewriter + Speech
 let charIndex = 0;
+let soundEnabled = true;
+const synth = window.speechSynthesis;
+let currentUtterance = null;
 
-function typeNextChar() {
-  if (lineIndex >= lines.length) return;
+const manifestoEl = document.getElementById('manifesto');
+const soundBtn = document.getElementById('soundToggle');
 
-  const line = lines[lineIndex];
-  const lineEl = document.getElementById(`line${lineIndex + 1}`);
-
-  if (!lineEl) return;
-
-  if (charIndex < line.length) {
-    lineEl.textContent += line[charIndex];
+function typeChar() {
+  if (charIndex < manifestoText.length) {
+    manifestoEl.textContent = manifestoText.substring(0, charIndex + 1);
     charIndex++;
-    setTimeout(typeNextChar, 30);
+
+    // Speak character
+    if (soundEnabled && /[א-ת]/.test(manifestoText[charIndex - 1])) {
+      const char = manifestoText[charIndex - 1];
+      if (char !== '\n' && char !== ' ') {
+        // Play typing sound
+        playTypeSound();
+      }
+    }
+
+    setTimeout(typeChar, manifestoText[charIndex] === '\n' ? 50 : 40);
   } else {
-    charIndex = 0;
-    lineIndex++;
-    setTimeout(typeNextChar, 400);
+    // Done typing
+    if (soundEnabled) {
+      speak(manifestoText);
+    }
   }
 }
 
-// התחל animation כאשר דף טוען
-window.addEventListener('load', () => {
-  setTimeout(typeNextChar, 500);
+function playTypeSound() {
+  // Web Audio API typing sound
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const now = audioContext.currentTime;
+
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+
+  osc.frequency.setValueAtTime(Math.random() * 3000 + 2000, now);
+  gain.gain.setValueAtTime(0.1, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+  osc.start(now);
+  osc.stop(now + 0.05);
+}
+
+function speak(text) {
+  if (!soundEnabled) return;
+
+  synth.cancel();
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = 'he-IL';
+  currentUtterance.rate = 0.9;
+  currentUtterance.pitch = 1;
+  currentUtterance.volume = 0.8;
+
+  synth.speak(currentUtterance);
+}
+
+// Sound toggle
+soundBtn.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+
+  if (!soundEnabled) {
+    synth.cancel();
+  }
 });
 
-// בחזרה לguide
+// Start animation on load
+window.addEventListener('load', () => {
+  setTimeout(typeChar, 300);
+});
+
+// Keyboard navigation
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     window.location.href = 'guide.html';
