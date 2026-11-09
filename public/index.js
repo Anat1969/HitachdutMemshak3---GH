@@ -106,9 +106,16 @@ function loadLesson(lessonId) {
 
   // Render lesson content
   const lesson = lessons.find(l => l.id === lessonId);
-  if (!lesson) return;
+  if (!lesson) {
+    console.warn(`Lesson not found: ${lessonId}`);
+    return;
+  }
 
   const mainContent = document.getElementById('main-content');
+  if (!mainContent) {
+    console.warn('main-content element not found');
+    return;
+  }
 
   mainContent.innerHTML = `
     <section class="section active" data-lesson="${lesson.id}">
