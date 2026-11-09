@@ -7,6 +7,7 @@
 <style>
 :root{--ink:#111;--g4:#8a8a8a;--g3:#6b6b6b;--g2:#e2e2e2;--g1:#f5f5f5;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e;--sh:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04)}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;font-family:system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.6;font-size:15px}
 header{padding:48px 6vw 28px}
 .kicker{color:var(--g3);font-size:12px;letter-spacing:.04em}
@@ -53,7 +54,10 @@ section.fit>h2{font-size:18px;margin:0 0 18px}
 .fitgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
 .fitgrid>div{padding:20px;border-radius:12px;background:#fafafa;box-shadow:var(--sh)}
 .fitgrid ul{margin:10px 0 0;padding:0;list-style:none}
-.fitgrid li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--g2);font-size:13.5px}
+.fitgrid li{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--g2);font-size:13.5px}
+.fitgrid small{display:block;color:var(--g3);font-size:11.5px;line-height:1.5}
+.rs{text-align:left}
+.dot.n{background:#d0d0d0}
 .reco{grid-column:1/-1;font-size:14px;color:var(--g3);margin:4px 0 0}
 section.learn{padding:8px 6vw 80px;border-top:1px solid var(--g2)}
 section.learn>h2{font-size:18px;margin:40px 0 4px}
@@ -290,19 +294,28 @@ var stMin=function(v,m){return v<m?"r":(v<m*1.05?"y":"g");};
 var stUse=function(v){return v>=90?"g":(v>=75?"y":"r");};
 var fmt=function(n,d){return Number(n).toLocaleString("he-IL",{maximumFractionDigits:(d===undefined?1:d)});};
 
-function checks(c){
-  return [
-    ["תכסית מרבית ("+R.cov+"%)", fmt(c.cov)+"%", stMax(c.cov,R.cov)],
-    ["אחוזי בנייה מרביים ("+R.bp+"%)", fmt(c.bp,0)+"%", stMax(c.bp,R.bp)],
-    ["מספר קומות ("+R.floors+")", c.fl, stMax(c.fl,R.floors)],
-    ["גובה מרבי ("+R.h+" מ')", fmt(c.h)+" מ'", stMax(c.h,R.h)],
-    ["יח\"ד מול תקרה ("+R.units+")", c.units, stMax(c.units,R.units)],
-    ["יח\"ד מול יעד יזם ("+R.target+")", c.units, stMin(c.units,R.target)],
-    ["ניצול זכויות יזם", fmt(c.use,0)+"%", stUse(c.use)]
-  ];
+function noteMax(v,m,u){
+  if(v>m) return "חורג ב-"+fmt(v-m)+u;
+  if(v>=m*0.95) return "עומד, מרווח קטן מ-5%";
+  return "עומד";
+}
+function checks(a){
+  var c=calc(a), g=geom(a), out=[], inside;
+  out.push({n:"תכסית מרבית",lim:"עד "+R.cov+"%",val:fmt(c.cov)+"%",st:stMax(c.cov,R.cov),note:noteMax(c.cov,R.cov,"%")});
+  out.push({n:"אחוזי בנייה",lim:"עד "+R.bp+"%",val:fmt(c.bp,0)+"%",st:stMax(c.bp,R.bp),note:noteMax(c.bp,R.bp,"%")});
+  out.push({n:"מספר קומות",lim:"עד "+R.floors,val:String(a.fl),st:stMax(a.fl,R.floors),note:noteMax(a.fl,R.floors," קומות")});
+  out.push({n:"גובה מרבי",lim:"עד "+R.h+" מ'",val:fmt(c.h)+" מ'",st:stMax(c.h,R.h),note:noteMax(c.h,R.h," מ'")});
+  inside=g.ox>=R.ss-1e-9 && g.ox+g.w<=g.P-R.ss+1e-9 && g.oy>=R.sr-1e-9 && g.oy+g.d<=g.P-R.sf+1e-9;
+  out.push({n:"קווי בניין",lim:"צד "+R.ss+" מ', אחורי "+R.sr+" מ', קדמי "+R.sf+" מ'",val:fmt(g.w)+" × "+fmt(g.d)+" מ'",st:inside?"g":"r",note:inside?"עומד, המסה בתוך אזור הבנייה":"לא עומד, המסה חורגת מקו הבניין"});
+  out.push({n:"יח\"ד מרבי",lim:"עד "+R.units,val:String(c.units),st:stMax(c.units,R.units),note:noteMax(c.units,R.units," יח\"ד")});
+  out.push({n:"יח\"ד מול יעד יזם",lim:"לפחות "+R.target,val:String(c.units),st:stMin(c.units,R.target),note:c.units<R.target?"לא עומד, מתחת ליעד":"עומד ביעד"});
+  out.push({n:"ניצול זכויות יזם",lim:"מעל 90%",val:fmt(c.use,0)+"%",st:stUse(c.use),note:c.use<75?"לא עומד, מתחת ל-75%":(c.use<90?"עומד חלקית, בין 75% ל-90%":"עומד")});
+  out.push({n:"חניה",lim:"לפי התב\"ע",val:"לא נמצא",st:"n",note:"לא נבדק: הדרישה חסרה במסמכים"});
+  return out;
 }
 function score(ch){
-  return Math.round(ch.reduce(function(s,x){return s+(x[2]==="g"?1:x[2]==="y"?0.5:0);},0)/ch.length*100);
+  var s=ch.filter(function(x){return x.st!=="n";});
+  return Math.round(s.reduce(function(t,x){return t+(x.st==="g"?1:x.st==="y"?0.5:0);},0)/s.length*100);
 }
 
 function renderRights(){
@@ -331,18 +344,19 @@ function renderAltSeg(){
 function renderFit(){
   var keys=Object.keys(ALTS), best=null;
   var cols=keys.map(function(k){
-    var c=calc(ALTS[k]), ch=checks(c), s=score(ch);
-    var reds=ch.filter(function(x){return x[2]==="r";}).length;
+    var ch=checks(ALTS[k]), s=score(ch);
+    var reds=ch.filter(function(x){return x.st==="r";}).length;
     var cand={k:k,s:s,r:reds};
     if(!best||cand.r<best.r||(cand.r===best.r&&cand.s>best.s)) best=cand;
-    var verdict=reds?"חורגת ב-"+reds+" בדיקות":"עומדת בכל התנאים";
-    return '<div><h3>חלופה '+k+'</h3><div class="score">'+s+'%</div>'+
-      '<div class="label">אחוזי התאמה · '+verdict+'</div><ul>'+
-      ch.map(function(x){return '<li><span>'+x[0]+'</span><span><span class="dot '+x[2]+'"></span>'+x[1]+'</span></li>';}).join("")+
-      '</ul></div>';
+    var verdict=reds?"לא עומדת ב-"+reds+" דרישות":"עומדת בכל הדרישות הנבדקות";
+    return '<div><h3>חלופה '+k+'</h3><div class="score">'+s+'%</div><div class="label">אחוזי התאמה · '+verdict+'</div><ul>'+
+      ch.map(function(x){
+        var status=x.st==="r"?"לא עומד":(x.st==="n"?"לא נבדק":"עומד");
+        return '<li><span><b>'+x.n+'</b><small>'+x.lim+' · '+x.val+'</small></span><span class="rs"><span class="dot '+x.st+'"></span>'+status+'<small>'+x.note+'</small></span></li>';
+      }).join("")+'</ul></div>';
   }).join("");
   document.getElementById("fit").innerHTML=cols+
-    '<p class="reco"><b>המלצה לתצוגה:</b> חלופה '+best.k+', עם '+best.s+'% התאמה ו-'+best.r+' בדיקות אדומות. הכלי מציג את ההמלצה ואת הנתונים שעליה, ולא מחליט במקום היזם או הרשות.</p>';
+    '<p class="reco"><b>המלצה לתצוגה:</b> חלופה '+best.k+', עם '+best.s+'% התאמה ו-'+best.r+' דרישות שלא עומדות. הכלי מציג את ההמלצה ואת הנתונים שעליה, ולא מחליט במקום היזם או הרשות.</p>';
 }
 
 function renderFlat(){
