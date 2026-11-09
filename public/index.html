@@ -6,6 +6,7 @@
 <link rel="icon" href="data:,">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <title>מפגש א: זכויות בנייה, חלופות והתאמה</title>
 <style>
 :root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e;--bg:#fff}
@@ -77,6 +78,14 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 .loadbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
 .filebtn{border:1px solid var(--ink);padding:8px 14px;cursor:pointer;font-size:13px}
 .scene{height:440px;width:100%;background:#f4f4f4;margin-top:10px}
+.docbox{border:1px solid var(--g2);padding:14px 16px;margin:14px 0}
+.docbox .plotlbl{display:flex;gap:10px;align-items:center;font-size:14px;margin-bottom:8px}
+.docbox .plotlbl input{padding:6px 8px;border:1px solid var(--g2);font:inherit;width:160px}
+.doclist{list-style:none;padding:0;margin:8px 0}
+.doclist li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--g1);font-size:13.5px}
+.evid{font-size:13px;margin:4px 0}
+.pickrow{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0;flex-wrap:wrap}
+.pickrow select{padding:5px;font:inherit;max-width:100%}
 #lout[hidden]{display:none}
 @media (max-width:980px){.formgrid{grid-template-columns:1fr}.frow{grid-template-columns:1fr 80px}.frow .src{grid-column:1/-1}.live{padding-left:20px;padding-right:20px}}
 @media (max-width:980px){main{grid-template-columns:1fr}.col{border-left:none;border-bottom:1px solid var(--g2)}.fitgrid{grid-template-columns:1fr}section.fit,section.learn,header{padding-left:20px;padding-right:20px}}
@@ -231,6 +240,17 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
     <button id="tplBtn" class="alt" type="button">הורד תבנית CSV</button>
     <label class="filebtn">טען קובץ (CSV או XLSX)<input type="file" id="lfile" accept=".csv,.xlsx,.xls" hidden></label>
     <span class="toast" id="lload"></span>
+  </div>
+  <div class="docbox">
+    <h3>מסמכי התכנית ומספר מגרש</h3>
+    <label class="plotlbl">מספר מגרש / תא שטח <input id="plotNo" type="text" placeholder="למשל 633"></label>
+    <div class="loadbar">
+      <label class="filebtn">בחר מסמכים (PDF, XLSX, CSV, DXF, SHP+DBF)<input type="file" id="docFiles" multiple accept=".pdf,.xlsx,.xls,.csv,.dxf,.shp,.dbf,.jpg,.jpeg,.png" hidden></label>
+      <button id="runDocs" type="button">בדוק מגרש וחלץ נתונים</button>
+    </div>
+    <ul class="doclist" id="docList"><li class="u">לא נבחרו מסמכים</li></ul>
+    <p class="note">הקבצים נקראים בדפדפן ולא נשלחים לשרת. תשריט בתמונה לא נקרא אוטומטית. כל ערך שחולץ מופיע בטופס עם מקורו, ויש לבדוק אותו לפני ההרצה.</p>
+    <div id="docResult"></div>
   </div>
   <div id="lstatus" class="status"></div>
   <div class="formgrid">
@@ -724,6 +744,312 @@ document.getElementById("lfile").addEventListener("change",e=>{
 });
 document.getElementById("copyRep").addEventListener("click",()=>copyText(lastReportText,document.getElementById("repToast")));
 setTimeout(()=>{ if(!window.scene3d) document.getElementById("sceneMsg").textContent="התצוגה התלת-ממדית לא נטענה (אין חיבור ל-CDN). הבדיקות והדוח פועלים."; },8000);
+/* ===== מסמכים ומספר מגרש ===== */
+let DOCS=[];
+if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const DOC_EXT=/\.(pdf|xlsx|xls|csv|dxf|shp|dbf|jpg|jpeg|png)$/i;
+const STAGE1=["plotArea","cov","bp","floors","below","h","front","side","rear","units","dens","uses","parking"];
+const LABEL_OF={pdf:"PDF",sheet:"טבלה",dxf:"DXF (טקסט)",shp:"שכבת מגרש SHP",dbf:"מאפייני שכבה DBF",image:"תשריט (לא נקרא אוטומטית)"};
+function baseName(n){return n.replace(/\.[^.]+$/,"").toLowerCase();}
+function kindOf(n){
+  const e=(n.match(/\.([^.]+)$/)||["",""])[1].toLowerCase();
+  if(["xls","xlsx","csv"].includes(e)) return "sheet";
+  if(["jpg","jpeg","png"].includes(e)) return "image";
+  return e;
+}
+function renderDocList(){
+  document.getElementById("docList").innerHTML=DOCS.length
+    ? DOCS.map(d=>`<li><span>${esc(d.name)}</span><span class="u">${esc(LABEL_OF[d.kind]||"לא נתמך")}</span></li>`).join("")
+    : `<li class="u">לא נבחרו מסמכים</li>`;
+}
+document.getElementById("docFiles").addEventListener("change",e=>{
+  DOCS=[...e.target.files].filter(f=>DOC_EXT.test(f.name)).map(f=>({name:f.name,file:f,kind:kindOf(f.name)}));
+  renderDocList();
+});
+// PDF רבים שומרים טקסט עברי בסדר חזותי: התווים הפוכים והמספרים נשארים משמאל לימין.
+function visualToLogical(s){
+  const r=[...s].reverse().join("");
+  return r.replace(/[%\d][\d.,%\-\/]*/g, m=>[...m].reverse().join(""));
+}
+function pageText(tc){
+  const lines={};
+  tc.items.forEach(it=>{ const y=Math.round(it.transform[5]); (lines[y]=lines[y]||[]).push(it); });
+  return Object.keys(lines).map(Number).sort((a,b)=>b-a)
+    .map(y=>lines[y].slice().sort((a,b)=>b.transform[4]-a.transform[4]).map(it=>visualToLogical(it.str)).join(" "))
+    .join("\n");
+}
+async function readPdf(file){
+  if(!window.pdfjsLib) throw new Error("pdf.js לא נטען");
+  const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    const tc=await (await pdf.getPage(i)).getTextContent();
+    pages.push({where:`עמוד ${i}`, text:pageText(tc)});
+  }
+  return pages;
+}
+async function readSheets(file){
+  if(!window.XLSX) throw new Error("SheetJS לא נטען");
+  const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:"array"});
+  return wb.SheetNames.map(n=>({name:n, rows:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:"",raw:true})}));
+}
+function parseDxf(text){
+  const L=text.split(/\r?\n/).map(s=>s.trim()), out=[];
+  let cur=null;
+  const flush=()=>{ if(cur&&cur.text!==undefined&&cur.text!=="") out.push({where:`שכבה ${cur.layer||"-"}`, text:cur.text}); };
+  for(let k=0;k+1<L.length;k+=2){
+    const code=L[k], v=L[k+1];
+    if(code==="0"){ flush(); cur={ent:v, layer:"", text:undefined}; }
+    else if(!cur) continue;
+    else if(code==="8") cur.layer=v;
+    else if((code==="1"||code==="3")&&(cur.ent==="TEXT"||cur.ent==="MTEXT")) cur.text=(cur.text||"")+v;
+  }
+  flush();
+  return out;
+}
+const decodeStr=b=>{ try{ return new TextDecoder("windows-1255").decode(b); }catch(e){ return new TextDecoder().decode(b); } };
+function parseDbf(buf){
+  const dv=new DataView(buf), u8=new Uint8Array(buf);
+  const n=dv.getUint32(4,true), hl=dv.getUint16(8,true), rl=dv.getUint16(10,true);
+  const fields=[]; let p=32;
+  while(p<hl-1&&u8[p]!==0x0D){
+    fields.push({name:decodeStr(u8.slice(p,p+11)).replace(/\0.*$/,"").trim(), len:u8[p+16]});
+    p+=32;
+  }
+  const recs=[];
+  for(let r=0;r<n;r++){
+    const base=hl+r*rl;
+    if(u8[base]===0x2A){ recs.push(null); continue; }
+    const rec={}; let fo=base+1;
+    fields.forEach(f=>{ rec[f.name]=decodeStr(u8.slice(fo,fo+f.len)).trim(); fo+=f.len; });
+    recs.push(rec);
+  }
+  return recs;
+}
+function parseShpAreas(buf){
+  const dv=new DataView(buf), out=[]; let off=100;
+  while(off+8<=buf.byteLength){
+    const clen=dv.getInt32(off+4,false)*2, c=off+8, type=dv.getInt32(c,true);
+    let area=null;
+    if(type===5||type===15||type===25){
+      const np=dv.getInt32(c+36,true), npt=dv.getInt32(c+40,true), pts0=c+44+np*4;
+      const parts=[]; for(let i=0;i<np;i++) parts.push(dv.getInt32(c+44+i*4,true));
+      let sum=0;
+      for(let i=0;i<np;i++){
+        const s=parts[i], e=i+1<np?parts[i+1]:npt;
+        for(let j=s;j<e;j++){
+          const j2=j+1<e?j+1:s;
+          const x1=dv.getFloat64(pts0+j*16,true), y1=dv.getFloat64(pts0+j*16+8,true);
+          const x2=dv.getFloat64(pts0+j2*16,true), y2=dv.getFloat64(pts0+j2*16+8,true);
+          sum+=x1*y2-x2*y1;
+        }
+      }
+      area=Math.abs(sum)/2;
+    }
+    out.push(area);
+    off=c+clen;
+  }
+  return out;
+}
+const sameNo=(a,b)=>{
+  const x=String(a).trim(), y=String(b).trim();
+  return x===y || (/^\d+(\.0+)?$/.test(x) && Number(x)===Number(y));
+};
+function plotPattern(p){
+  const e=p.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return "(?:מגרש|תא שטח|תא|חלקה)\\s*(?:מס'|מספר|מס)?\\s*[:.]?\\s*"+e+"(?!\\d)";
+}
+function findInTexts(list,plotNo){
+  const out=[];
+  list.forEach(t=>{
+    const re=new RegExp(plotPattern(plotNo),"g"); let m, n=0;
+    while((m=re.exec(t.text))&&n<3){
+      out.push({doc:t.doc, where:t.where, snippet:firstLine(t.text.slice(Math.max(0,m.index-30),m.index+m[0].length+40))});
+      n++;
+    }
+  });
+  return out;
+}
+const PRED={
+  plotArea:s=>/שטח/.test(s)&&/(מגרש|קרקע)/.test(s),
+  cov:s=>/תכסית/.test(s),
+  bp:s=>/אחוזי/.test(s)&&/בני/.test(s),
+  floors:s=>/קומות/.test(s)&&!/מתחת/.test(s),
+  below:s=>/מתחת/.test(s),
+  h:s=>/גובה/.test(s),
+  units:s=>/יח/.test(s)&&!/צפיפות|לדונם/.test(s)
+};
+const TEXT_RX={
+  cov:/תכסית[^0-9%]{0,40}(\d+(?:\.\d+)?)\s*%/g,
+  bp:/(?:אחוזי בנייה|אחוזי הבנייה|אחוזי בניה)[^0-9%]{0,40}(\d+(?:\.\d+)?)\s*%/g,
+  floors:/(?:קומות מעל|מספר קומות)[^0-9]{0,30}(\d+)/g,
+  below:/(?:קומות מתחת|מתחת לקרקע)[^0-9]{0,30}(\d+)/g,
+  h:/גובה (?:מרבי|מירבי)?[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  front:/קדמי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  side:/צדדי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  rear:/אחורי[^0-9]{0,30}(\d+(?:\.\d+)?)\s*מ/g,
+  units:/(?:(\d+)\s*יח["״']ד(?!\s*לדונם)|יח["״']ד מרבי[^0-9]{0,30}(\d+))/g,
+  dens:/(\d+(?:\.\d+)?)\s*יח["״']ד\s*לדונם/g,
+  plotArea:/שטח מגרש[^0-9]{0,30}(\d[\d,.]*)\s*מ/g
+};
+const firstLine=s=>s.split("\n")[0].trim();
+function textCandidates(pages){
+  const out={};
+  Object.keys(TEXT_RX).forEach(k=>{
+    out[k]=[];
+    pages.forEach(p=>{
+      const re=new RegExp(TEXT_RX[k].source,"g"); let m;
+      while((m=re.exec(p.text))){
+        const num=m.slice(1).find(x=>x!==undefined).replace(/,/g,"");
+        out[k].push({v:Number(num), where:`${p.doc}, ${p.where}`, snippet:firstLine(p.text.slice(Math.max(0,m.index),m.index+m[0].length+20))});
+      }
+    });
+  });
+  return out;
+}
+function tableValues(sheet,plotNo){
+  const rows=sheet.rows, pn=String(plotNo).trim();
+  const hits=[];
+  rows.forEach((row,i)=>{ if(row.some(c=>sameNo(c,pn)&&String(c).trim()!=="")) hits.push(i); });
+  let hdr=-1;
+  for(let i=0;i<rows.length&&hdr<0;i++){
+    const n=rows[i].filter(c=>typeof c==="string"&&Object.values(PRED).some(f=>f(c))).length;
+    if(n>=2) hdr=i;
+  }
+  if(!hits.length||hdr<0) return {hits:hits.length, values:{}};
+  const heads=rows[hdr].map(c=>String(c));
+  const values={};
+  Object.keys(PRED).forEach(k=>{
+    const j=heads.findIndex(h=>PRED[k](h));
+    if(j<0) return;
+    const raw=rows[hits[0]][j];
+    const v=Number(String(raw).replace(/,/g,""));
+    if(String(raw).trim()!==""&&!isNaN(v)) values[k]={v, where:`${sheet.doc}, גיליון ${sheet.name}, שורה ${hits[0]+1}, עמודה "${heads[j].trim()}"`, snippet:String(raw)};
+  });
+  return {hits:hits.length, values};
+}
+function setField(key,value,src){
+  document.getElementById("v_"+key).value=value===undefined||value===null?"":String(value);
+  document.getElementById("s_"+key).value=src||"";
+}
+async function runDocs(){
+  const plotNo=document.getElementById("plotNo").value.trim();
+  const out=document.getElementById("docResult");
+  if(!plotNo){ out.innerHTML=`<p class="status bad">יש להזין מספר מגרש או תא שטח לפני החילוץ.</p>`; return; }
+  if(!DOCS.length){ out.innerHTML=`<p class="status bad">לא נבחרו מסמכים.</p>`; return; }
+  out.innerHTML=`<p class="status">קורא את המסמכים בדפדפן...</p>`;
+  const read=[], unread=[], pdfPages=[], sheets=[], dxfTexts=[], shp={}, dbf={};
+  for(const d of DOCS){
+    try{
+      if(d.kind==="pdf"){
+        const pages=await readPdf(d.file);
+        if(pages.some(p=>p.text.trim())){
+          pages.forEach(p=>pdfPages.push({doc:d.name,...p}));
+          read.push(`${d.name} (${pages.length} עמודים)`);
+        } else unread.push(`${d.name}: אין טקסט קריא, כנראה סריקה`);
+      } else if(d.kind==="sheet"){
+        const sh=await readSheets(d.file);
+        sh.forEach(s=>sheets.push({doc:d.name,...s}));
+        read.push(`${d.name} (${sh.length} גיליונות)`);
+      } else if(d.kind==="dxf"){
+        const tx=parseDxf(await d.file.text());
+        tx.forEach(x=>dxfTexts.push({doc:d.name,...x}));
+        read.push(`${d.name} (${tx.length} טקסטים)`);
+      } else if(d.kind==="dbf"){
+        dbf[baseName(d.name)]={name:d.name, recs:parseDbf(await d.file.arrayBuffer())};
+        read.push(`${d.name} (מאפיינים)`);
+      } else if(d.kind==="shp"){
+        shp[baseName(d.name)]={name:d.name, areas:parseShpAreas(await d.file.arrayBuffer())};
+        read.push(`${d.name} (צורות)`);
+      } else unread.push(`${d.name}: ${LABEL_OF[d.kind]||"לא נתמך"}`);
+    }catch(err){ unread.push(`${d.name}: שגיאה בקריאה (${err.message})`); }
+  }
+  // חיפוש המגרש
+  const evid=[];
+  evid.push(...findInTexts(pdfPages,plotNo), ...findInTexts(dxfTexts,plotNo));
+  sheets.forEach(s=>{
+    s.rows.forEach((row,i)=>{
+      row.forEach((c,j)=>{
+        if(String(c).trim()!==""&&sameNo(c,plotNo)) evid.push({doc:s.doc, where:`גיליון ${s.name}, שורה ${i+1}`, snippet:String(c)});
+      });
+    });
+  });
+  let shpArea=null;
+  Object.keys(shp).forEach(key=>{
+    const db=dbf[key]; if(!db) return;
+    db.recs.forEach((rec,i)=>{
+      if(!rec) return;
+      const f=Object.keys(rec).find(k=>sameNo(rec[k],plotNo));
+      if(f){
+        const area=shp[key].areas[i]??null;
+        evid.push({doc:shp[key].name, where:`רשומה ${i+1}, שדה ${f}`, snippet:`שטח ${area!==null?area.toFixed(2)+" מ\"ר":"לא חושב"}`});
+        if(shpArea===null&&area!==null) shpArea={v:area, where:`${shp[key].name}, רשומה ${i+1}`};
+      }
+    });
+  });
+  const evidDocs=[...new Set(evid.map(e=>e.doc))];
+  if(!evid.length){
+    STAGE1.forEach(k=>setField(k,"","לא נמצא: המגרש לא נמצא במסמכים"));
+    renderLive();
+    out.innerHTML=`<p class="status bad">המגרש ${esc(plotNo)} לא נמצא באף אחד מהמסמכים שנקראו. לא חולצו נתונים. בדוק את המספר או העלה מסמך נוסף.</p>`+
+      `<p class="note">נקראו: ${esc(read.join(", ")||"אין")}. לא נקראו: ${esc(unread.join(", ")||"אין")}.</p>`;
+    return;
+  }
+  // חילוץ מטבלאות (שורת המגרש) ומטקסט
+  const tbl={};
+  sheets.forEach(s=>{ const r=tableValues(s,plotNo); Object.keys(r.values).forEach(k=>{ if(!tbl[k]) tbl[k]=r.values[k]; }); });
+  const cands=textCandidates(pdfPages);
+  const picks={};
+  const notFound=[];
+  let statusNote="";
+  STAGE1.forEach(k=>{
+    if(k==="uses"||k==="parking"){ setField(k,"","לא נמצא במסמכים: להזין ידנית"); return; }
+    if(k==="plotArea"){
+      if(tbl.plotArea){ setField(k,tbl.plotArea.v,tbl.plotArea.where); return; }
+      if(shpArea){ setField(k,shpArea.v.toFixed(2),shpArea.where+" (חושב מהצורה)"); return; }
+      const pl=cands.plotArea||[];
+      if(new Set(pl.map(x=>x.v)).size===1){ const c=pl[0]; setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`); return; }
+      setField(k,"","לא נמצא במסמכים"); notFound.push(FIELDS.find(f=>f[0]===k)[1]); return;
+    }
+    if(tbl[k]){ setField(k,tbl[k].v,tbl[k].where); return; }
+    const list=cands[k]||[];
+    const distinct=[...new Set(list.map(x=>x.v))];
+    if(distinct.length===1){ const c=list[0]; setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`); return; }
+    if(distinct.length>1){ picks[k]=list; setField(k,"","ממתין לבחירה מהמועמדים"); return; }
+    setField(k,"","לא נמצא במסמכים"); notFound.push(FIELDS.find(f=>f[0]===k)[1]);
+  });
+  // בדיקת שטח מגרש: טבלה מול שכבה
+  if(tbl.plotArea&&shpArea){
+    const diff=Math.abs(tbl.plotArea.v-shpArea.v)/shpArea.v*100;
+    statusNote=`שטח מגרש: טבלה ${fmt(tbl.plotArea.v,0)} מ"ר מול שכבה ${fmt(shpArea.v,0)} מ"ר, סטייה ${fmt(diff,2)}%. ${diff<=0.5?"תקין (עד 0.5%).":"חורג מ-0.5%: ממצא לאימות באדום."}`;
+  }
+  window.__picks=picks;
+  let pickHTML="";
+  Object.keys(picks).forEach(k=>{
+    const opts=picks[k].map((c,i)=>`<option value="${i}">${esc(c.v)} · ${esc(c.where)} · "${esc(c.snippet)}"</option>`).join("");
+    pickHTML+=`<div class="pickrow"><span>${esc(FIELDS.find(f=>f[0]===k)[1])}: נמצאו מועמדים שונים. בחר אחד:</span><select data-pick="${k}"><option value="">בחר</option>${opts}</select></div>`;
+  });
+  out.innerHTML=
+    `<h3>המגרש נמצא</h3>`+
+    evid.slice(0,12).map(e=>`<p class="evid">${esc(e.doc)} · ${esc(e.where)} · ${esc(e.snippet)}</p>`).join("")+
+    (evid.length>12?`<p class="note">ועוד ${evid.length-12} מקומות.</p>`:"")+
+    `<p class="note">נמצא ב-${evidDocs.length} מסמכים. נקראו: ${esc(read.join(", ")||"אין")}. לא נקראו: ${esc(unread.join(", ")||"אין")}.</p>`+
+    (statusNote?`<p class="status">${esc(statusNote)}</p>`:"")+
+    (notFound.length?`<p class="status bad">לא נמצא במסמכים, להזין ידנית: ${esc(notFound.join(", "))}.</p>`:"")+
+    pickHTML+
+    `<p class="note">הערכים הוזנו לטופס עם מקורם. בדוק כל ערך מול המקור לפני הרצת המודל.</p>`;
+  renderLive();
+}
+document.getElementById("docResult").addEventListener("change",e=>{
+  const k=e.target.dataset.pick; if(!k) return;
+  const i=e.target.value; if(i==="") return;
+  const c=window.__picks[k][Number(i)];
+  setField(k,c.v,`כללי, לאימות: ${c.where}, "${c.snippet}"`);
+  renderLive();
+});
+document.getElementById("runDocs").addEventListener("click",()=>runDocs().catch(err=>{
+  document.getElementById("docResult").innerHTML=`<p class="status bad">שגיאה בחילוץ: ${esc(err.message)}</p>`;
+}));
 buildForms();
 renderRights(); renderAltSeg(); renderView(); renderFit();
 </script>
