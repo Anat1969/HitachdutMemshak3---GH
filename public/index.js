@@ -9,12 +9,21 @@ import { lessons } from './data.js';
 let currentLesson = 'about';
 let currentTab = 0;
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
+// Expose lessons globally for debugging
+window.lessons = lessons;
+
+// Initialize immediately if DOM is ready, or wait for DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+function initApp() {
   renderApp();
   attachEventListeners();
   loadLesson('about');
-});
+}
 
 /**
  * Render main app structure

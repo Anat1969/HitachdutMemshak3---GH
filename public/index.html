@@ -37,16 +37,8 @@
 
 <div class="app" id="app"></div>
 
-<!-- Import data and logic as modules -->
-<script type="module">
-  import { lessons } from './data.js';
-
-  // Expose lessons globally for debugging
-  window.lessons = lessons;
-
-  // Dynamic import of index.js
-  import('./index.js');
-</script>
+<!-- Load main app logic -->
+<script type="module" src="./index.js"></script>
 
 </body>
 </html>
