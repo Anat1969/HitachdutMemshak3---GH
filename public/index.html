@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>מפגש א: זכויות בנייה, חלופות והתאמה</title>
 <style>
 :root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e;--bg:#fff}
@@ -117,6 +118,8 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
 <section class="fit" id="s3">
   <h2>בדיקת התאמה: תב"ע ועירייה מול יזם</h2>
+  <div class="label">יעד יח"ד של היזם (דמו, שדה קלט)</div>
+  <input type="number" id="target" value="32" min="0" aria-label="יעד יח&quot;ד של היזם" style="max-width:200px">
   <div class="fitgrid" id="fit"></div>
 </section>
 
@@ -126,7 +129,7 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">שלב 1: מיפוי זכויות בנייה למגרש</h2>
   <details open><summary><span class="step">1</span>מה משנה במספר אחוזי הבנייה</summary>
-    <p>מאז תיקון דצמבר 2023 לתקנות חישוב השטחים (התשנ"ב-1992), אין חובה לפצל בתכנית בין שטחים עיקריים לשטחי שירות. לכן הקלט חייב לזהות איזה נוסח חל על התכנית לפני שמחשבים אחוזים.</p>
+    <p>מאז תיקון דצמבר 2023 לתקנות חישוב השטחים (התשנ"ב-1992), אין חובה לפצל בתכנית בין שטחים עיקריים לשטחי שירות. לכן הקלט חייב לזהות איזה נוסח חל על התכנית לפני שמחשבים אחוזים. (לא אומת בבדיקה: תיקון 2025 קיים ולא נבדק.)</p>
     <p><b>נבין:</b> האם הטבלה מציגה שטח כולל או פיצול? מה קורה כשהתכנית ישנה יותר מ-1992?</p>
   </details>
   <details><summary><span class="step">2</span>שטח מגרש, תכסית וקווי בניין</summary>
@@ -189,7 +192,7 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 
   <h2 class="big">איך נמדדת האמינות של הכלי</h2>
   <details open><summary>מקרה מבחן ראשון</summary>
-    <p>תב"ע 603 כבר נבדקה ידנית, ונמצאו בה שישה ממצאים לאימות: סיכומי שטח שאינם תואמים לרכיבים, שורת סיכום שמשתנה לאחר תיקון, ושגיאת הקלדה באחוזי בנייה. הכלי צריך לזהות את כל הממצאים האלה לבד.</p>
+    <p>תב"ע 603-0811588 כבר נבדקה ידנית, ונמצאו בה שישה ממצאים לאימות: סיכומי שטח שאינם תואמים לרכיבים, שורת סיכום שמשתנה לאחר תיקון, ושגיאת הקלדה באחוזי בנייה. הכלי צריך לזהות את כל הממצאים האלה לבד.</p>
   </details>
   <details><summary>מדדים</summary>
     <p>כל ערך מהשלב הראשון מקושר למקור: יעד 100%. סטיית שטח מול שייפ: עד 0.5%. ממצא עקביות שלא זוהה במקרה המבחן נרשם ככשל של הכלי.</p>
@@ -255,9 +258,9 @@ function calc(a){
   const h=a.fl*R.fl, units=Math.floor(gross*R.sell/R.avg), use=bp/R.bp*100;
   return {fp:a.fp,fl:a.fl,gross,cov,bp,h,units,use};
 }
-const stMax=(v,m)=>v>m?"r":(v>=m*0.95?"y":"g");
+const stMax=(v,m)=>v>m?"r":(v>m*0.95?"y":"g");
 const stMin=(v,m)=>v<m?"r":(v<m*1.05?"y":"g");
-const stUse=v=>v>=90?"g":(v>=75?"y":"r");
+const stUse=v=>v>90?"g":(v>=75?"y":"r");
 const fmt=(n,d=1)=>Number(n).toLocaleString("he-IL",{maximumFractionDigits:d});
 
 function checks(c){
@@ -275,19 +278,22 @@ const score=ch=>Math.round(ch.reduce((s,x)=>s+(x[2]==="g"?1:x[2]==="y"?0.5:0),0)
 
 function renderRights(){
   const rows=[
-    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", "מקור: יוזן מהמסמכים", "g"],
-    ["תכסית מרבית", R.cov+"%", "מקור: יוזן מהמסמכים", "g"],
-    ["אחוזי בנייה", R.bp+"%", "מקור: יוזן מהמסמכים", "g"],
-    ["קומות מרבי", R.floors, "מקור: יוזן מהמסמכים", "g"],
-    ["גובה מרבי", R.h+" מ'", "מקור: יוזן מהמסמכים", "g"],
-    ["קו בניין קדמי / צדדי", "5 / 4 מ'", "מקור: יוזן מהמסמכים", "y"],
-    ["יח\"ד מרבי", R.units, "מקור: יוזן מהמסמכים", "g"],
-    ["חניה", "לא נמצא", "מקור: יוזן מהמסמכים", "r"]
+    ["שטח מגרש", fmt(R.plot,0)+" מ\"ר", "דמו: טרם חולץ ממסמך", "g"],
+    ["תכסית מרבית", R.cov+"%", "דמו: טרם חולץ ממסמך", "g"],
+    ["אחוזי בנייה", R.bp+"%", "דמו: טרם חולץ ממסמך", "g"],
+    ["קומות מרבי", R.floors, "דמו: טרם חולץ ממסמך", "g"],
+    ["גובה מרבי", R.h+" מ'", "דמו: טרם חולץ ממסמך", "g"],
+    ["קו בניין קדמי / צדדי", "5 / 4 מ'", "דמו: טרם חולץ ממסמך", "y"],
+    ["יח\"ד מרבי", R.units, "דמו: טרם חולץ ממסמך", "g"],
+    ["חניה", "לא נמצא", "דמו: טרם חולץ ממסמך", "r"]
   ];
   document.getElementById("rights").innerHTML=rows.map(r=>
     `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td><span class="dot ${r[3]}"></span></td></tr>
      <tr><td colspan="3" class="src">${r[2]}</td></tr>`).join("");
 }
+document.getElementById("target").addEventListener("input",e=>{
+  R.target=Number(e.target.value)||0; renderFit();
+});
 
 function renderAltSeg(){
   document.getElementById("altSeg").innerHTML=Object.keys(ALTS).map(k=>
