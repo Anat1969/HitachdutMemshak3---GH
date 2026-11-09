@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="קורס בינה מלאכותית לאדריכלים - אפליקציה אחודה לבנייה וניתוח">
+<title>קורס בינה מלאכותית לאדריכלים</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Color, Typography, Spacing
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Color palette */
+  --bg: #ffffff;
+  --bg-alt: #fafafa;
+  --fg: #0f0f0f;
+  --fg-secondary: #555555;
+  --fg-tertiary: #888888;
+  --edge: #e0e0e0;
+  --accent-primary: #2d7a4a;
+  --accent-secondary: #d4a017;
+  --accent-tertiary: #b83a2e;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Courier New", monospace;
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0d0d;
+    --bg-alt: #1a1a1a;
+    --fg: #f5f5f5;
+    --fg-secondary: #aaaaaa;
+    --fg-tertiary: #777777;
+    --edge: #2a2a2a;
+    --accent-primary: #5ed47d;
+    --accent-secondary: #e8b923;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d0d0d;
+  --bg-alt: #1a1a1a;
+  --fg: #f5f5f5;
+  --fg-secondary: #aaaaaa;
+  --fg-tertiary: #777777;
+  --edge: #2a2a2a;
+  --accent-primary: #5ed47d;
+  --accent-secondary: #e8b923;
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; }
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT — Navigation + Main
+   ═══════════════════════════════════════════════════════════════ */
+
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+  gap: 0;
+}
+
+/* Navigation sidebar — fixed, doesn't scroll */
+nav.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: var(--bg-alt);
+  border-left: 1px solid var(--edge);
+  overflow-y: auto;
+  padding: var(--space-3xl) 0 var(--space-2xl);
+  z-index: 1000;
+}
+
+nav.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+nav.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+nav.sidebar::-webkit-scrollbar-thumb {
+  background: var(--fg-tertiary);
+  border-radius: 3px;
+}
+
+/* Main content area */
+main {
+  grid-column: 2;
+  padding: var(--space-3xl) var(--space-2xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION SIDEBAR
+   ═══════════════════════════════════════════════════════════════ */
+
+.nav-header {
+  padding: 0 var(--space-2xl) var(--space-2xl);
+  margin-bottom: var(--space-3xl);
+  border-bottom: 1px solid var(--edge);
+}
+
+.nav-logo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin: 0;
+}
+
+.nav-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: block;
+  padding: var(--space-lg) var(--space-2xl);
+  color: var(--fg-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-right: 3px solid transparent;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--fg);
+  background: var(--bg);
+}
+
+.nav-link.active {
+  color: var(--accent-primary);
+  border-right-color: var(--accent-primary);
+  background: var(--bg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════════════════════════════ */
+
+.hero {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+  margin-bottom: var(--space-4xl);
+  padding-bottom: var(--space-3xl);
+  border-bottom: 1px solid var(--edge);
+}
+
+.hero-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  background: var(--bg-alt);
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-text h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 var(--space-lg);
+  letter-spacing: -0.5px;
+}
+
+.hero-text .subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--fg-secondary);
+  margin: 0 0 var(--space-xl);
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  font-size: 13px;
+  color: var(--fg-tertiary);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--edge);
+  margin-top: var(--space-xl);
+}
+
+.meta-item {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: var(--space-lg);
+}
+
+.meta-label {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-weight: 500;
+  color: var(--fg-secondary);
+}
+
+.meta-value a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.meta-value a:hover {
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTIONS & TABS
+   ═══════════════════════════════════════════════════════════════ */
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.section h2 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  margin: 0 0 var(--space-2xl);
+  letter-spacing: -0.5px;
+}
+
+.section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: var(--space-2xl) 0 var(--space-lg);
+  color: var(--fg);
+}
+
+.section p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--fg-secondary);
+  margin: 0 0 var(--space-xl);
+  max-width: 820px;
+}
+
+/* Sub-tabs within sections */
+.tabs {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--edge);
+  overflow-x: auto;
+}
+
+.tab-button {
+  padding: var(--space-lg) var(--space-xl);
+  background: transparent;
+  border: none;
+  color: var(--fg-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: var(--fg);
+}
+
+.tab-button.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT BOXES
+   ═══════════════════════════════════════════════════════════════ */
+
+.content-box {
+  background: var(--bg-alt);
+  padding: var(--space-2xl);
+  border-radius: 12px;
+  border: 1px solid var(--edge);
+  margin-bottom: var(--space-2xl);
+}
+
+.content-box h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 var(--space-md);
+  color: var(--fg);
+}
+
+.content-box p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LISTS
+   ═══════════════════════════════════════════════════════════════ */
+
+ul.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+ul.features li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+ul.features li::before {
+  content: '◆';
+  color: var(--accent-primary);
+  font-size: 10px;
+  margin-top: 6px;
+}
+
+ul.features b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+
+footer {
+  padding: var(--space-3xl) var(--space-2xl);
+  border-top: 1px solid var(--edge);
+  background: var(--bg-alt);
+  text-align: center;
+  color: var(--fg-tertiary);
+  font-size: 13px;
+  margin-top: var(--space-4xl);
+}
+
+footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+footer a:hover {
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .app {
+    grid-template-columns: 220px 1fr;
+  }
+
+  nav.sidebar {
+    width: 220px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+  }
+
+  .hero-image {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  nav.sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-bottom: 1px solid var(--edge);
+    padding: var(--space-2xl) 0;
+  }
+
+  .nav-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    padding: 0 var(--space-lg);
+  }
+
+  .nav-item {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .nav-link {
+    padding: var(--space-md) var(--space-lg);
+    border-right: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+  }
+
+  .nav-link.active {
+    border-right: none;
+    border-bottom-color: var(--accent-primary);
+  }
+
+  main {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  .hero {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .section h2 {
+    font-size: 28px;
+  }
+
+  .hero-text h1 {
+    font-size: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <nav class="sidebar">
+    <div class="nav-header">
+      <p class="nav-logo">קורס בינה מלאכותית</p>
+    </div>
+    <ul class="nav-items">
+      <li class="nav-item">
+        <a class="nav-link active" data-section="about">אודות הקורס</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-section="session-a">מפגש א</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-section="session-b">מפגש ב</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-section="chaos">סדר בבאלגן</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- SECTION 1: ABOUT -->
+    <section id="about" class="section active">
+      <div class="hero">
+        <div class="hero-image">
+          <img src="author.png" alt="ענת שטרן">
+        </div>
+        <div class="hero-text">
+          <h1>קורס בינה מלאכותית לאדריכלים</h1>
+          <p class="subtitle">כלים לחשיבה מעודכנת בעידן השינוי.</p>
+          <div class="hero-meta">
+            <div class="meta-item">
+              <span class="meta-label">שם</span>
+              <span class="meta-value">ענת שטרן</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">מייל</span>
+              <span class="meta-value"><a href="mailto:shtanat5@gmail.com">shtanat5@gmail.com</a></span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">תאריך</span>
+              <span class="meta-value" id="current-date"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>המטרה</h3>
+        <p>בנייה של כלים בינה מלאכותית אשר מסייעים לאדריכלים וללקוחותיהם לחשוב טוב יותר במהלך תהליך תכנוני. לא עוד טבלאות מסובכות וטופסים שמעייפים — אלא שיחות ברורות וחזון המומחש בעיניים.</p>
+      </div>
+
+      <div class="content-box">
+        <h3>הסיפור</h3>
+        <p style="font-family: var(--font-mono); font-size: 14px; line-height: 1.9;">
+          למדתי ברומא, במילאנו ובוונציה, ועדיין אני מגלה את אשדוד מחדש בכל יום בתור אדריכלית העיר שלה.<br><br>
+          הקולנוע וההדרכה בטיולים לימדו אותי שגם אדריכל וגם מדריך מבלים את חייהם בהסבר למישהו איפה הוא נמצא, ואני עדיין לא בטוחה אם זה מחמיא או מביך.<br><br>
+          אז אני בונה כלים לקורס הזה בבינה מלאכותית, כי מי שכבר מטפל בתוכניות לא צריך עוד תוכנית, אלא כלי שעובד.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SESSION A -->
+    <section id="session-a" class="section">
+      <h2>מפגש א: זכויות בנייה</h2>
+
+      <div class="tabs">
+        <button class="tab-button active" data-tab="sa-intro">סקירה</button>
+        <button class="tab-button" data-tab="sa-learn">נלמד</button>
+        <button class="tab-button" data-tab="sa-do">נעשה</button>
+      </div>
+
+      <div id="sa-intro" class="tab-content active">
+        <div class="content-box">
+          <h4>מה בחלק הזה</h4>
+          <p>אפליקציה אינטראקטיבית לביצוע מיפוי זכויות, בנייה של מודל וחלופות, ובדיקת התאמה. הממשק מפרק תב"ע למקורות, בונה מודל לכל חלופה, ובודק כל חלופה מול היזם ומול העירייה.</p>
+        </div>
+
+        <h3>שלושת השלבים</h3>
+        <ul class="features">
+          <li><b>שלב 1 · מיפוי זכויות:</b> קלט את מסמכי התב"ע, הצפה מושכלת של הנתונים, מקור ברור לכל מספר.</li>
+          <li><b>שלב 2 · מודל וחלופות:</b> בנייה של מודלים תלת-ממדיים לכל חלופה, שינוי משתנים (גובה קומה, צפיפות, שטחים), טבלאות השוואה.</li>
+          <li><b>שלב 3 · בדיקת התאמה:</b> רמזור ירוק/צהוב/אדום על כל קריטריון, ממשק אינטראקטיבי לשינוי הנתונים בזמן אמת.</li>
+        </ul>
+      </div>
+
+      <div id="sa-learn" class="tab-content">
+        <h3>נלמד · חמש שאלות עיקריות</h3>
+        <ul class="features">
+          <li><b>מה משנה במספר אחוזי הבנייה:</b> תיקון דצמבר 2023 לתקנות חישוב השטחים — הבנה של האם הטבלה מציגה שטח כולל או פיצול.</li>
+          <li><b>שטח מגרש, תכסית וקווי בניין:</b> סטייה של עד 0.5% בין השייפ לטבלה נחשבת תקינה.</li>
+          <li><b>קומות, גובה וזכויות מתחת לקרקע:</b> מספר קומות מעל ומתחת לקרקע מופיע בהוראות, גובה נמדד לפי ההגדרה בתכנית.</li>
+          <li><b>יחידות דיור ושימושים:</b> מספר יח"ד מרבי וצפיפות בהוראות או בטבלה בלבד.</li>
+          <li><b>בקרת עקביות:</b> רכיבי השטח חייבים לסכום לסה"כ, אחוזים חייבים להתאים לשטחים.</li>
+        </ul>
+      </div>
+
+      <div id="sa-do" class="tab-content">
+        <h3>נעשה · בנייה מעשית</h3>
+        <p>להזין פרויקט אחד במלואו: זכויות בנייה, מודל תלת-ממדי לשלוש חלופות, בדיקת התאמה מול היזם והעירייה.</p>
+        <div class="content-box">
+          <h4>הצעד הבא</h4>
+          <p>פתח את <b>מפגש א</b> בטלסקופ מלא כדי לעבוד עם הנתונים של התב"ע שלך.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: SESSION B -->
+    <section id="session-b" class="section">
+      <h2>מפגש ב: הצעות וניתוח</h2>
+
+      <div class="tabs">
+        <button class="tab-button active" data-tab="sb-intro">סקירה</button>
+        <button class="tab-button" data-tab="sb-learn">נלמד</button>
+        <button class="tab-button" data-tab="sb-do">נעשה</button>
+      </div>
+
+      <div id="sb-intro" class="tab-content active">
+        <div class="content-box">
+          <h4>מה בחלק הזה</h4>
+          <p>כשלוקחים את הזכויות ממפגש א ובונים עליהן הצעות משפחתיות וניתוח השפעות עירוניות. כל הצעה משקפת סטוריית משתמש שונה, ודוח ההשפעות חושף כל חיבור בין הבחירות שלך לשינויים בעיר.</p>
+        </div>
+
+        <h3>שלושת השלבים</h3>
+        <ul class="features">
+          <li><b>משפחות הצעות:</b> בנייה של משפחות הצעות שנשלפו מהזכויות בא, כל משפחה על בסיס סטוריית משתמש שונה.</li>
+          <li><b>ניתוח השפעות:</b> תוכנית פנימית מתופסת בעיניים, חשופות ההשפעות על הסביבה הקרובה, חישובי צפיפות ותפוסה.</li>
+          <li><b>שיתוף עם בעלי עניין:</b> הצעת גרסאות לדוגמה ללקוח, עיר, רשות תכנון — כל גרסה מהודרת לקהל שלה.</li>
+        </ul>
+      </div>
+
+      <div id="sb-learn" class="tab-content">
+        <h3>נלמד · שתי רמות של ניתוח</h3>
+        <p>רמה ראשונה: הבנת איך הצעה משפיעה על יעדי היזם (מכירות, מחיר, עירוניות). רמה שנייה: ההשפעות על הרחוב, האוויר, הישימות של המטבח, המים.</p>
+      </div>
+
+      <div id="sb-do" class="tab-content">
+        <h3>נעשה · הדוח המיוחד</h3>
+        <p>הכנת דוח השוואה בין שלוש הצעות, לכל אחת יתרון וחיסרון, המלצה מנומקת, ודוח נפרד לכל גרם מעניין (יזם, עיר, רשות).</p>
+      </div>
+    </section>
+
+    <!-- SECTION 4: CHAOS -->
+    <section id="chaos" class="section">
+      <h2>סדר בבאלגן: ארגון בעיות מורכבות</h2>
+
+      <div class="tabs">
+        <button class="tab-button active" data-tab="c-intro">סקירה</button>
+        <button class="tab-button" data-tab="c-learn">נלמד</button>
+        <button class="tab-button" data-tab="c-do">נעשה</button>
+      </div>
+
+      <div id="c-intro" class="tab-content active">
+        <div class="content-box">
+          <h4>מה בחלק הזה</h4>
+          <p>כשהמטלה גדולה מדי, הנתונים מפוזרים, או שיש הרבה חלופות. איך לארגן את התהליך לפני שממשיכים? שלוש סיבות עיקריות להכאוס: נתונים מפוזרים, שאלות רבות בבת אחת, אפיון לא ברור.</p>
+        </div>
+
+        <h3>ששת הכלים</h3>
+        <ul class="features">
+          <li><b>זיהוי הבעיה:</b> איזה מהשלוש הם במקרה שלך?</li>
+          <li><b>פתרת חוט אחד:</b> בדיקת נתונים, בחירת שאלה אחת, השגת הסכמה על קריטריונים.</li>
+          <li><b>ניהול חלופות:</b> טבלה ודרך לרישום גרסאות, מה משתנה ומה התוצאה.</li>
+          <li><b>רישום ממצאים:</b> איך תעדים כדי שאחרים יבינו — תוצאה, חישוב, ערעור, צילום.</li>
+          <li><b>דיווח תוצאות:</b> שלוש דרכים לפי הקהל — לעצמך, להצוות, ללקוח.</li>
+          <li><b>רשימת בדיקה:</b> שש שאלות לפני ההמשך לשלב הבא.</li>
+        </ul>
+      </div>
+
+      <div id="c-learn" class="tab-content">
+        <h3>נלמד · התרגיל הבסיסי</h3>
+        <p>קח משימה שמנת כדלקדת בחודש שעבר. חלץ מתוכה שלוש משפחות בעיות: איזה נתונים חסרים, איזה שאלות עומדות, איזה הנחות צריך להסדיר. אל תכתוב פתרון עדיין.</p>
+      </div>
+
+      <div id="c-do" class="tab-content">
+        <h3>נעשה · בניית מערכת עבודה</h3>
+        <p>אחרי שזיהית את הבעיה, בנה לעצמך טבלה עם שלוש שורות: שאלה, מצב נוכחי, צעד הבא. הדבק אותה בדיסקוד או בתוך המסמך שלך. כשיש לך שלוש ברורות, אתה כבר לא בבאלגן.</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 ענת שטרן. קורס בתהליך בעיצוב ופיתוח.</p>
+    </footer>
+
+  </main>
+
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const sectionId = link.getAttribute('data-section');
+
+    // Update nav state
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+
+    // Update section state
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+
+    // Reset tabs in new section
+    const newSection = document.getElementById(sectionId);
+    newSection.querySelectorAll('.tab-button').forEach((b, i) => {
+      b.classList.toggle('active', i === 0);
+    });
+    newSection.querySelectorAll('.tab-content').forEach((c, i) => {
+      c.classList.toggle('active', i === 0);
+    });
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  });
+});
+
+// Tabs within sections
+document.querySelectorAll('.tab-button').forEach(button => {
+  button.addEventListener('click', () => {
+    const tabId = button.getAttribute('data-tab');
+    const section = button.closest('.section');
+
+    // Update tab button state
+    section.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    button.classList.add('active');
+
+    // Update tab content state
+    section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+  });
+});
+
+// Set current date
+const today = new Date();
+const dateStr = new Intl.DateTimeFormat('he-IL', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(today);
+document.getElementById('current-date').textContent = dateStr;
+</script>
+
+</body>
+</html>
