@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <title>מפגש א: זכויות בנייה, חלופות והתאמה</title>
 <style>
 :root{--ink:#111;--g3:#6b6b6b;--g2:#d9d9d9;--g1:#f4f4f4;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e;--bg:#fff}
@@ -61,6 +63,22 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
 .copybar button{background:var(--ink);color:#fff;border:none;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px}
 .copybar button.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
 .toast{font-size:12px;color:var(--gr);align-self:center}
+.modes{display:flex;margin-top:16px}
+.modes button{border:1px solid var(--ink);background:#fff;padding:7px 16px;font:inherit;cursor:pointer;color:var(--ink)}
+.modes button.on{background:var(--ink);color:#fff}
+.live{padding:24px 40px 60px;border-top:1px solid var(--g2)}
+.live h3{font-size:15px;margin:18px 0 6px}
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.frow{display:grid;grid-template-columns:1.3fr .8fr 1.3fr;gap:6px;align-items:center;margin-bottom:6px;font-size:13px}
+.frow input{padding:5px 6px;border:1px solid var(--g2);font:inherit;width:100%;min-width:0;background:#fff}
+.u{color:var(--g3);font-size:11px}
+.status{font-size:14px;margin:12px 0;padding:8px 10px;border:1px solid var(--g2)}
+.status.bad{border-color:var(--rd);color:var(--rd)}
+.loadbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.filebtn{border:1px solid var(--ink);padding:8px 14px;cursor:pointer;font-size:13px}
+.scene{height:440px;width:100%;background:#f4f4f4;margin-top:10px}
+#lout[hidden]{display:none}
+@media (max-width:980px){.formgrid{grid-template-columns:1fr}.frow{grid-template-columns:1fr 80px}.frow .src{grid-column:1/-1}.live{padding-left:20px;padding-right:20px}}
 @media (max-width:980px){main{grid-template-columns:1fr}.col{border-left:none;border-bottom:1px solid var(--g2)}.fitgrid{grid-template-columns:1fr}section.fit,section.learn,header{padding-left:20px;padding-right:20px}}
 </style>
 </head>
@@ -75,8 +93,13 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
     <a href="#s2">שלב 2 · מודל וחלופות</a>
     <a href="#s3">שלב 3 · בדיקת התאמה</a>
   </nav>
+  <div class="modes">
+    <button type="button" data-mode="demo" class="on">דוגמה</button>
+    <button type="button" data-mode="live">המחשה</button>
+  </div>
 </header>
 
+<div id="demoMode">
 <main>
   <div class="col" id="s1">
     <h2>קלט</h2>
@@ -199,12 +222,47 @@ details p,details li{font-size:14px;color:#222;max-width:860px}
     <p>כל ערך מהשלב הראשון מקושר למקור: יעד 100%. סטיית שטח מול שייפ: עד 0.5%. ממצא עקביות שלא זוהה במקרה המבחן נרשם ככשל של הכלי.</p>
   </details>
 </section>
+</div>
+
+<section class="live" id="liveMode" hidden>
+  <h2 class="big" style="margin-top:0">מצב המחשה: קלט, מודל, בדיקה ודוח</h2>
+  <p class="note">כל ערך צריך מקור. ערך שמקורו מתחיל ב"דמו" או "ברירת מחדל" הוא דמו ולא מאומת. ערך בלי מקור נחשב טיוטה ומופיע בדוח. כל שינוי מחשב מחדש את המודל, הבדיקות והדוח.</p>
+  <div class="loadbar">
+    <button id="tplBtn" class="alt" type="button">הורד תבנית CSV</button>
+    <label class="filebtn">טען קובץ (CSV או XLSX)<input type="file" id="lfile" accept=".csv,.xlsx,.xls" hidden></label>
+    <span class="toast" id="lload"></span>
+  </div>
+  <div id="lstatus" class="status"></div>
+  <div class="formgrid">
+    <div><h3>נתוני תב"ע (שלב 1)</h3><div id="lform1"></div></div>
+    <div><h3>חלופות (שלב 2)</h3><div id="lform2"></div></div>
+    <div><h3>יזם וכלכלה (שלב 3)</h3><div id="lform3"></div></div>
+  </div>
+  <div id="lout" hidden>
+    <h3>מודל תלת-ממד</h3>
+    <div class="seg" id="lAltSeg"></div>
+    <div class="seg" id="lViewSeg">
+      <button data-lv="iso" class="on" type="button">איזומטרי</button>
+      <button data-lv="plan" type="button">תוכנית</button>
+      <button data-lv="elev" type="button">חזית</button>
+    </div>
+    <div id="scene" class="scene"></div>
+    <p class="note" id="sceneMsg">גרירה מסובבת את המודל, גלגלת העכבר מזמת. לחיצה על תוכנית או חזית מציבה את המצלמה בתצוגה הזו.</p>
+    <h3>בדיקת התאמה</h3>
+    <div id="lfit"></div>
+    <h2 class="big">דוח השוואה</h2>
+    <div id="lreport"></div>
+    <div class="copybar"><button id="copyRep" type="button">העתק דוח (עברית)</button><span class="toast" id="repToast"></span></div>
+  </div>
+</section>
 
 <script>
-const R={plot:2000,cov:35,bp:250,floors:8,below:1,h:28,units:40,dens:20,front:5,side:4,rear:4,uses:"מגורים",fl:3.2,sell:0.8,avg:90,target:32,
+const DEMO_R={plot:2000,cov:35,bp:250,floors:8,below:1,h:28,units:40,dens:20,front:5,side:4,rear:4,uses:"מגורים",fl:3.2,sell:0.8,avg:90,target:32,
   pMain:50000,cons:12000,plan:0.05,cont:0.05,mkt:0.03,fees:5000000,land:80000000,rate:0.06,build:30,delay:0,sale:12,disc:0.10,tgtProfit:30};
+let R=DEMO_R;
 const SB_WARN=1;
-const ALTS={"א":{fp:650,fl:6,below:0,purpose:"מגורים"},"ב":{fp:600,fl:8,below:0,purpose:"מגורים"},"ג":{fp:700,fl:7,below:0,purpose:"מגורים"}};
+const DEMO_ALTS={"א":{fp:650,fl:6,below:0,purpose:"מגורים"},"ב":{fp:600,fl:8,below:0,purpose:"מגורים"},"ג":{fp:700,fl:7,below:0,purpose:"מגורים"}};
+let ALTS=DEMO_ALTS;
 const GN={g:"רווחי",y:"בסדר",r:"לא רווחי"};
 let cur="א", mode="iso";
 
@@ -430,7 +488,292 @@ document.querySelectorAll(".copybar button[data-key]").forEach(btn=>{
   });
 });
 
+/* ===== מצב המחשה ===== */
+let appMode="demo", lcur="א", lview="iso", LIVE=null, lastReportText="";
+const DEMO_SRC="דמו: טרם חולץ ממסמך";
+const ECO="ברירת מחדל כלכלית: דמו, להחליף במקור";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+// [מפתח, תווית, יחידה, ברירת מחדל, מקור ברירת מחדל, סוג n=מספר t=טקסט, קבוצה 1-3]
+const FIELDS=[
+  ["plotArea","שטח מגרש","מ\"ר","2000",DEMO_SRC,"n",1],
+  ["cov","תכסית מרבית","%","35",DEMO_SRC,"n",1],
+  ["bp","אחוזי בנייה מרביים","%","250",DEMO_SRC,"n",1],
+  ["floors","קומות מעל לקרקע (מרבי)","קומות","8",DEMO_SRC,"n",1],
+  ["below","קומות מתחת לקרקע (מרבי)","קומות","1",DEMO_SRC,"n",1],
+  ["h","גובה מרבי","מ'","28",DEMO_SRC,"n",1],
+  ["front","קו בניין קדמי","מ'","5",DEMO_SRC,"n",1],
+  ["side","קו בניין צדדי","מ'","4",DEMO_SRC,"n",1],
+  ["rear","קו בניין אחורי","מ'","4",DEMO_SRC,"n",1],
+  ["units","יח\"ד מרבי","יח\"ד","40",DEMO_SRC,"n",1],
+  ["dens","צפיפות מרבית","יח\"ד לדונם","20",DEMO_SRC,"n",1],
+  ["uses","שימושים מותרים","טקסט","מגורים",DEMO_SRC,"t",1],
+  ["parking","חניה (מספר מקומות)","מקומות","","","t",1],
+  ["fp_א","חלופה א: שטח קומה","מ\"ר","650","דמו: הגדרת חלופה באפיון","n",2],
+  ["fl_א","חלופה א: מספר קומות","קומות","6","דמו: הגדרת חלופה באפיון","n",2],
+  ["pu_א","חלופה א: שימוש מוצע","טקסט","מגורים","דמו: הגדרת חלופה באפיון","t",2],
+  ["fp_ב","חלופה ב: שטח קומה","מ\"ר","600","דמו: הגדרת חלופה באפיון","n",2],
+  ["fl_ב","חלופה ב: מספר קומות","קומות","8","דמו: הגדרת חלופה באפיון","n",2],
+  ["pu_ב","חלופה ב: שימוש מוצע","טקסט","מגורים","דמו: הגדרת חלופה באפיון","t",2],
+  ["fp_ג","חלופה ג: שטח קומה","מ\"ר","700","דמו: הגדרת חלופה באפיון","n",2],
+  ["fl_ג","חלופה ג: מספר קומות","קומות","7","דמו: הגדרת חלופה באפיון","n",2],
+  ["pu_ג","חלופה ג: שימוש מוצע","טקסט","מגורים","דמו: הגדרת חלופה באפיון","t",2],
+  ["fl","גובה קומה","מ'","3.2","ברירת מחדל: 3.2 מ' אלא אם המסמכים קובעים אחרת","n",3],
+  ["sell","שטח נטו למכירה","%","80","ברירת מחדל: 80% (אפיון)","n",3],
+  ["avg","שטח יח\"ד ממוצע","מ\"ר","90","ברירת מחדל: 90 מ\"ר (אפיון)","n",3],
+  ["target","יעד יח\"ד של היזם","יח\"ד","32","דמו: שדה קלט","n",3],
+  ["pMain","מחיר מכר למ\"ר עיקרי","₪","50000",ECO,"n",3],
+  ["cons","עלות בנייה למ\"ר","₪","12000",ECO,"n",3],
+  ["land","שווי קרקע","₪","80000000",ECO,"n",3],
+  ["fees","היטלים ואגרות","₪","5000000",ECO,"n",3],
+  ["plan","תכנון ופיקוח","%","5",ECO,"n",3],
+  ["cont","עתודה לבלתי צפוי","%","5",ECO,"n",3],
+  ["mkt","שיווק וניהול מכירה","%","3",ECO,"n",3],
+  ["rate","ריבית מימון שנתית","%","6",ECO,"n",3],
+  ["build","משך בנייה","חודשים","30",ECO,"n",3],
+  ["sale","משך מכירה","חודשים","12",ECO,"n",3],
+  ["delay","עיכוב נוסף","חודשים","0",ECO,"n",3],
+  ["disc","שיעור היוון שנתי","%","10",ECO,"n",3],
+  ["tgtProfit","רווח יזמי יעד (על עלות)","%","30",ECO,"n",3]
+];
+function buildForms(){
+  [1,2,3].forEach(g=>{
+    document.getElementById("lform"+g).innerHTML=FIELDS.filter(f=>f[6]===g).map(f=>
+      `<div class="frow"><label for="v_${f[0]}">${esc(f[1])} <span class="u">(${esc(f[2])})</span></label><input id="v_${f[0]}" value="${esc(f[3])}"><input id="s_${f[0]}" class="src" value="${esc(f[4])}" placeholder="מסמך, עמוד, סעיף או תא"></div>`).join("");
+  });
+}
+function readLive(){
+  const val=k=>document.getElementById("v_"+k).value.trim();
+  const src=k=>document.getElementById("s_"+k).value.trim();
+  const N={}, miss=[], rows=[], demoList=[], nosrcList=[];
+  FIELDS.forEach(f=>{
+    const k=f[0], v=val(k), s=src(k);
+    rows.push({label:f[1], value:v, src:s});
+    if(v!==""){
+      if(/^(דמו|ברירת מחדל)/.test(s)) demoList.push(f[1]);
+      else if(s==="") nosrcList.push(f[1]);
+    }
+    if(f[5]==="n"){
+      const n=Number(v.replace(",","."));
+      if(v===""||isNaN(n)) miss.push(f[1]); else N[k]=n;
+    }
+  });
+  const bad=[];
+  if(!miss.length){
+    if(N.plotArea<=0) bad.push("שטח מגרש חייב להיות חיובי");
+    if(N.floors<1) bad.push("קומות מעל לקרקע: לפחות 1");
+    if(N.fl<=0) bad.push("גובה קומה חייב להיות חיובי");
+    if(N.sell<=0||N.sell>100) bad.push("שטח נטו למכירה: בין 1 ל-100");
+    ["א","ב","ג"].forEach(k=>{
+      if(N["fp_"+k]<=0) bad.push(`חלופה ${k}: שטח קומה חייב להיות חיובי`);
+      if(N["fl_"+k]<1) bad.push(`חלופה ${k}: לפחות קומה אחת`);
+    });
+  }
+  const RL={plot:N.plotArea,cov:N.cov,bp:N.bp,floors:N.floors,below:N.below,h:N.h,front:N.front,side:N.side,rear:N.rear,units:N.units,dens:N.dens,uses:val("uses")||"לא נמצא",fl:N.fl,sell:N.sell/100,avg:N.avg,target:N.target,pMain:N.pMain,cons:N.cons,plan:N.plan/100,cont:N.cont/100,mkt:N.mkt/100,fees:N.fees,land:N.land,rate:N.rate/100,build:N.build,delay:N.delay,sale:N.sale,disc:N.disc/100,tgtProfit:N.tgtProfit};
+  const AL={};
+  ["א","ב","ג"].forEach(k=>{AL[k]={fp:N["fp_"+k],fl:N["fl_"+k],below:0,purpose:val("pu_"+k)||"לא נמצא"};});
+  return {ok:!(miss.length||bad.length), problems:[...miss.map(x=>"חסר: "+x),...bad], R:RL, ALTS:AL, demo:demoList.length, nosrc:nosrcList.length, demoList, nosrcList, rows};
+}
+function fitHTML(){
+  const cols=Object.keys(ALTS).map(k=>{
+    const c=calc(ALTS[k]), ch=checks(c), s=score(ch), reds=ch.filter(x=>x[2]==="r").length;
+    return `<div><h3>חלופה ${esc(k)}</h3><div class="score">${s}%</div><div class="label">אחוזי התאמה · ${reds?"חורגת ב-"+reds+" בדיקות":"עומדת בכל התנאים"}</div><ul>${ch.map(x=>`<li><span>${esc(x[0])}</span><span><span class="dot ${x[2]}"></span>${esc(x[1])}</span></li>`).join("")}</ul></div>`;
+  }).join("");
+  return `<div class="fitgrid">${cols}</div>`;
+}
+function renderLAltSeg(){
+  document.getElementById("lAltSeg").innerHTML=Object.keys(ALTS).map(k=>`<button type="button" data-la="${k}" class="${k===lcur?"on":""}">חלופה ${k}</button>`).join("");
+}
+function pushScene(){
+  const c=calc(ALTS[lcur]), g=c.g, P=Math.sqrt(R.plot);
+  const p={P, x0:-P/2+R.side, x1:P/2-R.side, z0:-P/2+R.rear, z1:P/2-R.front, w:g.w, d:g.d, H:c.h, fl:R.fl, floors:ALTS[lcur].fl, maxH:R.h, breach:Math.min(g.mx,g.my)<0, view:lview};
+  if(window.scene3d) window.scene3d.update(p); else window.__scenePending=p;
+}
+function renderLive(){
+  if(appMode!=="live") return;
+  const r=readLive(); LIVE=r;
+  const st=document.getElementById("lstatus"), out=document.getElementById("lout");
+  if(!r.ok){
+    st.className="status bad";
+    st.textContent="לא ניתן לחשב: "+r.problems.join("; ")+". המודל והבדיקות יופיעו אחרי תיקון.";
+    out.hidden=true; return;
+  }
+  st.className="status";
+  st.textContent=`כל השדות מולאו. ערכי דמו: ${r.demo}. ערכים בלי מקור: ${r.nosrc}.`;
+  out.hidden=false;
+  R=r.R; ALTS=r.ALTS;
+  if(!ALTS[lcur]) lcur="א";
+  renderLAltSeg();
+  document.getElementById("lfit").innerHTML=fitHTML();
+  renderReport();
+  pushScene();
+}
+function buildReport(){
+  const rows=Object.keys(ALTS).map(k=>{const c=calc(ALTS[k]),chk=checks(c),s=score(chk),r=chk.filter(x=>x[2]==="r").length;return {k,c,chk,s,r};});
+  const b=[...rows].sort((x,y)=>x.r-y.r||y.s-x.s||y.c.pct-x.c.pct)[0];
+  const greens=b.chk.filter(x=>x[2]==="g").length, pg=profitGrade(b.c);
+  const s1=`המלצה: חלופה ${b.k}, עם ציון התאמה ${b.s}% ו-${b.r} בדיקות אדומות.`;
+  const s2=`היא עומדת ב-${greens} מתוך ${b.chk.length} בדיקות בירוק, ורווחיות היזם שלה: ${GN[pg]} (רווח על עלות ${fmt(b.c.pct)}%).`;
+  const s3=(LIVE.demo?"הנתונים הכלכליים כוללים ערכי דמו שלא אומתו במקור.":"הערכים הכלכליים הוזנו ממקור.")+(LIVE.nosrc?` יש ${LIVE.nosrc} ערכים בלי מקור, והם נחשבים טיוטה.`:" כל הערכים מסומנים במקור.");
+  const W={g:"ירוק",y:"צהוב",r:"אדום"};
+  const labels=rows[0].chk.map(x=>x[0]);
+  const table={head:["פרמטר",...rows.map(x=>"חלופה "+x.k),"סטטוס"],
+    rows:labels.map((lb,i)=>{
+      const cells=rows.map(x=>x.chk[i]);
+      const st=cells.some(x=>x[2]==="r")?"חורג באחת החלופות":cells.some(x=>x[2]==="y")?"מרווח צר":"עומד";
+      return [{t:lb},...cells.map(x=>({t:`${x[1]} (${W[x[2]]})`,c:x[2]})),{t:st}];
+    })};
+  const pc=rows.map(x=>{
+    const g=x.chk.find(y=>y[2]==="g"), bd=x.chk.find(y=>y[2]==="r")||x.chk.find(y=>y[2]==="y");
+    return `חלופה ${x.k}: יתרון: ${g?g[0]+" ("+g[1]+")":"אין"}. חיסרון: ${bd?bd[0]+" ("+bd[1]+")":"אין חריגה"}.`;
+  });
+  const ver=rows.flatMap(x=>x.chk.filter(y=>y[2]!=="g").map(y=>`חלופה ${x.k}: ${y[0]} (${y[1]})`));
+  const asm=[
+    "המגרש מרובע בשטח שהוזן. צורת המגרש לא נלקחה מתשריט.",
+    `השטח הבנוי ממוקם במרכז אזור הבנייה. סף אזהרה לקווי בניין: ${SB_WARN} מ'.`,
+    "קומות מתחת לקרקע בחלופות: 0, כי לא הוגדר באפיון.",
+    "חניה לא נבדקת בשלב 3.",
+    `יעד רווח היזם: ${R.tgtProfit}% על עלות.`,
+    LIVE.demoList.length?`ערכי דמו: ${LIVE.demoList.join(", ")}.`:"אין ערכי דמו.",
+    LIVE.nosrcList.length?`ערכים בלי מקור: ${LIVE.nosrcList.join(", ")}.`:"כל הערכים עם מקור."
+  ];
+  const src=LIVE.rows.map(r=>`${r.label}: ${r.value||"לא נמצא"} · ${r.src||"בלי מקור"}`);
+  return [
+    {h:"מסקנה", p:[s1,s2,s3]},
+    {h:"טבלת השוואה", table},
+    {h:"יתרונות וחסרונות", p:pc},
+    {h:"מה לבדוק מול הרשות", p:ver.length?ver:["אין פריטים לבדיקה מול הרשות."]},
+    {h:"המלצה והנחות", li:asm, p:["הכלי מציג את ההמלצה ואת הנתונים שעליה, ולא מחליט במקום היזם או הרשות."]},
+    {h:"מקור לכל מספר", li:[...src,"מספרים מחושבים (תכסית, אחוזי בנייה, גובה, יח\"ד, צפיפות, ניצול, רווח ו-NPV) חושבו מהערכים לעיל."]}
+  ];
+}
+function tblHTML(t){
+  return `<table><thead><tr>${t.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.rows.map(r=>`<tr>${r.map(c=>`<td class="num">${esc(c.t)}${c.c?` <span class="dot ${c.c}"></span>`:""}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+function renderReport(){
+  const rep=buildReport();
+  document.getElementById("lreport").innerHTML=rep.map(s=>`<h3>${esc(s.h)}</h3>`+(s.table?tblHTML(s.table):"")+(s.p||[]).map(t=>`<p>${esc(t)}</p>`).join("")+(s.li?`<ul>${s.li.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"")).join("");
+  lastReportText=rep.map(s=>[s.h,...(s.table?[s.table.head.join(" | "),...s.table.rows.map(r=>r.map(c=>c.t).join(" | "))]:[]),...(s.p||[]),...(s.li||[]).map(t=>"- "+t)].join("\n")).join("\n\n");
+}
+async function copyText(text,toast){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(text); ok=true; }catch(err){
+    const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ ok=document.execCommand("copy"); }catch(e2){ ok=false; }
+    ta.remove();
+  }
+  toast.textContent=ok?"הועתק":"ההעתקה נחסמה בתצוגה הזו";
+  setTimeout(()=>toast.textContent="",2000);
+}
+function downloadTemplate(){
+  const rows=[["שדה","ערך","מקור"],...FIELDS.map(f=>[f[1],f[3],f[4]])];
+  const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  const a=document.createElement("a"); a.href=url; a.download="tba603_inputs.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function loadFile(file){
+  const buf=await file.arrayBuffer();
+  let rows;
+  if(window.XLSX){
+    const wb=XLSX.read(new Uint8Array(buf),{type:"array"});
+    rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:""});
+  } else {
+    rows=new TextDecoder("utf-8").decode(buf).replace(/^﻿/,"").split(/\r?\n/).filter(x=>x.trim()).map(line=>line.split(",").map(c=>c.trim().replace(/^"|"$/g,"").replace(/""/g,'"')));
+  }
+  let set=0; const unk=[];
+  rows.forEach(r=>{
+    const label=String(r[0]??"").trim();
+    if(!label||label==="שדה") return;
+    const f=FIELDS.find(x=>x[1]===label);
+    if(!f){ unk.push(label); return; }
+    const v=String(r[1]??"").trim(), s=String(r[2]??"").trim();
+    if(v!==""){ document.getElementById("v_"+f[0]).value=v; set++; }
+    if(s!==""){ document.getElementById("s_"+f[0]).value=s; }
+  });
+  document.getElementById("lload").textContent=`נטענו ${set} ערכים.`+(unk.length?` לא זוהו: ${unk.join(", ")}.`:"");
+  renderLive();
+}
+function setMode(m){
+  appMode=m;
+  document.querySelectorAll(".modes button").forEach(b=>b.classList.toggle("on",b.dataset.mode===m));
+  document.getElementById("demoMode").hidden=m!=="demo";
+  document.getElementById("liveMode").hidden=m!=="live";
+  if(m==="demo"){
+    DEMO_R.target=Number(document.getElementById("target").value)||0;
+    R=DEMO_R; ALTS=DEMO_ALTS;
+    renderRights(); renderAltSeg(); renderView(); renderFit();
+  } else {
+    renderLive();
+  }
+}
+document.querySelectorAll(".modes button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+document.getElementById("lAltSeg").addEventListener("click",e=>{const b=e.target.closest("button[data-la]"); if(!b) return; lcur=b.dataset.la; renderLive();});
+document.getElementById("lViewSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-lv]"); if(!b) return;
+  lview=b.dataset.lv;
+  document.querySelectorAll("#lViewSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  pushScene();
+});
+document.getElementById("liveMode").addEventListener("input",renderLive);
+document.getElementById("tplBtn").addEventListener("click",downloadTemplate);
+document.getElementById("lfile").addEventListener("change",e=>{
+  const f=e.target.files[0];
+  if(f) loadFile(f).catch(err=>{document.getElementById("lload").textContent="קריאת הקובץ נכשלה: "+err.message;});
+});
+document.getElementById("copyRep").addEventListener("click",()=>copyText(lastReportText,document.getElementById("repToast")));
+setTimeout(()=>{ if(!window.scene3d) document.getElementById("sceneMsg").textContent="התצוגה התלת-ממדית לא נטענה (אין חיבור ל-CDN). הבדיקות והדוח פועלים."; },8000);
+buildForms();
 renderRights(); renderAltSeg(); renderView(); renderFit();
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const host=document.getElementById("scene");
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+host.appendChild(renderer.domElement);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0xf4f4f4);
+scene.add(new THREE.AmbientLight(0xffffff,0.85));
+const sun=new THREE.DirectionalLight(0xffffff,0.6); sun.position.set(60,120,80); scene.add(sun);
+const cam=new THREE.PerspectiveCamera(40,1,0.1,5000);
+const ctl=new OrbitControls(cam,renderer.domElement); ctl.enableDamping=true;
+const group=new THREE.Group(); scene.add(group);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const ring=(pts,color)=>new THREE.Line(new THREE.BufferGeometry().setFromPoints([...pts,pts[0]]),new THREE.LineBasicMaterial({color}));
+function size(){const w=host.clientWidth||600, h=host.clientHeight||440; renderer.setSize(w,h); renderer.domElement.style.display="block"; cam.aspect=w/h; cam.updateProjectionMatrix();}
+window.addEventListener("resize",size); size();
+function update(p){
+  size();
+  while(group.children.length){
+    const o=group.children.pop();
+    if(o.geometry) o.geometry.dispose();
+    if(o.material&&o.material.dispose) o.material.dispose();
+  }
+  const y0=0.02, cx=(p.x0+p.x1)/2, cz=(p.z0+p.z1)/2, hw=p.w/2, hd=p.d/2;
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(p.P,p.P),new THREE.MeshBasicMaterial({color:0xfafafa}));
+  ground.rotation.x=-Math.PI/2; group.add(ground);
+  group.add(ring([V(-p.P/2,y0,-p.P/2),V(p.P/2,y0,-p.P/2),V(p.P/2,y0,p.P/2),V(-p.P/2,y0,p.P/2)],0x111111));
+  group.add(ring([V(p.x0,y0,p.z0),V(p.x1,y0,p.z0),V(p.x1,y0,p.z1),V(p.x0,y0,p.z1)],0x6b6b6b));
+  const body=new THREE.Mesh(new THREE.BoxGeometry(p.w,p.H,p.d),new THREE.MeshLambertMaterial({color:p.breach?0xb83a2e:0xcfcfcf}));
+  body.position.set(cx,p.H/2,cz); group.add(body);
+  const edges=new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry),new THREE.LineBasicMaterial({color:0x111111}));
+  edges.position.copy(body.position); group.add(edges);
+  for(let i=1;i<p.floors;i++){
+    const y=i*p.fl;
+    group.add(ring([V(cx-hw,y,cz-hd),V(cx+hw,y,cz-hd),V(cx+hw,y,cz+hd),V(cx-hw,y,cz+hd)],0x6b6b6b));
+  }
+  group.add(ring([V(p.x0,p.maxH,p.z0),V(p.x1,p.maxH,p.z0),V(p.x1,p.maxH,p.z1),V(p.x0,p.maxH,p.z1)],0xd4a017));
+  const top=Math.max(p.H,p.maxH);
+  if(p.view==="plan"){ cam.up.set(0,0,-1); cam.position.set(0,p.P*1.9,0.001); ctl.target.set(0,0,0); }
+  else if(p.view==="elev"){ cam.up.set(0,1,0); cam.position.set(0,top*0.6+1,p.P*2.4); ctl.target.set(0,top*0.5,0); }
+  else { cam.up.set(0,1,0); cam.position.set(p.P*0.95,top*1.4+p.P*0.5,p.P*0.95); ctl.target.set(0,p.H/2,0); }
+  ctl.update();
+}
+(function loop(){ requestAnimationFrame(loop); ctl.update(); renderer.render(scene,cam); })();
+window.scene3d={update};
+if(window.__scenePending) update(window.__scenePending);
 </script>
 </body>
 </html>
