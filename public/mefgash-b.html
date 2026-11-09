@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מפגש ב · ניהול הסטודיו</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#151515;--g1:#6e6e6e;--g2:#b5b5b5;--line:#edeaea;--bg:#fff;--gr:#3c8c5a;--ye:#d4a017;--rd:#b83a2e}
+*{box-sizing:border-box}
+body{margin:0;font-family:Heebo,system-ui,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+
+/* top bar: three flat buttons */
+.top{display:flex;gap:28px;align-items:center;padding:20px 64px 0}
+.top a{text-decoration:none;color:var(--g1);padding:6px 0;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
+.top a:hover{color:var(--ink)}
+.top a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* header */
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;padding:40px 64px 0}
+h1{margin:0;font-size:20px;font-weight:400}
+.tabs{display:flex;gap:28px;font-size:15px}
+.tabs button{color:var(--g1);padding:6px 0;border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+
+.wrap{padding:48px 64px 64px}
+.g1{color:var(--g1)}
+.small{font-size:13px}
+[hidden]{display:none!important}
+
+/* path view */
+.path{display:grid;grid-template-columns:300px 1fr;gap:72px;align-items:start}
+.sb p{margin:0 0 8px}
+.sb .node{display:flex;gap:12px;align-items:center;width:100%;text-align:right;padding:10px 0;color:var(--g1);transition:color .3s,transform .3s}
+.sb .node:hover{color:var(--ink);transform:translateX(-4px)}
+.sb .node[aria-current="true"]{color:var(--ink)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--line)}
+.node[aria-current="true"] .dot{background:var(--ink)}
+.sb .out{padding:10px 0;color:var(--g1)}
+.sb .out-h{margin:28px 0 8px}
+
+.panel{animation:up .6s ease both}
+.panel .tag{margin:0 0 10px;font-size:14px;color:var(--g1)}
+.panel h2{margin:0 0 14px;font-size:36px;font-weight:300;line-height:1.25}
+.panel .lead{margin:0 0 32px;font-size:18px;line-height:1.7;color:var(--g1);max-width:640px}
+.prompt{max-width:680px}
+.prompt-h{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.prompt-h span{font-size:13px;color:var(--g1)}
+.prompt-text{margin:0 0 24px;padding:16px 0;font-size:16px;line-height:1.8}
+.cp{padding:4px 0;font-size:13px;color:var(--g1)}
+.cp:hover{color:var(--ink)}
+.cp.ok{color:var(--gr)}
+.note{margin:0 0 24px;font-size:14px;color:var(--g1)}
+.note b{font-weight:500;color:var(--ink)}
+
+/* materials view */
+.mat{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
+.mat h3{margin:0 0 12px;font-size:13px;font-weight:400;color:var(--g1)}
+.row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.row .txt{flex:1;min-width:0}
+.row .title{display:block;font-weight:500}
+.row .body{display:block;margin-top:6px;font-size:14px;color:var(--g1);line-height:1.7}
+
+/* example budget */
+.budget{font-size:14px}
+.budget .sum{display:flex;justify-content:space-between;padding:0 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.budget .sum strong{font-weight:500}
+.dem{font-size:12px;color:var(--g1)}
+.stage{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:14px 0;border-top:1px solid var(--line)}
+.stage .name{font-weight:500}
+.stage .nums{font-variant-numeric:tabular-nums;color:var(--g1);text-align:left}
+.stage .bar{grid-column:1/-1;height:4px;background:var(--line);margin-top:8px;position:relative}
+.stage .bar i{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+.stage .st{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g1)}
+.light{width:10px;height:10px;border-radius:50%;flex:none}
+.light.gr{background:var(--gr)}
+.light.ye{background:var(--ye)}
+.light.rd{background:var(--rd)}
+.light.none{background:var(--line)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--g1);margin-top:14px}
+.legend span{display:flex;gap:6px;align-items:center}
+
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* phone */
+@media (max-width:860px){
+  .top{padding:16px 16px 0;gap:20px;flex-wrap:wrap}
+  .head{padding:28px 16px 0}
+  .wrap{padding:32px 16px 48px}
+  .path,.mat{grid-template-columns:1fr;gap:36px}
+  .panel h2{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="מפגשים">
+  <a href="index.html">מפגש א</a>
+  <a href="mefgash-b.html" aria-current="page">מפגש ב</a>
+  <a href="sider-bevlagan.html">סדר בבלאגן</a>
+</nav>
+
+<header class="head">
+  <h1>ניהול הסטודיו</h1>
+  <div class="tabs" role="tablist" aria-label="תצוגה">
+    <button role="tab" id="tab-path" aria-selected="true" aria-controls="view-path" data-tab="path">מסלול</button>
+    <button role="tab" id="tab-mat" aria-selected="false" aria-controls="view-mat" data-tab="mat">חומרים</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- מסלול -->
+  <section id="view-path" class="path" role="tabpanel" aria-labelledby="tab-path">
+    <aside class="sb">
+      <p class="g1 small">מפגש 2 · ניהול הסטודיו</p>
+      <nav id="nodes" aria-label="צמתי המסלול"></nav>
+      <p class="g1 small out-h">יוצאים עם</p>
+      <div class="out">דבר אחד שעובד</div>
+      <div class="out">שאלה אחת לבינה</div>
+    </aside>
+    <main id="panel" aria-live="polite"></main>
+  </section>
+
+  <!-- חומרים -->
+  <section id="view-mat" class="mat" role="tabpanel" aria-labelledby="tab-mat" hidden>
+    <div>
+      <h3>שלושה פרומפטים לבניית ה-MVP</h3>
+      <div id="mvp"></div>
+    </div>
+    <div class="budget">
+      <h3>פרויקט דוגמה · בדיוני · תקציב משרד</h3>
+      <p class="dem" style="margin:0 0 12px">כל הערכים דמו. אינם מתב"ע ואינם נתון אמיתי.</p>
+      <div id="budget"></div>
+      <div class="legend" aria-label="מקרא">
+        <span><i class="light gr"></i>עד 80%</span>
+        <span><i class="light ye"></i>מעל 80% בשלב פתוח</span>
+        <span><i class="light rd"></i>מעל 100%</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- נתונים ---------- */
+const NODES = [
+  { tag: "נלמד", title: "מה הכלי מחזיק",
+    lead: "חמש ישויות ושדות החובה של כל אחת: פרויקט, איש מקצוע, עלות, שלב ביצוע ותקציב.",
+    prompt: "אני מנהל משרד אדריכלות. עזור לי לפרק את המשרד לחמש ישויות, ולכל ישות הצע שדות חובה בלבד, בטבלה קצרה.",
+    works: "רשומת פרויקט אחת עם שם, מזמין, סטטוס ותקציב.",
+    question: "איזה שדות חסרים בכל רשומת פרויקט כדי שאדע את מצבו בלי לפתוח אותו?" },
+  { tag: "נלמד", title: "שלבים ועלויות",
+    lead: "שלבי הפרויקט במשרד (תכנון, היתר, ליווי ביצוע, סגירה) וסוגי העלות הפנימיות: שעות צוות, יועצים, הוצאות ישירות.",
+    prompt: "הצע רשימת שלבי עבודה טיפוסית של משרד אדריכלות לפרויקט מסוג [סוג פרויקט], ולכל שלב שלוש עלויות פנימיות אופייניות.",
+    works: "עץ של פרויקט אחד עם ארבעה שלבים ורשימת עלויות מסווגת.",
+    question: "אילו שלבים קבועים בכל פרויקט, ואילו משתנים לפי סוג הפרויקט?" },
+  { tag: "נבין", title: "הקשרים בין הישויות",
+    lead: "כל שלב שייך לפרויקט, כל עלות משויכת לשלב ולאיש מקצוע, והתקציב הוא המסגרת שמעל הכול.",
+    prompt: "הסבר בשפה פשוטה איך פרויקט, שלבים, אנשי מקצוע, עלויות ותקציב מקושרים זה לזה. הדגם עם פרויקט בן שלושה שלבים.",
+    works: "עלות אחת מקושרת לשלב אחד ולאיש מקצוע אחד, וסכומה מופיע בתקציב הפרויקט.",
+    question: "מה קורה לתקציב הפרויקט כשעלות נרשמת בלי שלב?" },
+  { tag: "נבין", title: "סטיות ורמזור",
+    lead: "מתי תקציב או לוח זמנים הופכים לסיכון: ירוק עד 80 אחוז, צהוב מעל 80 בשלב פתוח, אדום מעל 100.",
+    prompt: "הצע שלושה ספי סטייה לתקציב ולוח זמנים של פרויקט במשרד אדריכלות (ירוק, צהוב, אדום). לכל סף פעולה מומלצת אחת.",
+    works: "ניצול תקציב מעל 80 אחוז לפני סיום שלב מסומן צהוב.",
+    question: "מאיזה סף סטיית תקציב דורשת החלטה של מנהל המשרד ולא רק הערה?" },
+  { tag: "נעשה", title: "בניית הכלי",
+    lead: "להזין פרויקט אחד במלואו: שלבים, אנשי מקצוע, עלויות ותקציב המשרד. אפשר פרויקט משלך או פרויקט דוגמה.",
+    prompt: "בנה טבלה אחת לפרויקט שלי עם העמודות: שלב, איש מקצוע, תקציב מתוכנן, עלות בפועל, סטטוס. אחרי שאמלא, סכם לי את הסטייה הכוללת.",
+    works: "הפרויקט מוזן, והמספרים מתיישבים עם הכסף בפועל.",
+    question: "אילו שלושה נתונים חסרים לי כדי לסגור את התקציב של הפרויקט הזה?" },
+  { tag: "נעשה", title: "סקירה שבועית",
+    lead: "עמוד אחד שמציג לכל הפרויקטים סטטוס, סטייה ופעולה הבאה.",
+    prompt: "צור עמוד סקירה שבועית לכל הפרויקטים. לכל פרויקט שלושה שדות בלבד: סטטוס, סטייה מתקציב, הפעולה הבאה.",
+    works: "עמוד אחד שמציג לכל פרויקט סטטוס, סטייה והפעולה הבאה.",
+    question: "איזה מידע בעמוד השבועי משנה החלטה, ואיזה רק מוסיף רעש?" }
+];
+
+const MVP = [
+  { tag: "נלמד", title: "מודל הנתונים והמסכים",
+    prompt: "בנה אפליקציית ניהול משרד אדריכלות בעברית, RTL. חמש ישויות: פרויקט, איש מקצוע, שלב, עלות, תקציב. הצג לכל ישות את שדות החובה בלבד והצע מסך רשימה ומסך פרטים לכל אחת." },
+  { tag: "נבין", title: "הקשרים, חישובים וכללים",
+    prompt: "הוסף לאפליקציה את הקשרים: כל שלב שייך לפרויקט, כל עלות שייכת לשלב ולאיש מקצוע. חשב ניצול תקציב לכל שלב. צבע בירוק עד 80 אחוז, בצהוב מעל 80 בשלב פתוח, באדום מעל 100." },
+  { tag: "נעשה", title: "בניית ה-MVP המלא",
+    prompt: "בנה את ה-MVP המלא: הזנת פרויקט, שלבים, עלויות ותקציב, ועמוד סקירה שבועית שמציג לכל פרויקט סטטוס, סטייה ופעולה הבאה. אחרי הבנייה הרץ בדיקה על פרויקט דוגמה ודווח מה עובד." }
+];
+
+/* תקציב לדוגמה: דמו בלבד, לא נתון אמיתי */
+const SUM = { label: "שכר טרחה מאושר", value: 180000 };
+const STAGES = [
+  { name: "תכנון",        budget: 90000, actual: 98000, open: false },
+  { name: "היתר",         budget: 30000, actual: 30000, open: false },
+  { name: "ליווי ביצוע",  budget: 50000, actual: 36000, open: true,  note: "בתהליך" },
+  { name: "סגירה ומסירה", budget: null,  actual: null,  open: true,  note: "טרם התחיל" }
+];
+
+/* ---------- רמזור: ירוק עד 80, צהוב מעל 80 בשלב פתוח, אדום מעל 100 ---------- */
+function light(s) {
+  if (s.actual === null) return { cls: "none", text: s.note };
+  const pct = s.actual / s.budget * 100;
+  if (pct > 100) return { cls: "rd", text: "אדום" };
+  if (s.open && pct > 80) return { cls: "ye", text: "צהוב" };
+  return { cls: "gr", text: s.note ? "ירוק (" + s.note + ")" : "ירוק" };
+}
+const fmt = n => n.toLocaleString("he-IL");
+
+/* ---------- רינדור ---------- */
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function copyBtn(text, id) {
+  return '<button class="cp" data-copy="' + id + '">העתק</button>';
+}
+
+let current = 0;
+function renderNodes() {
+  $("nodes").innerHTML = NODES.map((n, i) =>
+    '<button class="node" aria-current="' + (i === current ? 'true' : 'false') + '" data-i="' + i + '">' +
+    '<span class="dot"></span>' + (i + 1) + '. ' + esc(n.tag) + ' · ' + esc(n.title) + '</button>'
+  ).join("");
+}
+function renderPanel() {
+  const n = NODES[current];
+  $("panel").innerHTML =
+    '<div class="panel">' +
+    '<p class="tag">' + esc(n.tag) + '</p>' +
+    '<h2>' + esc(n.title) + '</h2>' +
+    '<p class="lead">' + esc(n.lead) + '</p>' +
+    '<div class="prompt">' +
+      '<div class="prompt-h"><span>פרומפט · עברית</span>' + copyBtn(n.prompt, "n" + current) + '</div>' +
+      '<p class="prompt-text" dir="rtl">' + esc(n.prompt) + '</p>' +
+      '<p class="note"><b>דבר אחד שעובד:</b> ' + esc(n.works) + '</p>' +
+      '<p class="note"><b>שאלה אחת לבינה:</b> ' + esc(n.question) + '</p>' +
+    '</div></div>';
+  renderNodes();
+}
+function renderMvp() {
+  $("mvp").innerHTML = MVP.map((m, i) =>
+    '<div class="row"><span class="txt"><span class="title">' + esc(m.tag) + ' · ' + esc(m.title) + '</span>' +
+    '<span class="body">' + esc(m.prompt) + '</span></span>' + copyBtn(m.prompt, "m" + i) + '</div>'
+  ).join("");
+}
+function renderBudget() {
+  const sumHtml =
+    '<div class="sum"><span>' + esc(SUM.label) + '</span><strong>' + fmt(SUM.value) + ' ש"ח · דמו</strong></div>';
+  const rows = STAGES.map(s => {
+    const l = light(s);
+    if (s.actual === null) {
+      return '<div class="stage"><span class="name">' + esc(s.name) + '</span><span class="nums"></span>' +
+        '<span class="st"><i class="light ' + l.cls + '"></i>' + esc(l.text) + '</span></div>';
+    }
+    const pct = Math.round(s.actual / s.budget * 100);
+    const width = Math.min(pct, 100);
+    return '<div class="stage">' +
+      '<span class="name">' + esc(s.name) + '</span>' +
+      '<span class="nums">' + fmt(s.actual) + ' מתוך ' + fmt(s.budget) + ' ש"ח · ' + pct + '%</span>' +
+      '<span class="bar"><i style="width:' + width + '%"></i></span>' +
+      '<span class="st"><i class="light ' + l.cls + '"></i>' + esc(l.text) + '</span></div>';
+  }).join("");
+  $("budget").innerHTML = sumHtml + rows;
+}
+
+/* ---------- אירועים ---------- */
+document.addEventListener("click", async e => {
+  const node = e.target.closest(".node");
+  if (node) { current = +node.dataset.i; renderPanel(); return; }
+
+  const tab = e.target.closest("[data-tab]");
+  if (tab) {
+    const path = tab.dataset.tab === "path";
+    $("tab-path").setAttribute("aria-selected", path);
+    $("tab-mat").setAttribute("aria-selected", !path);
+    $("view-path").hidden = !path;
+    $("view-mat").hidden = path;
+    return;
+  }
+
+  const cp = e.target.closest("[data-copy]");
+  if (cp) {
+    const key = cp.dataset.copy;
+    const text = key[0] === "n" ? NODES[+key.slice(1)].prompt : MVP[+key.slice(1)].prompt;
+    try {
+      await navigator.clipboard.writeText(text);
+      cp.textContent = "הועתק";
+      cp.classList.add("ok");
+    } catch (err) {
+      cp.textContent = "לא הועתק";
+    }
+    setTimeout(() => { cp.textContent = "העתק"; cp.classList.remove("ok"); }, 1600);
+  }
+});
+
+renderNodes();
+renderPanel();
+renderMvp();
+renderBudget();
+</script>
+</body>
+</html>
