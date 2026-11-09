@@ -3,125 +3,192 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="קורס בינה מלאכותית לאדריכלים - שלוש יחידות לבנייה וניתוח">
 <title>קורס בינה מלאכותית לאדריכלים</title>
 <style>
-:root{
-  /* צבעים: בסיס + משמעות */
+:root {
   --bg: #ffffff;
-  --fg: #111111;
-  --fg-light: #6b6b6b;
-  --edge: #d9d9d9;
-  --surface: #f8f8f8;
-  --accent-1: #3c8c5a;
-  --accent-2: #d4a017;
-  --accent-3: #b83a2e;
-  --focus: #2d6241;
+  --bg-alt: #fafafa;
+  --fg: #0f0f0f;
+  --fg-secondary: #555555;
+  --fg-tertiary: #888888;
+  --edge: #e0e0e0;
+  --accent-primary: #2d7a4a;
+  --accent-secondary: #d4a017;
+  --accent-tertiary: #b83a2e;
 
-  /* טיפוגרפיה */
-  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  /* רווחים */
-  --gap-xs: 8px;
-  --gap-s: 12px;
-  --gap-m: 16px;
-  --gap-l: 24px;
-  --gap-xl: 32px;
-  --gap-2xl: 48px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0a0a0a;
+    --bg: #0d0d0d;
+    --bg-alt: #1a1a1a;
     --fg: #f5f5f5;
-    --fg-light: #a0a0a0;
+    --fg-secondary: #aaaaaa;
+    --fg-tertiary: #777777;
     --edge: #2a2a2a;
-    --surface: #1a1a1a;
-    --focus: #5cb584;
+    --accent-primary: #5ed47d;
+    --accent-secondary: #e8b923;
     color-scheme: dark;
   }
 }
 
-:root[data-theme="dark"] {
-  --bg: #0a0a0a;
-  --fg: #f5f5f5;
-  --fg-light: #a0a0a0;
-  --edge: #2a2a2a;
-  --surface: #1a1a1a;
-  --focus: #5cb584;
-  color-scheme: dark;
+* { box-sizing: border-box }
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
 }
 
-* { box-sizing: border-box }
-html { direction: rtl }
 body {
   margin: 0;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  font-family: var(--font-body);
+  padding: 0;
+  font-family: var(--font-sans);
   color: var(--fg);
   background: var(--bg);
-  line-height: 1.7;
-  font-size: 15px;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
 header {
-  padding-block: var(--gap-2xl);
+  padding: var(--space-3xl) var(--space-2xl);
   border-bottom: 1px solid var(--edge);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+@media (prefers-color-scheme: dark) {
+  header:not([data-theme="light"]) {
+    background-color: rgba(13, 13, 13, 0.95);
+  }
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .kicker {
-  color: var(--fg-light);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
+  color: var(--fg-tertiary);
   margin: 0;
+}
+
+.header-links {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.header-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-secondary);
+  text-decoration: none;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.header-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header-links a:hover {
+  color: var(--fg);
+}
+
+.header-links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 h1 {
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: var(--gap-m) 0 var(--gap-s);
-  max-width: 900px;
-  text-wrap: balance;
+  font-size: clamp(32px, 6vw, 48px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 var(--space-lg);
+  letter-spacing: -0.5px;
 }
 
 .lead {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--fg-light);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--fg-secondary);
   margin: 0;
-  max-width: 820px;
+  max-width: 720px;
+  line-height: 1.7;
 }
 
 main {
-  padding: var(--gap-xl) 0 var(--gap-2xl);
   max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-2xl);
 }
 
-/* דפים כקלפים */
-.grid2 {
+section {
+  margin-bottom: var(--space-3xl);
+}
+
+section h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 var(--space-2xl);
+  letter-spacing: -0.5px;
+}
+
+.cards-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--gap-l);
-  margin-top: var(--gap-2xl);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-2xl);
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  background: var(--bg-alt);
   border: 1px solid var(--edge);
-  border-radius: 8px;
-  padding: var(--gap-l);
-  background: var(--bg);
+  border-radius: 12px;
+  padding: var(--space-2xl);
   text-decoration: none;
-  color: var(--fg);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
 }
@@ -129,237 +196,312 @@ main {
 .card::before {
   content: '';
   position: absolute;
-  inset: -1px;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   opacity: 0;
-  z-index: -1;
-  border-radius: 8px;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+  border-radius: 12px;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .card:hover {
-  border-color: var(--accent-1);
-  transform: translateY(-4px);
+  border-color: var(--accent-primary);
+  transform: translateY(-8px);
 }
 
 .card:hover::before {
   opacity: 0.05;
 }
 
-.card-num {
+.card-icon {
   font-size: 48px;
-  font-weight: 700;
-  color: var(--accent-1);
+  font-weight: 800;
+  color: var(--accent-primary);
   line-height: 1;
-  margin: 0 0 var(--gap-m);
+  margin-bottom: var(--space-lg);
 }
 
 .card-title {
   font-size: 20px;
   font-weight: 700;
-  line-height: 1.3;
-  margin: 0 0 var(--gap-s);
-  color: var(--fg);
+  margin: 0 0 var(--space-md);
 }
 
 .card-desc {
   font-size: 15px;
-  color: var(--fg-light);
-  margin: 0;
+  color: var(--fg-secondary);
+  margin: 0 0 var(--space-lg);
   line-height: 1.6;
   flex: 1;
 }
 
-.card-link {
-  display: inline-flex;
-  align-items: center;
-  margin-top: var(--gap-m);
-  padding: 8px 0;
-  color: var(--accent-1);
-  font-weight: 600;
-  text-decoration: none;
-  gap: 6px;
-  border-bottom: 2px solid var(--accent-1);
-  transition: gap 0.2s ease;
-}
-
-.card-link:hover {
-  gap: 10px;
-}
-
-.card-link::after {
-  content: '←';
-  font-size: 14px;
-}
-
-.meta {
-  color: var(--fg-light);
+.card-meta {
   font-size: 12px;
-  margin-top: var(--gap-m);
+  color: var(--fg-tertiary);
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--space-sm);
 }
 
-.meta::before {
-  content: '•';
-  margin-right: 4px;
+.card-meta span {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--edge);
+  border-radius: 4px;
 }
 
-section {
-  padding-block: var(--gap-xl);
-  border-bottom: 1px solid var(--edge);
-}
-
-h2 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 var(--gap-s);
-  color: var(--fg);
-}
-
-.sub {
-  color: var(--fg-light);
-  font-size: 14px;
-  margin: 0 0 var(--gap-m);
-}
-
-ul.plain {
+/* Lists */
+ul.features {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-s);
+  gap: var(--space-xl);
 }
 
-ul.plain li {
-  display: flex;
-  gap: var(--gap-m);
-  line-height: 1.6;
-  color: var(--fg-light);
+ul.features li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-lg);
+  align-items: start;
 }
 
-ul.plain li::before {
+ul.features li::before {
   content: '◆';
-  color: var(--accent-1);
-  flex-shrink: 0;
+  color: var(--accent-primary);
   font-size: 10px;
+  margin-top: 6px;
 }
 
-ul.plain b {
+ul.features b {
   color: var(--fg);
   font-weight: 600;
 }
 
-h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin: var(--gap-l) 0 var(--gap-m);
-  color: var(--fg);
+ul.features p {
+  margin: var(--space-xs) 0 0;
+  color: var(--fg-secondary);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-footer {
-  padding-block: var(--gap-xl);
-  color: var(--fg-light);
-  font-size: 13px;
+.subsection {
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-3xl);
   border-top: 1px solid var(--edge);
 }
 
-@media (max-width: 860px) {
-  h1 { font-size: 28px }
-  .grid2 { grid-template-columns: 1fr; gap: var(--gap-m) }
-  .card-num { font-size: 40px }
+.subsection h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 var(--space-xl);
+}
+
+footer {
+  padding: var(--space-3xl) var(--space-2xl);
+  border-top: 1px solid var(--edge);
+  background: var(--bg-alt);
+  text-align: center;
+  color: var(--fg-tertiary);
+  font-size: 13px;
+}
+
+footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+footer a:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+
+  .header-links {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  main {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  section h2 {
+    font-size: 24px;
+  }
+
+  .subsection {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-2xl);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card { transition: none }
-  .card::before { transition: none }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+  <div class="header-top">
     <div class="kicker">קורס בינה מלאכותית לאדריכלים</div>
-    <a href="about.html" style="font-size: 13px; color: var(--fg-light); text-decoration: none; transition: color 0.2s;">אודות</a>
+    <div class="header-links">
+      <a href="about.html">אודות</a>
+    </div>
   </div>
-  <h1>מפגשים בקורס: מפגש א, מפגש ב, וסדר בבאלגן</h1>
-  <p class="lead">שלוש יחידות לבנייה וניתוח: מפגש א בזכויות בנייה, מפגש ב בחלופות וניתוח, וסדר בבאלגן בארגון בעיות.</p>
+  <div class="header-content">
+    <h1>מפגשים בקורס: מפגש א, מפגש ב, וסדר בבאלגן</h1>
+    <p class="lead">שלוש יחידות לבנייה וניתוח: מפגש א בזכויות בנייה, מפגש ב בחלופות וניתוח, וסדר בבאלגן בארגון בעיות.</p>
+  </div>
 </header>
 
 <main>
 
 <section>
   <h2>הדפים</h2>
-  <div class="grid2">
+  <div class="cards-grid">
     <a href="./" class="card">
-      <div class="card-num">א</div>
+      <div class="card-icon">א</div>
       <h3 class="card-title">מפגש א: זכויות בנייה</h3>
       <p class="card-desc">אפליקציה אינטראקטיבית לביצוע מיפוי זכויות, בנייה של מודל וחלופות, ובדיקת התאמה.</p>
-      <div class="card-link">הרץ</div>
-      <div class="meta">מיפוי, מודל, בדיקה התאמה, רמזור</div>
+      <div class="card-meta">
+        <span>מיפוי</span>
+        <span>מודל</span>
+        <span>בדיקה</span>
+        <span>רמזור</span>
+      </div>
     </a>
 
     <a href="session-b.html" class="card">
-      <div class="card-num">ב</div>
+      <div class="card-icon">ב</div>
       <h3 class="card-title">מפגש ב: הצעות וניתוח</h3>
       <p class="card-desc">כשלוקחים את הזכויות ממפגש א ובונים עליהן הצעות משפחתיות וניתוח השפעות עירוניות.</p>
-      <div class="card-link">קרא</div>
-      <div class="meta">הצעות, ניתוח השפעות, שיתוף עם בעלי עניין</div>
+      <div class="card-meta">
+        <span>הצעות</span>
+        <span>ניתוח</span>
+        <span>שיתוף</span>
+      </div>
     </a>
 
     <a href="order-in-chaos.html" class="card" style="grid-column: 1 / -1;">
-      <div class="card-num">🔄</div>
+      <div class="card-icon">🔄</div>
       <h3 class="card-title">סדר בבאלגן: ארגון בעיות מורכבות</h3>
       <p class="card-desc">כשהמטלה גדולה מדי, הנתונים מפוזרים, או שיש הרבה חלופות. כיצד לארגן את התהליך לפני שממשיכים.</p>
-      <div class="card-link">קרא</div>
-      <div class="meta">פתרת חוט אחד, ניהול חלופות, רישום ממצאים, דיווח תוצאות</div>
+      <div class="card-meta">
+        <span>ארגון</span>
+        <span>חלופות</span>
+        <span>ממצאים</span>
+        <span>דיווח</span>
+      </div>
     </a>
   </div>
 </section>
 
 <section>
-  <h2>איך להשתמש בדפים האלה</h2>
-  <ul class="plain">
-    <li><b>מפגש א (זכויות בנייה):</b> התחל כאן. הרץ את האפליקציה, הכנס את הנתונים של התב"ע, וראה את הזכויות בנייה ממופות וחלופות.</li>
-    <li><b>מפגש ב (הצעות וניתוח):</b> קח את הזכויות מא, בנה על בסיסן הצעות משפחתיות, ובדוק איזו משפחה עומדת בקריטריונים.</li>
-    <li><b>סדר בבאלגן:</b> כשעובדת עם כל אחד מהמפגשים וגילית שהנתונים מפוזרים או שיש הרבה חלופות - שימוש בדף הזה כדי לארגן את התהליך.</li>
+  <h2>איך להשתמש בדפים</h2>
+  <ul class="features">
+    <li>
+      <p><b>מפגש א (זכויות בנייה):</b> התחל כאן. הרץ את האפליקציה, הכנס את הנתונים של התב"ע, וראה את הזכויות בנייה ממופות וחלופות.</p>
+    </li>
+    <li>
+      <p><b>מפגש ב (הצעות וניתוח):</b> קח את הזכויות מא, בנה על בסיסן הצעות משפחתיות, ובדוק איזו משפחה עומדת בקריטריונים.</p>
+    </li>
+    <li>
+      <p><b>סדר בבאלגן:</b> כשעובדת עם כל אחד מהמפגשים וגילית שהנתונים מפוזרים או שיש הרבה חלופות - שימוש בדף הזה כדי לארגן את התהליך.</p>
+    </li>
   </ul>
 </section>
 
 <section>
   <h2>מה כל מפגש עוסק בו</h2>
-  <h3>מפגש א: זכויות בנייה</h3>
-  <ul class="plain">
-    <li><b>מיפוי זכויות:</b> קלט את מסמכי התב"ע, הצפה מושכלת של הנתונים, מקור ברור לכל מספר.</li>
-    <li><b>מודל וחלופות:</b> בנייה של מודלים תלת-ממדיים לכל חלופה, שינוי משתנים (גובה קומה, צפיפות, שטחים), טבלאות השוואה.</li>
-    <li><b>בדיקת התאמה:</b> רמזור ירוק/צהוב/אדום על כל קריטריון, ממשק אינטראקטיבי לשינוי הנתונים בזמן אמת.</li>
-  </ul>
 
-  <h3>מפגש ב: הצעות וניתוח (בעבודה)</h3>
-  <ul class="plain">
-    <li><b>משפחות הצעות:</b> בנייה של משפחות הצעות שנשלפו מהזכויות בא, כל משפחה על בסיס סטוריית משתמש שונה.</li>
-    <li><b>ניתוח השפעות:</b> תוכנית פנימית מתופסת בעיניים, חשופות ההשפעות על הסביבה הקרובה, חישובי צפיפות ותפוסה.</li>
-    <li><b>שיתוף עם בעלי עניין:</b> הצעת גרסאות לדוגמה ללקוח, עיר, רשות תכנון - כל גרסה מהודרת לקהל שלה.</li>
-  </ul>
+  <div class="subsection">
+    <h3>מפגש א: זכויות בנייה</h3>
+    <ul class="features">
+      <li>
+        <p><b>מיפוי זכויות:</b> קלט את מסמכי התב"ע, הצפה מושכלת של הנתונים, מקור ברור לכל מספר.</p>
+      </li>
+      <li>
+        <p><b>מודל וחלופות:</b> בנייה של מודלים תלת-ממדיים לכל חלופה, שינוי משתנים (גובה קומה, צפיפות, שטחים), טבלאות השוואה.</p>
+      </li>
+      <li>
+        <p><b>בדיקת התאמה:</b> רמזור ירוק/צהוב/אדום על כל קריטריון, ממשק אינטראקטיבי לשינוי הנתונים בזמן אמת.</p>
+      </li>
+    </ul>
+  </div>
 
-  <h3>סדר בבאלגן: ארגון בעיות מורכבות</h3>
-  <ul class="plain">
-    <li><b>למה הכאוס קורה:</b> שלוש סיבות עיקריות (נתונים מפוזרים, שאלות רבות בבת אחת, אפיון לא ברור) וכיצד לזהות את המשלך.</li>
-    <li><b>פתרת חוט אחד בכל פעם:</b> עקרון עבודה בשלוש רמות: בדיקת נתונים, בחירת שאלה אחת, השגת הסכמה על קריטריונים.</li>
-    <li><b>ניהול חלופות:</b> טבלה ודרך לרישום גרסאות, מה משתנה ומה התוצאה בכל גרסה.</li>
-    <li><b>רישום ממצאים:</b> איך תעדים תוצאות כדי שאחרים יוכלו להבין - תוצאה בשורה אחת, חישוב, ערעור, צילום.</li>
-    <li><b>דיווח תוצאות:</b> שלוש דרכים לדיווח לפי הקהל: לעצמך, להצוות, ללקוח.</li>
-    <li><b>רשימת בדיקה:</b> שש שאלות לפני ההמשך לשלב הבא.</li>
-  </ul>
+  <div class="subsection">
+    <h3>מפגש ב: הצעות וניתוח</h3>
+    <ul class="features">
+      <li>
+        <p><b>משפחות הצעות:</b> בנייה של משפחות הצעות שנשלפו מהזכויות בא, כל משפחה על בסיס סטוריית משתמש שונה.</p>
+      </li>
+      <li>
+        <p><b>ניתוח השפעות:</b> תוכנית פנימית מתופסת בעיניים, חשופות ההשפעות על הסביבה הקרובה, חישובי צפיפות ותפוסה.</p>
+      </li>
+      <li>
+        <p><b>שיתוף עם בעלי עניין:</b> הצעת גרסאות לדוגמה ללקוח, עיר, רשות תכנון - כל גרסה מהודרת לקהל שלה.</p>
+      </li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h3>סדר בבאלגן: ארגון בעיות מורכבות</h3>
+    <ul class="features">
+      <li>
+        <p><b>למה הכאוס קורה:</b> שלוש סיבות עיקריות (נתונים מפוזרים, שאלות רבות בבת אחת, אפיון לא ברור) וכיצד לזהות את המשלך.</p>
+      </li>
+      <li>
+        <p><b>פתרת חוט אחד בכל פעם:</b> עקרון עבודה בשלוש רמות: בדיקת נתונים, בחירת שאלה אחת, השגת הסכמה על קריטריונים.</p>
+      </li>
+      <li>
+        <p><b>ניהול חלופות:</b> טבלה ודרך לרישום גרסאות, מה משתנה ומה התוצאה בכל גרסה.</p>
+      </li>
+      <li>
+        <p><b>רישום ממצאים:</b> איך תעדים תוצאות כדי שאחרים יוכלו להבין - תוצאה בשורה אחת, חישוב, ערעור, צילום.</p>
+      </li>
+      <li>
+        <p><b>דיווח תוצאות:</b> שלוש דרכים לדיווח לפי הקהל: לעצמך, להצוות, ללקוח.</p>
+      </li>
+      <li>
+        <p><b>רשימת בדיקה:</b> שש שאלות לפני ההמשך לשלב הבא.</p>
+      </li>
+    </ul>
+  </div>
 </section>
 
 </main>
 
 <footer>
   <p>דפים אלה נכתבו עבור סטודנטים בקורס. הם משתדרגים עם כל גרסה של Claude Code וכלים נלווים.</p>
+  <p>© 2026 ענת שטרן. <a href="about.html">אודות הקורס</a></p>
 </footer>
 
 </body>
